@@ -1,0 +1,22 @@
+{
+  "name": "@hopcroft/insightlib",
+  "version": "0.0.1",
+  "description": "Hierachical view library",
+  "main": "index.js",
+  "scripts": {
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
+  },
+  "author": "Mike Hopcroft",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "gts": "^3.1.0",
+    "typescript": "^4.0.3"
+  }
+}
