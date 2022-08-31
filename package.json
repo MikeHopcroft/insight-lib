@@ -1,8 +1,15 @@
 {
-  "name": "@hopcroft/insightlib",
+  "name": "@hopcroft/insight-lib",
   "version": "0.0.1",
   "description": "Hierachical view library",
   "main": "index.js",
+  "types": "build/src/index.d.ts",
+  "files": [
+    "build/src"
+  ],
+  "author": "Mike Hopcroft",
+  "license": "MIT",
+  "repository": "https://github.com/MikeHopcroft/insight-lib",
   "scripts": {
     "lint": "gts lint",
     "clean": "gts clean",
@@ -12,11 +19,15 @@
     "pretest": "npm.cmd run compile",
     "posttest": "npm.cmd run lint"
   },
-  "author": "Mike Hopcroft",
-  "license": "MIT",
   "devDependencies": {
+    "@types/csv-parse": "^1.2.2",
     "@types/node": "^14.11.2",
     "gts": "^3.1.0",
     "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "csv-parse": "^5.3.0",
+    "ts-node": "^10.9.1"
   }
 }
