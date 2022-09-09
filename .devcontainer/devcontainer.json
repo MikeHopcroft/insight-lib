@@ -1,0 +1,17 @@
+{
+    "name": "Node Typescript Codespace",
+    "extensions": [
+        "coenraads.bracket-pair-colorizer-2",
+        "github.vscode-pull-request-github",
+        "ms-vscode.vscode-typescript-next",
+        "visualstudioexptteam.vscodeintellicode"
+    ],
+    "dockerFile": "Dockerfile",
+    "settings": {
+        "terminal.integrated.shell.linux": "/usr/bin/zsh",
+        "files.exclude": {
+            "**/CODE_OF_CONDUCT.md": true,
+            "**/LICENSE": true
+        }
+    }
+}
