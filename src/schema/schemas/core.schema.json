@@ -1,0 +1,58 @@
+{
+    "definitions": {
+        "core": {
+            "type": "object",
+            "required": [ "id", "type", "name" ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/type"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                }
+            }
+        },
+        "end_point": {
+            "type": "object",
+            "required": [ "id", "type", "name" ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/type"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+
+    "$defs": {
+        "type": {
+            "enum": [
+                "Account",
+                "Capability",
+                "Customer Pattern",
+                "Customer Scenario",
+                "Impact",
+                "Industry",
+                "Insight",
+                "Macro Trend",
+                "Market Force",
+                "Solution Play",
+                "Work"
+            ]
+        }
+    }
+}

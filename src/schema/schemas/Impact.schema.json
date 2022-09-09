@@ -1,0 +1,9 @@
+{
+    "$id": "https://microsoft.com/is/Impact",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Impact node",
+    "type": "object",
+    "allOf": [
+        {"$ref": "core"}
+    ]
+}

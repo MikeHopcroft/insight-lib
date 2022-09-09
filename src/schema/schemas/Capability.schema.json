@@ -1,0 +1,9 @@
+{
+    "$id": "https://microsoft.com/is/Capability",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Industry node",
+    "type": "object",
+    "allOf": [
+        {"$ref": "core"}
+    ]
+}
