@@ -1,16 +1,14 @@
 import {outgoingInContext} from '../view/expressions';
 import {Renderer} from '../view/hierarchy';
-import { RowDefinition } from '../view/interfaces';
+import {RowDefinition} from '../view/interfaces';
 import {Store} from '../view/node-store';
 import {renderRowsToString} from '../view/row-to-string';
 import {loadTablesAndEdges} from '../sample-data/sample-loader';
 import {
   accountInsightImpactView,
   capabilityFeatureTaskView,
-  featureTaskView,
   impactView,
   insightImpactView,
-  taskView,
 } from '../sample-data/sample-views';
 
 function render(store: Store, view: RowDefinition) {

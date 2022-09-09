@@ -28,11 +28,7 @@ export const tasks: TypedSourceTable<
 export const features: TypedSourceTable<[string]> = {
   id: 'features',
   columns: ['title'],
-  rows: [
-    ['Data driven'],
-    ['Cloud deployment'],
-    ['Interactive graphs'],
-  ],
+  rows: [['Data driven'], ['Cloud deployment'], ['Interactive graphs'],],
 }
 
 export const capabilities: TypedSourceTable<[string, string[]]> = {
