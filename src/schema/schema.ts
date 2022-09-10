@@ -15,6 +15,7 @@ import solutionPlay from './schemas/SolutionPlay.schema.json';
 import marketForce from './schemas/Trend.schema.json';
 import work from './schemas/Work.schema.json';
 import edge from './schemas/Edge.schema.json';
+import log from './schemas/Log.schema.json';
 
 const prefix = 'https://microsoft.com/is/';
 
@@ -34,6 +35,7 @@ ajv.addSchema(regulatoryPattern);
 ajv.addSchema(solutionPlay);
 ajv.addSchema(work);
 ajv.addSchema(edge);
+ajv.addSchema(log);
 
 export function validateJSONObj(json: Object): [boolean, string] {
   if (ajv.validate(schemaForJSONObj(json), json)) {

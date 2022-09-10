@@ -326,6 +326,51 @@ describe('validating system json documents', () => {
       `)
     ).toStrictEqual([true, '']);
   });
+
+  test('valid system Log is valid', () => {
+    expect(
+      validateJSONStr(`
+        {
+          "type": "Log",
+          "id": "0123456789ABCDEF",
+          "tag": {
+            "timestamp": "2022-09-10T11:51:45.832+00:00",
+            "upn": "somename"
+          },
+          "docIds": [
+            "0123456789ABCDEFFEDCBA9876543210",
+            "BCDEF012345676890A"
+          ],
+          "documents": [
+            {
+              "type": "Edge",
+              "id": "0123456789ABCDEFFEDCBA9876543210",
+              "from": {
+                "id": "0123456789ABCDEF",
+                "type": "Industry",
+                "name": "Retail"
+              },
+              "pred": "includes",
+              "to": {
+                "id": "ABCDEF0123456789",
+                "type": "Account",
+                "name": "Tailspin Toys"
+              }
+            },
+            {
+              "type": "Work",
+              "id": "BCDEF012345676890A",
+              "name": "Deliver a Feature",
+              "link": "https://is.visualstudio.com/IS/_workitems/edit/521399",
+              "description": "This is an important feature for many customers.",
+              "due": "FY23 Q3",
+              "status": "At Risk"
+            }
+          ]
+        }
+      `)
+    ).toStrictEqual([true, '']);
+  });
 });
 
 describe('validating invalid json documents', () => {
