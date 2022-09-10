@@ -404,7 +404,7 @@ describe('validating invalid json documents', () => {
       `)
     ).toStrictEqual([
       false,
-      'data/due must match pattern "^((FY|CY)(\\d{2}|\\d{4}) ((H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))|TBD|Unknown)$"',
+      'data/due must match pattern "^((FY|CY)(\\d{4}|\\d{2}))( (H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))?|TBD|Unknown$"',
     ]);
   });
 });

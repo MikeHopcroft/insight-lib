@@ -89,7 +89,7 @@
     "$defs": {
         "bizDate": {
             "type": "string",
-            "pattern": "^((FY|CY)(\\d{2}|\\d{4}) ((H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))|TBD|Unknown)$"
+            "pattern": "^((FY|CY)(\\d{4}|\\d{2}))( (H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))?|TBD|Unknown$"
         },
         "indicator": {
             "type": "string",
