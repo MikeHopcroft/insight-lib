@@ -283,6 +283,7 @@ describe('validating system json documents', () => {
     expect(
       validateJSONStr(`
         {
+          "org": "/is",
           "type": "Insight",
           "id": "56789ABCDEF01234",
           "name": "Networks are hard",
@@ -305,6 +306,7 @@ describe('validating system json documents', () => {
     expect(
       validateJSONStr(`
         {
+          "org": "/is",
           "type": "Edge",
           "id": "0123456789ABCDEFFEDCBA9876543210",
           "from": {
@@ -331,6 +333,7 @@ describe('validating system json documents', () => {
     expect(
       validateJSONStr(`
         {
+          "month": "2022-09/is",
           "type": "Log",
           "id": "0123456789ABCDEF",
           "tag": {

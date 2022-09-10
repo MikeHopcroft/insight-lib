@@ -5,6 +5,9 @@
     "type": "object",
     "required": [ "id", "type", "from", "pred", "to" ],
     "properties": {
+        "org": {
+            "const": "/is"
+        },
         "id": {
             "type": "string"
         },

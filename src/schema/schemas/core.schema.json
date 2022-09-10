@@ -4,6 +4,9 @@
             "type": "object",
             "required": [ "id", "type", "name" ],
             "properties": {
+                "org": {
+                    "const": "/is"
+                },
                 "id": {
                     "type": "string"
                 },

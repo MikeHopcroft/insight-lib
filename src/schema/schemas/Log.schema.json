@@ -3,8 +3,12 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "description": "Industry Solutions graph log record",
     "type": "object",
-    "required": [ "id", "tag"],
+    "required": [ "month", "id", "tag", "docIds", "documents"],
     "properties": {
+        "month": {
+            "type": "string",
+            "pattern": "^([0-9]{4})-(1[0-2]|0[1-9])(/[a-z]+)*$"
+        },
         "id": {
             "type": "string"
         },
