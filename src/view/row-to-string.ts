@@ -18,7 +18,7 @@ const indent = 2;
 
 function computeColumnWidths(level: number, root: RenderRow, widths: number[]) {
   for (const [i, cell] of root.cells.entries()) {
-    const w = String(cell.text).length + (i == 0 ? indent : 0);
+    const w = String(cell.text).length + (i === 0 ? indent : 0);
     if (!widths[i] || w > widths[i]) {
       widths[i] = w;
     }

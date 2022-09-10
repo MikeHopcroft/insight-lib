@@ -39,7 +39,7 @@ function go() {
     'insights=>impacts',
     impactView,
     'accounts=>impacts'
-  ),
+  );
   render(store, accountInsightImpactView);
 
   render(store, capabilityFeatureTaskView);
