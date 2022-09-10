@@ -4,6 +4,8 @@
     "description": "Customer Pattern node",
     "type": "object",
     "allOf": [
-        {"$ref": "core"}
+        {"$ref": "core#/definitions/core"},
+        {"$ref": "core#/definitions/deliverable"},
+        {"$ref": "core#/definitions/requirement"}
     ]
 }

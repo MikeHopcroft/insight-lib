@@ -18,10 +18,27 @@
                 },
                 "link": {
                     "type": "string"
+                },
+                "updated": {
+                    "$ref": "#/$defs/isoDateTime"
                 }
             }
         },
-        "end_point": {
+        "deliverable": {
+            "type": "object",
+            "properties": {
+                "due": {
+                    "$ref": "#/$defs/bizDate"
+                },
+                "status": {
+                    "$ref": "#/$defs/status"
+                },
+                "note": {
+                    "type": "string"
+                }
+            }
+        },
+        "endPoint": {
             "type": "object",
             "required": [ "id", "type", "name" ],
             "properties": {
@@ -35,11 +52,59 @@
                     "type": "string"
                 }
             }
+        },
+        "requirement": {
+            "type": "object",
+            "properties": {
+                "reported": {
+                    "$ref": "#/$defs/bizDate"
+                },
+                "indicator": {
+                    "$ref": "#/$defs/indicator"
+                },
+                "note": {
+                    "type": "string"
+                }
+            }
         }
     },
 
     "$defs": {
+        "bizDate": {
+            "type": "string",
+            "pattern": "^((FY|CY)(\\d{2}|\\d{4}) ((H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))|TBD|Unknown)$"
+        },
+        "indicator": {
+            "type": "string",
+            "enum": [
+                "Acceptable Workaround",
+                "Does Not Meet",
+                "Green",
+                "Meets",
+                "Red",
+                "Yellow"
+            ]
+        },
+        "isoDateTime": {
+            "type": "string",
+            "pattern": "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "Accepted",
+                "At Risk",
+                "Closed",
+                "Committed",
+                "Delivered",
+                "On Track",
+                "Planned",
+                "Rejected",
+                "Submitted"
+            ]
+        },
         "type": {
+            "type": "string",
             "enum": [
                 "Account",
                 "Capability",
@@ -50,6 +115,7 @@
                 "Insight",
                 "Macro Trend",
                 "Market Force",
+                "Regulatory Pattern",
                 "Solution Play",
                 "Work"
             ]
