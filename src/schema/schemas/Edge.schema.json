@@ -19,6 +19,9 @@
         },
         "to": {
             "$ref": "core#/definitions/endPoint"
+        },
+        "tag": {
+            "$ref": "core#/definitions/tag"
         }
     }
 }

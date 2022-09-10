@@ -19,8 +19,8 @@
                 "link": {
                     "type": "string"
                 },
-                "updated": {
-                    "$ref": "#/$defs/isoDateTime"
+                "tag": {
+                    "$ref": "core#/definitions/tag"
                 }
             }
         },
@@ -66,6 +66,17 @@
                     "type": "string"
                 }
             }
+        },
+        "tag": {
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "$ref": "#/$defs/isoDateTime"
+                },
+                "upn": {
+                    "type": "string"
+                }
+            }
         }
     },
 
@@ -78,6 +89,7 @@
             "type": "string",
             "enum": [
                 "Acceptable Workaround",
+                "Blocking",
                 "Does Not Meet",
                 "Green",
                 "Meets",

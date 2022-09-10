@@ -4,7 +4,8 @@
     "description": "insight node",
     "allOf": [
         {"$ref": "core#/definitions/core"},
-        {"$ref": "#/$defs/body"}
+        {"$ref": "#/$defs/body"},
+        {"$ref": "core#/definitions/requirement"}
     ],
 
     "$defs": {

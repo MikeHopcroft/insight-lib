@@ -4,6 +4,7 @@
     "description": "Work node",
     "type": "object",
     "allOf": [
-        {"$ref": "core"}
+        {"$ref": "core"},
+        {"$ref": "core#/definitions/deliverable"}
     ]
 }

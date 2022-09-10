@@ -1,5 +1,5 @@
 {
-    "$id": "https://microsoft.com/is/Impact",
+    "$id": "https://microsoft.com/is/CustomerImpact",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "description": "Impact node",
     "type": "object",
