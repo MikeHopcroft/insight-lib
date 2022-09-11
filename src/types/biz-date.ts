@@ -57,14 +57,14 @@ export class BizDate {
 
   constructor(kind: YearKind, year: number, part: YearPart) {
     this.year = kind;
-    const y = validYear(year);
+    const vYear = validYear(year);
     if (kind === YearKind.CY || kind === YearKind.FY) {
       this.part = part;
       this.calendarMonth = calendarMonthFor(kind, part);
       if (kind === YearKind.CY) {
-        this.calendarYear = y;
+        this.calendarYear = vYear;
       } else {
-        this.calendarYear = fiscalToCalendarYear(y, this.calendarMonth);
+        this.calendarYear = fiscalToCalendarYear(vYear, this.calendarMonth);
       }
     } else {
       this.part = YearPart.None;
