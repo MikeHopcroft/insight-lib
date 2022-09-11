@@ -85,7 +85,7 @@ export class BizDate {
   }
 
   toFiscalYear(): BizDate {
-    if (this.year === YearKind.FY) {
+    if (this.year === YearKind.CY) {
       return new BizDate(
         YearKind.FY,
         calenderToFiscalYear(this.calendarYear, this.calendarMonth),
