@@ -61,6 +61,68 @@ describe('transforming biz date', () => {
     });
   });
 
+  test('FY Half to Month', () => {
+    expect(new BizDate(YearKind.FY, 2023, YearPart.H2).toMonth()).toMatchObject(
+      {
+        year: YearKind.FY,
+        part: YearPart.Jun,
+        calendarYear: 2023,
+        calendarMonth: 6,
+      }
+    );
+  });
+
+  test('FY Month to Quarter', () => {
+    expect(
+      new BizDate(YearKind.FY, 2023, YearPart.Oct).toQuarter()
+    ).toMatchObject({
+      year: YearKind.FY,
+      part: YearPart.Q2,
+      calendarYear: 2022,
+      calendarMonth: 12,
+    });
+  });
+
+  test('CY Quarter to Half', () => {
+    expect(new BizDate(YearKind.CY, 2022, YearPart.Q2).toHalf()).toMatchObject({
+      year: YearKind.CY,
+      part: YearPart.H1,
+      calendarYear: 2022,
+      calendarMonth: 6,
+    });
+  });
+
+  test('FY Month to Year', () => {
+    expect(new BizDate(YearKind.FY, 2023, YearPart.Q2).toYear()).toMatchObject({
+      year: YearKind.FY,
+      part: YearPart.Year,
+      calendarYear: 2023,
+      calendarMonth: 6,
+    });
+  });
+
+  test('CY to string', () => {
+    expect(new BizDate(YearKind.CY, 2022, YearPart.Sep).toString()).toBe(
+      'CY2022 Sep'
+    );
+  });
+
+  test('FY to string', () => {
+    expect(new BizDate(YearKind.FY, 2023, YearPart.Q2).toString()).toBe(
+      'FY2023 Q2'
+    );
+  });
+
+  test('TBD to string', () => {
+    expect(new BizDate(YearKind.TBD, 2023, YearPart.Q2).toString()).toBe('TBD');
+  });
+
+  test('Unknown to string', () => {
+    expect(new BizDate(YearKind.Unknown, 0, YearPart.None).toString()).toBe(
+      'Unknown'
+    );
+  });
+
   test('Unknown to FY', () => {
     expect(
       new BizDate(YearKind.Unknown, 3.1415, YearPart.Q4).toFiscalYear()
