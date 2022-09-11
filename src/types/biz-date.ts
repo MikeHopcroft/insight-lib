@@ -57,13 +57,14 @@ export class BizDate {
 
   constructor(kind: YearKind, year: number, part: YearPart) {
     this.year = kind;
+    const y = validYear(year);
     if (kind === YearKind.CY || kind === YearKind.FY) {
       this.part = part;
       this.calendarMonth = calendarMonthFor(kind, part);
       if (kind === YearKind.CY) {
-        this.calendarYear = year;
+        this.calendarYear = y;
       } else {
-        this.calendarYear = fiscalToCalendarYear(year, this.calendarMonth);
+        this.calendarYear = fiscalToCalendarYear(y, this.calendarMonth);
       }
     } else {
       this.part = YearPart.None;
@@ -84,6 +85,10 @@ export class BizDate {
     }
   }
 
+  toCYStr(): string {
+    return '';
+  }
+
   toFiscalYear(): BizDate {
     if (this.year === YearKind.CY) {
       return new BizDate(
@@ -96,10 +101,6 @@ export class BizDate {
     }
   }
 
-  toCYStr(): string {
-    return '';
-  }
-
   toFYStr(): string {
     return '';
   }
@@ -107,6 +108,14 @@ export class BizDate {
 
 export function parseBizDate(str: string): BizDate {
   return thisMonth();
+}
+
+export function thisHalf(yearKind = YearKind.CY): BizDate {
+  return thisMonth(yearKind);
+}
+
+export function thisQuarter(yearKind = YearKind.CY): BizDate {
+  return thisMonth(yearKind);
 }
 
 export function thisMonth(yearKind = YearKind.CY): BizDate {
@@ -121,30 +130,6 @@ export function thisMonth(yearKind = YearKind.CY): BizDate {
       calenderToFiscalYear(yearNow, monthNow),
       yearPartFor(monthNow)
     );
-  }
-}
-
-export function thisQuarter(yearKind = YearKind.CY): BizDate {
-  return thisMonth(yearKind);
-}
-
-export function thisHalf(yearKind = YearKind.CY): BizDate {
-  return thisMonth(yearKind);
-}
-
-function calenderToFiscalYear(year: number, month: number): number {
-  if (month > 6) {
-    return year + 1;
-  } else {
-    return year;
-  }
-}
-
-function fiscalToCalendarYear(year: number, month: number): number {
-  if (month > 6) {
-    return year - 1;
-  } else {
-    return year;
   }
 }
 
@@ -189,6 +174,22 @@ function calendarMonthFor(kind: YearKind, part: YearPart): number {
   }
 }
 
+function calenderToFiscalYear(year: number, month: number): number {
+  if (month > 6) {
+    return year + 1;
+  } else {
+    return year;
+  }
+}
+
+function fiscalToCalendarYear(year: number, month: number): number {
+  if (month > 6) {
+    return year - 1;
+  } else {
+    return year;
+  }
+}
+
 function reverseYearPart(part: YearPart): number {
   switch (part) {
     case YearPart.H1:
@@ -208,9 +209,18 @@ function reverseYearPart(part: YearPart): number {
   }
 }
 
+function validYear(year: number): number {
+  let y = Math.floor(year);
+  y = y < 0 ? -y : y;
+  y = y > 9999 ? 9999 : y;
+  return y;
+}
+
 function yearPartFor(month: number): YearPart {
   return Months[month];
 }
+
+// ========== Parser ==========
 
 enum TokenKind {
   YearSpec,
