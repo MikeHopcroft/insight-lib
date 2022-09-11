@@ -168,6 +168,15 @@ describe('parsing biz dates', () => {
     });
   });
 
+  test('parse shorter FY', () => {
+    expect(parseBizDate('FY24')).toMatchObject({
+      year: YearKind.FY,
+      part: YearPart.Year,
+      calendarYear: 2024,
+      calendarMonth: 6,
+    });
+  });
+
   test('parse TBD', () => {
     expect(parseBizDate('TBD')).toMatchObject({
       year: YearKind.TBD,
@@ -184,5 +193,64 @@ describe('parsing biz dates', () => {
       calendarYear: 9999,
       calendarMonth: 12,
     });
+  });
+
+  test('loose parse', () => {
+    expect(parseBizDate(' CY 23  H 2 ')).toMatchObject({
+      year: YearKind.CY,
+      part: YearPart.H2,
+      calendarYear: 2023,
+      calendarMonth: 12,
+    });
+  });
+});
+
+const noYearKind = () => {
+  parseBizDate('2022 Sep');
+};
+
+const noYear = () => {
+  parseBizDate('CY H1');
+};
+
+const badPart = () => {
+  parseBizDate('FY2023 U76');
+};
+
+const badHalf = () => {
+  parseBizDate('CY2022 H4');
+};
+
+const yearTooLong = () => {
+  parseBizDate('CY20245 H1');
+};
+
+const tooManyParts = () => {
+  parseBizDate('FY2023 H1 Q3');
+};
+
+describe('parsing errors', () => {
+  test('no year kind', () => {
+    expect(noYearKind).toThrowError();
+  });
+
+  test('no year', () => {
+    expect(noYear).toThrowError();
+  });
+
+  test('bad part', () => {
+    expect(badPart).toThrowError();
+  });
+
+  test('bad half', () => {
+    expect(badHalf).toThrowError();
+  });
+
+  test('year too long', () => {
+    expect(yearTooLong).toThrowError();
+  });
+
+  test('too many parts', () => {
+    expect(tooManyParts).toThrowError();
   });
 });

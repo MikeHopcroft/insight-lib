@@ -4,6 +4,7 @@ import {
   buildLexer,
   expectEOF,
   expectSingleResult,
+  opt,
   rule,
   seq,
   tok,
@@ -359,32 +360,42 @@ function applyCY(
   value: [Token<TokenKind.CY>, Token<TokenKind.Number>]
 ): [YearKind, number] {
   let year = +value[1].text;
-  year = year < 0 ? -year : year;
+  if (year < 1) {
+    throw new Error(`Years must be whole numbers: ${year}`);
+  }
+  if (year > 9999) {
+    throw new Error(`Years must be less than 10,000: ${year}`);
+  }
   year = year < 100 ? 2000 + year : year;
-  year = year > 9999 ? 9999 : year;
   return [YearKind.CY, year];
 }
 
-function applyDate(value: [[YearKind, number], YearPart]): BizDate {
-  return new BizDate(value[0][0], value[0][1], value[1]);
+function applyDate(value: [[YearKind, number], YearPart | undefined]): BizDate {
+  const part = value[1] === undefined ? YearPart.Year : value[1];
+  return new BizDate(value[0][0], value[0][1], part);
 }
 
 function applyFY(
   value: [Token<TokenKind.FY>, Token<TokenKind.Number>]
 ): [YearKind, number] {
   let year = +value[1].text;
-  year = year < 0 ? -year : year;
+  if (year < 1) {
+    throw new Error(`Years must be whole numbers: ${year}`);
+  }
+  if (year > 9999) {
+    throw new Error(`Years must be less than 10,000: ${year}`);
+  }
   year = year < 100 ? 2000 + year : year;
-  year = year > 9999 ? 9999 : year;
   return [YearKind.FY, year];
 }
 
 function applyHalf(
   value: [Token<TokenKind.Half>, Token<TokenKind.Number>]
 ): YearPart {
-  let n = +value[1].text;
-  n = n > 2 ? 2 : n;
-  n = n < 1 ? 1 : n;
+  const n = +value[1].text;
+  if (n < 1 || n > 2) {
+    throw new Error(`There are two halves in a year: ${n}`);
+  }
   return n; // YearPart[1..2]
 }
 
@@ -395,9 +406,10 @@ function applyMonth(value: Token<any>): YearPart {
 function applyQuarter(
   value: [Token<TokenKind.Quarter>, Token<TokenKind.Number>]
 ): YearPart {
-  let n = +value[1].text;
-  n = n > 4 ? 4 : n;
-  n = n < 1 ? 1 : n;
+  const n = +value[1].text;
+  if (n < 1 || n > 4) {
+    throw new Error(`There are four quarters in a year: ${n}`);
+  }
   return n + 2; // YearPart[3..6]
 }
 
@@ -440,7 +452,7 @@ DATE
 */
 DATE.setPattern(
   alt(
-    apply(seq(YEAR, PART), applyDate),
+    apply(seq(YEAR, opt(PART)), applyDate),
     apply(tok(TokenKind.TBD), applyTBD),
     apply(tok(TokenKind.Unknown), applyUnknown)
   )
