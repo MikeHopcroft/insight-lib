@@ -1,4 +1,14 @@
-import {buildLexer} from 'typescript-parsec';
+import {
+  alt,
+  apply,
+  buildLexer,
+  expectEOF,
+  expectSingleResult,
+  rule,
+  seq,
+  tok,
+  Token,
+} from 'typescript-parsec';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const regex =
@@ -218,7 +228,7 @@ export class BizDate {
 }
 
 export function parseBizDate(str: string): BizDate {
-  return thisMonth();
+  return parse(str);
 }
 
 export function thisHalf(yearKind = YearKind.CY): BizDate {
@@ -319,27 +329,160 @@ function yearPartFor(year: YearKind, month: number, res: Resolution): YearPart {
 // ========== Parser ==========
 
 enum TokenKind {
-  YearSpec,
-  YearNumber,
-  YearPart,
-  Month,
+  CY,
+  FY,
+  Half,
   Number,
+  Quarter,
   TBD,
   Unknown,
+  Jan,
+  Feb,
+  Mar,
+  Apr,
+  May,
+  Jun,
+  Jul,
+  Aug,
+  Sep,
+  Oct,
+  Nov,
+  Dec,
   Space,
 }
 
+const DATE = rule<TokenKind, BizDate>();
+const YEAR = rule<TokenKind, [YearKind, number]>();
+const PART = rule<TokenKind, YearPart>();
+
+function applyCY(
+  value: [Token<TokenKind.CY>, Token<TokenKind.Number>]
+): [YearKind, number] {
+  let year = +value[1].text;
+  year = year < 0 ? -year : year;
+  year = year < 100 ? 2000 + year : year;
+  year = year > 9999 ? 9999 : year;
+  return [YearKind.CY, year];
+}
+
+function applyDate(value: [[YearKind, number], YearPart]): BizDate {
+  return new BizDate(value[0][0], value[0][1], value[1]);
+}
+
+function applyFY(
+  value: [Token<TokenKind.FY>, Token<TokenKind.Number>]
+): [YearKind, number] {
+  let year = +value[1].text;
+  year = year < 0 ? -year : year;
+  year = year < 100 ? 2000 + year : year;
+  year = year > 9999 ? 9999 : year;
+  return [YearKind.FY, year];
+}
+
+function applyHalf(
+  value: [Token<TokenKind.Half>, Token<TokenKind.Number>]
+): YearPart {
+  let n = +value[1].text;
+  n = n > 2 ? 2 : n;
+  n = n < 1 ? 1 : n;
+  return n; // YearPart[1..2]
+}
+
+function applyMonth(value: Token<any>): YearPart {
+  return value.kind; // YearPart[7..18]
+}
+
+function applyQuarter(
+  value: [Token<TokenKind.Quarter>, Token<TokenKind.Number>]
+): YearPart {
+  let n = +value[1].text;
+  n = n > 4 ? 4 : n;
+  n = n < 1 ? 1 : n;
+  return n + 2; // YearPart[3..6]
+}
+
+function applyTBD(): BizDate {
+  return new BizDate(YearKind.TBD, 9999, YearPart.None);
+}
+
+function applyUnknown(): BizDate {
+  return new BizDate(YearKind.Unknown, 9999, YearPart.None);
+}
+
 const lexer = buildLexer([
-  [true, /^(FY)|(CY)/g, TokenKind.YearSpec],
-  [true, /^\d{4}|\d{2}/g, TokenKind.YearNumber],
-  [true, /^H|Q/g, TokenKind.YearPart],
-  [true, /^\d/g, TokenKind.Number],
-  [
-    true,
-    /^(Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)/g,
-    TokenKind.Month,
-  ],
+  [true, /^CY/g, TokenKind.CY],
+  [true, /^FY/g, TokenKind.FY],
+  [true, /^\d{1,4}/g, TokenKind.Number],
+  [true, /^H/g, TokenKind.Half],
+  [true, /^Q/g, TokenKind.Quarter],
   [true, /^TBD/g, TokenKind.TBD],
   [true, /^Unknown/g, TokenKind.Unknown],
+  [true, /^Jan/g, TokenKind.Jan],
+  [true, /^Feb/g, TokenKind.Feb],
+  [true, /^Mar/g, TokenKind.Mar],
+  [true, /^Apr/g, TokenKind.Apr],
+  [true, /^May/g, TokenKind.May],
+  [true, /^Jun/g, TokenKind.Jun],
+  [true, /^Jul/g, TokenKind.Jul],
+  [true, /^Aug/g, TokenKind.Aug],
+  [true, /^Sep/g, TokenKind.Sep],
+  [true, /^Oct/g, TokenKind.Oct],
+  [true, /^Nov/g, TokenKind.Nov],
+  [true, /^Dec/g, TokenKind.Dec],
   [false, /^\s/g, TokenKind.Space],
 ]);
+
+/*
+DATE
+  = YEAR PART
+  = 'TBD'
+  = 'UNKOWN'
+*/
+DATE.setPattern(
+  alt(
+    apply(seq(YEAR, PART), applyDate),
+    apply(tok(TokenKind.TBD), applyTBD),
+    apply(tok(TokenKind.Unknown), applyUnknown)
+  )
+);
+
+/*
+YEAR
+  = CY(\d{4}|\d{2})
+  = FY(\d{4}|\d{2})
+*/
+YEAR.setPattern(
+  alt(
+    apply(seq(tok(TokenKind.CY), tok(TokenKind.Number)), applyCY),
+    apply(seq(tok(TokenKind.FY), tok(TokenKind.Number)), applyFY)
+  )
+);
+
+/*
+PART
+  = [Month]
+  = Half HalfNumber
+  = Quarter QuarterNumber
+*/
+PART.setPattern(
+  alt(
+    apply(tok(TokenKind.Jan), applyMonth),
+    apply(tok(TokenKind.Feb), applyMonth),
+    apply(tok(TokenKind.Mar), applyMonth),
+    apply(tok(TokenKind.Apr), applyMonth),
+    apply(tok(TokenKind.May), applyMonth),
+    apply(tok(TokenKind.Jun), applyMonth),
+    apply(tok(TokenKind.Jul), applyMonth),
+    apply(tok(TokenKind.Aug), applyMonth),
+    apply(tok(TokenKind.Sep), applyMonth),
+    apply(tok(TokenKind.Oct), applyMonth),
+    apply(tok(TokenKind.Nov), applyMonth),
+    apply(tok(TokenKind.Dec), applyMonth),
+    apply(seq(tok(TokenKind.Half), tok(TokenKind.Number)), applyHalf),
+    apply(seq(tok(TokenKind.Quarter), tok(TokenKind.Number)), applyQuarter)
+  )
+);
+
+function parse(expr: string): BizDate {
+  return expectSingleResult(expectEOF(DATE.parse(lexer.parse(expr))));
+}

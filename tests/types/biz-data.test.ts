@@ -1,4 +1,9 @@
-import {BizDate, YearKind, YearPart} from '../../src/types/biz-date';
+import {
+  BizDate,
+  parseBizDate,
+  YearKind,
+  YearPart,
+} from '../../src/types/biz-date';
 
 describe('constructing biz date', () => {
   test('with normal FY', () => {
@@ -127,6 +132,53 @@ describe('transforming biz date', () => {
     expect(
       new BizDate(YearKind.Unknown, 3.1415, YearPart.Q4).toFiscalYear()
     ).toMatchObject({
+      year: YearKind.Unknown,
+      part: YearPart.None,
+      calendarYear: 9999,
+      calendarMonth: 12,
+    });
+  });
+});
+
+describe('parsing biz dates', () => {
+  test('parse CY', () => {
+    expect(parseBizDate('CY2023 May')).toMatchObject({
+      year: YearKind.CY,
+      part: YearPart.May,
+      calendarYear: 2023,
+      calendarMonth: 5,
+    });
+  });
+
+  test('parse FY', () => {
+    expect(parseBizDate('FY2023 Q1')).toMatchObject({
+      year: YearKind.FY,
+      part: YearPart.Q1,
+      calendarYear: 2022,
+      calendarMonth: 9,
+    });
+  });
+
+  test('parse short FY', () => {
+    expect(parseBizDate('FY24 Q3')).toMatchObject({
+      year: YearKind.FY,
+      part: YearPart.Q3,
+      calendarYear: 2024,
+      calendarMonth: 3,
+    });
+  });
+
+  test('parse TBD', () => {
+    expect(parseBizDate('TBD')).toMatchObject({
+      year: YearKind.TBD,
+      part: YearPart.None,
+      calendarYear: 9999,
+      calendarMonth: 12,
+    });
+  });
+
+  test('parse Unknown', () => {
+    expect(parseBizDate('Unknown')).toMatchObject({
       year: YearKind.Unknown,
       part: YearPart.None,
       calendarYear: 9999,
