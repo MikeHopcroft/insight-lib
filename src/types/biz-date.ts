@@ -232,7 +232,7 @@ export function thisQuarter(yearKind = YearKind.CY): BizDate {
 export function thisMonth(yearKind = YearKind.CY): BizDate {
   const dateNow = new Date();
   const yearNow = dateNow.getUTCFullYear();
-  const monthNow = dateNow.getUTCMonth();
+  const monthNow = dateNow.getUTCMonth() + 1;
   if (yearKind === YearKind.CY) {
     return new BizDate(
       YearKind.CY,
