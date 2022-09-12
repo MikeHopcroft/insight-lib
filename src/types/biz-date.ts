@@ -222,7 +222,9 @@ export class BizDate {
 
     // semi-opaque comparison value, for ease of sorting
     this.comp =
-      (this.calendarYear * 100 + this.calendarMonth) * 4 + stableComp(part);
+      ((this.calendarYear * 16 + this.calendarMonth) * 4 + stableComp(part)) *
+        4 +
+      kind;
   }
 
   /**
@@ -399,6 +401,36 @@ export class BizDate {
 }
 
 /**
+ * Provided for debugging and symmetry
+ */
+export function fromComparable(comp: number): BizDate {
+  const kind = comp % 4;
+  let acc = Math.floor(comp / 4);
+  const res = acc % 4;
+  acc = Math.floor(acc / 4);
+  const month = acc % 16;
+  const year = Math.floor(acc / 16);
+  return new BizDate(
+    kind,
+    calendarTo(kind, year, month),
+    yearPartFor(kind, month, reverseStableComp(res))
+  );
+}
+
+/**
+ * @returns a CY BizDate corresponding to `date`
+ */
+export function fromDate(date: Date): BizDate {
+  const yearNow = date.getUTCFullYear();
+  const monthNow = date.getUTCMonth() + 1;
+  return new BizDate(
+    YearKind.CY,
+    yearNow,
+    yearPartFor(YearKind.CY, monthNow, Resolution.Month)
+  );
+}
+
+/**
  * Parses a string in the form 'FY2023 Q1' or 'CY22 Sep'
  *
  * @param str the string to parse
@@ -444,21 +476,16 @@ export function thisQuarter(yearKind = YearKind.CY): BizDate {
  * @returns a BizDate representing the current month
  */
 export function thisMonth(yearKind = YearKind.CY): BizDate {
-  if (yearKind === YearKind.TBD) {
-    return tbd();
+  switch (yearKind) {
+    case YearKind.TBD:
+      return tbd();
+    case YearKind.CY:
+      return fromDate(new Date());
+    case YearKind.FY:
+      return fromDate(new Date()).toFiscalYear();
+    default:
+      return unknown();
   }
-  if (yearKind === YearKind.Unknown) {
-    return unknown();
-  }
-
-  const dateNow = new Date();
-  const yearNow = dateNow.getUTCFullYear();
-  const monthNow = dateNow.getUTCMonth() + 1;
-  return new BizDate(
-    yearKind,
-    calendarTo(yearKind, yearNow, monthNow),
-    yearPartFor(yearKind, monthNow, Resolution.Month)
-  );
 }
 
 /**
@@ -578,6 +605,7 @@ function reverseYearPart(part: YearPart): number {
  */
 function stableComp(part: YearPart): number {
   switch (part) {
+    case YearPart.None:
     case YearPart.Year:
       return 0;
     case YearPart.H1:
@@ -590,6 +618,22 @@ function stableComp(part: YearPart): number {
       return 2;
     default:
       return 3;
+  }
+}
+
+/**
+ * inverse of `stableComp`
+ */
+function reverseStableComp(r: number): Resolution {
+  switch (r) {
+    case 0:
+      return Resolution.Year;
+    case 1:
+      return Resolution.Half;
+    case 2:
+      return Resolution.Quarter;
+    default:
+      return Resolution.Month;
   }
 }
 

@@ -6,6 +6,7 @@ import {
   YearKind,
   YearPart,
   unknown,
+  fromComparable,
 } from '../../src/types/biz-date';
 
 function bdObj(k: YearKind, p: YearPart, y: number, m: number): object {
@@ -130,7 +131,19 @@ describe('comparing biz dates', () => {
 
   test('comparable', () => {
     expect(new BizDate(YearKind.CY, 2022, YearPart.Aug).comparable()).toBe(
-      808835
+      517772
+    );
+  });
+
+  test('comparable round trip', () => {
+    expect(
+      fromComparable(new BizDate(YearKind.FY, 2024, YearPart.H1).comparable())
+    ).toMatchObject(bdObj(YearKind.FY, YearPart.H1, 2023, 12));
+  });
+
+  test('from comparable', () => {
+    expect(fromComparable(517736)).toMatchObject(
+      bdObj(YearKind.CY, YearPart.Q2, 2022, 6)
     );
   });
 
