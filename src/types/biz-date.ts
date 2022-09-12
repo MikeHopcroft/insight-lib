@@ -100,11 +100,14 @@ const partStr = [
 
 /**
  * enum used to specify transformations in private methods
+ *
+ * The enum order must remain stable. It is used in lookup tables and
+ * parsing. New enum values should be added to the end.
  */
 enum Resolution {
-  Half,
   Month,
   Quarter,
+  Half,
   Year,
 }
 
@@ -116,52 +119,52 @@ enum Resolution {
  */
 const PartsTable = [
   [
-    [YearPart.H1, YearPart.Jan, YearPart.Q1, YearPart.Year],
-    [YearPart.H2, YearPart.Jan, YearPart.Q3, YearPart.Year],
+    [YearPart.Jan, YearPart.Q1, YearPart.H1, YearPart.Year],
+    [YearPart.Jan, YearPart.Q3, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H1, YearPart.Feb, YearPart.Q1, YearPart.Year],
-    [YearPart.H2, YearPart.Feb, YearPart.Q3, YearPart.Year],
+    [YearPart.Feb, YearPart.Q1, YearPart.H1, YearPart.Year],
+    [YearPart.Feb, YearPart.Q3, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H1, YearPart.Mar, YearPart.Q1, YearPart.Year],
-    [YearPart.H2, YearPart.Mar, YearPart.Q3, YearPart.Year],
+    [YearPart.Mar, YearPart.Q1, YearPart.H1, YearPart.Year],
+    [YearPart.Mar, YearPart.Q3, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H1, YearPart.Apr, YearPart.Q2, YearPart.Year],
-    [YearPart.H2, YearPart.Apr, YearPart.Q4, YearPart.Year],
+    [YearPart.Apr, YearPart.Q2, YearPart.H1, YearPart.Year],
+    [YearPart.Apr, YearPart.Q4, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H1, YearPart.May, YearPart.Q2, YearPart.Year],
-    [YearPart.H2, YearPart.May, YearPart.Q4, YearPart.Year],
+    [YearPart.May, YearPart.Q2, YearPart.H1, YearPart.Year],
+    [YearPart.May, YearPart.Q4, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H1, YearPart.Jun, YearPart.Q2, YearPart.Year],
-    [YearPart.H2, YearPart.Jun, YearPart.Q4, YearPart.Year],
+    [YearPart.Jun, YearPart.Q2, YearPart.H1, YearPart.Year],
+    [YearPart.Jun, YearPart.Q4, YearPart.H2, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Jul, YearPart.Q3, YearPart.Year],
-    [YearPart.H1, YearPart.Jul, YearPart.Q1, YearPart.Year],
+    [YearPart.Jul, YearPart.Q3, YearPart.H2, YearPart.Year],
+    [YearPart.Jul, YearPart.Q1, YearPart.H1, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Aug, YearPart.Q3, YearPart.Year],
-    [YearPart.H1, YearPart.Aug, YearPart.Q1, YearPart.Year],
+    [YearPart.Aug, YearPart.Q3, YearPart.H2, YearPart.Year],
+    [YearPart.Aug, YearPart.Q1, YearPart.H1, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Sep, YearPart.Q3, YearPart.Year],
-    [YearPart.H1, YearPart.Sep, YearPart.Q1, YearPart.Year],
+    [YearPart.Sep, YearPart.Q3, YearPart.H2, YearPart.Year],
+    [YearPart.Sep, YearPart.Q1, YearPart.H1, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Oct, YearPart.Q4, YearPart.Year],
-    [YearPart.H1, YearPart.Oct, YearPart.Q2, YearPart.Year],
+    [YearPart.Oct, YearPart.Q4, YearPart.H2, YearPart.Year],
+    [YearPart.Oct, YearPart.Q2, YearPart.H1, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Nov, YearPart.Q4, YearPart.Year],
-    [YearPart.H1, YearPart.Nov, YearPart.Q2, YearPart.Year],
+    [YearPart.Nov, YearPart.Q4, YearPart.H2, YearPart.Year],
+    [YearPart.Nov, YearPart.Q2, YearPart.H1, YearPart.Year],
   ],
   [
-    [YearPart.H2, YearPart.Dec, YearPart.Q4, YearPart.Year],
-    [YearPart.H1, YearPart.Dec, YearPart.Q2, YearPart.Year],
+    [YearPart.Dec, YearPart.Q4, YearPart.H2, YearPart.Year],
+    [YearPart.Dec, YearPart.Q2, YearPart.H1, YearPart.Year],
   ],
 ];
 
@@ -185,6 +188,8 @@ export class BizDate {
   // comparison.
   private calendarYear: number;
   private calendarMonth: number;
+
+  // Help value for sorting
   private comp: number;
 
   /**
@@ -199,30 +204,35 @@ export class BizDate {
    * @throws Error, if `year` < 1 or `year` > 9999
    */
   constructor(
-    kind: YearKind,
+    kind: YearKind = YearKind.CY,
     year: number = new Date().getUTCFullYear(),
     part: YearPart = YearPart.Year
   ) {
     this.year = kind;
-    const vYear = validateYear(year);
-    if (kind === YearKind.CY || kind === YearKind.FY) {
-      this.part = part;
-      this.calendarMonth = calendarMonthFor(kind, part);
-      if (kind === YearKind.CY) {
-        this.calendarYear = vYear;
-      } else {
-        this.calendarYear = fiscalToCalendarYear(vYear, this.calendarMonth);
-      }
-    } else {
-      // TBD || Unknown
-      this.part = YearPart.None;
-      this.calendarYear = 9999;
-      this.calendarMonth = 12;
+    this.part = part;
+    this.calendarYear = validateYear(year);
+    this.calendarMonth = calendarMonthFor(kind, part);
+    switch (kind) {
+      case YearKind.CY:
+        break;
+      case YearKind.FY:
+        this.calendarYear = fiscalTo(
+          YearKind.CY,
+          this.calendarYear,
+          this.calendarMonth
+        );
+        break;
+      case YearKind.TBD:
+        this.spoil(YearKind.TBD);
+        break;
+      default:
+        this.spoil(YearKind.Unknown);
     }
 
     // semi-opaque comparison value, for ease of sorting
     this.comp =
-      ((this.calendarYear * 16 + this.calendarMonth) * 4 + stableComp(part)) *
+      ((this.calendarYear * 16 + this.calendarMonth) * 4 +
+        stableComp(this.part)) *
         4 +
       kind;
   }
@@ -263,6 +273,41 @@ export class BizDate {
       return true;
     }
     return false;
+  }
+
+  /**
+   * @returns the calendar year associated with this BizDate
+   */
+  getCalendarYear(): number {
+    return this.calendarYear;
+  }
+
+  /**
+   * @returns the calendar month associated with this BizDate, in [1..12]
+   */
+  getCalendarMonth(): number {
+    return this.calendarMonth;
+  }
+
+  /**
+   * @returns the fiscal year associated with this BizDate
+   */
+  getFiscalYear(): number {
+    return calendarTo(YearKind.FY, this.calendarYear, this.calendarMonth);
+  }
+
+  /**
+   * @returns the `YearKind` associated with this BizDate
+   */
+  getKind(): YearKind {
+    return this.year;
+  }
+
+  /**
+   * @returns the `YearPart` associated with this BizDate
+   */
+  getPart(): YearPart {
+    return this.part;
   }
 
   /**
@@ -311,7 +356,7 @@ export class BizDate {
     if (this.year === YearKind.CY) {
       return new BizDate(
         YearKind.FY,
-        calenderToFiscalYear(this.calendarYear, this.calendarMonth),
+        calendarTo(YearKind.FY, this.calendarYear, this.calendarMonth),
         reverseYearPart(this.part)
       );
     } else {
@@ -331,28 +376,6 @@ export class BizDate {
    */
   toMonth(): BizDate {
     return this.toResolution(Resolution.Month);
-  }
-
-  /**
-   * Maps this BizDate to a specific YearPart resolution
-   *
-   * `toResolution` and the methods that depend on it are lossy in that the
-   * resulting BizDates have calendar months mapped to the new resolution,
-   * always in the final month of the specified year part.
-   *
-   * @param resolution year, half, quarter, or month
-   * @returns this BizDate mapped to a specific year part
-   */
-  private toResolution(resolution: Resolution): BizDate {
-    if (this.year === YearKind.CY || this.year === YearKind.FY) {
-      return new BizDate(
-        this.year,
-        calendarTo(this.year, this.calendarYear, this.calendarMonth),
-        yearPartFor(this.year, this.calendarMonth, resolution)
-      );
-    } else {
-      return this;
-    }
   }
 
   /**
@@ -377,12 +400,14 @@ export class BizDate {
         }
       case YearKind.FY:
         if (this.part === YearPart.Year || this.part === YearPart.None) {
-          return `FY${calenderToFiscalYear(
+          return `FY${calendarTo(
+            YearKind.FY,
             this.calendarYear,
             this.calendarMonth
           )}`;
         } else {
-          return `FY${calenderToFiscalYear(
+          return `FY${calendarTo(
+            YearKind.FY,
             this.calendarYear,
             this.calendarMonth
           )} ${partStr[this.part]}`;
@@ -397,6 +422,40 @@ export class BizDate {
    */
   toYear(): BizDate {
     return this.toResolution(Resolution.Year);
+  }
+
+  /**
+   * Maps this BizDate to a specific YearPart resolution
+   *
+   * `toResolution` and the methods that depend on it are lossy in that the
+   * resulting BizDates have calendar months mapped to the new resolution,
+   * always in the final month of the specified year part.
+   *
+   * @param resolution year, half, quarter, or month
+   * @returns this BizDate mapped to a specific year part
+   */
+  private toResolution(resolution: Resolution): BizDate {
+    if (this.year === YearKind.CY || this.year === YearKind.FY) {
+      return new BizDate(
+        this.year,
+        calendarTo(this.year, this.calendarYear, this.calendarMonth),
+        yearPartFor(this.year, this.calendarMonth, resolution)
+      );
+    } else {
+      return this;
+    }
+  }
+
+  private spoil(kind: YearKind = YearKind.Unknown) {
+    if (kind === YearKind.TBD) {
+      this.year = kind;
+      this.calendarMonth = 11;
+    } else {
+      this.year = YearKind.Unknown;
+      this.calendarMonth = 12;
+    }
+    this.part = YearPart.None;
+    this.calendarYear = 9999;
   }
 }
 
@@ -413,7 +472,7 @@ export function fromComparable(comp: number): BizDate {
   return new BizDate(
     kind,
     calendarTo(kind, year, month),
-    yearPartFor(kind, month, reverseStableComp(res))
+    yearPartFor(kind, month, res)
   );
 }
 
@@ -421,12 +480,10 @@ export function fromComparable(comp: number): BizDate {
  * @returns a CY BizDate corresponding to `date`
  */
 export function fromDate(date: Date): BizDate {
-  const yearNow = date.getUTCFullYear();
-  const monthNow = date.getUTCMonth() + 1;
   return new BizDate(
     YearKind.CY,
-    yearNow,
-    yearPartFor(YearKind.CY, monthNow, Resolution.Month)
+    date.getUTCFullYear(),
+    yearPartFor(YearKind.CY, date.getUTCMonth() + 1, Resolution.Month)
   );
 }
 
@@ -477,12 +534,12 @@ export function thisQuarter(yearKind = YearKind.CY): BizDate {
  */
 export function thisMonth(yearKind = YearKind.CY): BizDate {
   switch (yearKind) {
-    case YearKind.TBD:
-      return tbd();
     case YearKind.CY:
       return fromDate(new Date());
     case YearKind.FY:
       return fromDate(new Date()).toFiscalYear();
+    case YearKind.TBD:
+      return tbd();
     default:
       return unknown();
   }
@@ -531,37 +588,31 @@ function calendarMonthFor(kind: YearKind, part: YearPart): number {
  */
 function calendarTo(kind: YearKind, year: number, month: number): number {
   if (kind === YearKind.FY) {
-    return calenderToFiscalYear(year, month);
+    if (month > 6) {
+      return year + 1;
+    } else {
+      return year;
+    }
   } else {
     return year;
   }
 }
 
 /**
- * Converts the year from calendar to fiscal
+ * Converts the year from fiscal to calendar or fiscal
  *
- * @param year the calendar year to convert
- * @param month the month of the year
- * @returns the fiscal year
- */
-function calenderToFiscalYear(year: number, month: number): number {
-  if (month > 6) {
-    return year + 1;
-  } else {
-    return year;
-  }
-}
-
-/**
- * Converts the year from fiscal to calendar
- *
+ * @param kind the year kind to convert to
  * @param year the calendar year to convert
  * @param month the month of the year
  * @returns the calendar year
  */
-function fiscalToCalendarYear(year: number, month: number): number {
-  if (month > 6) {
-    return year - 1;
+function fiscalTo(kind: YearKind, year: number, month: number): number {
+  if (kind === YearKind.CY) {
+    if (month > 6) {
+      return year - 1;
+    } else {
+      return year;
+    }
   } else {
     return year;
   }
@@ -607,30 +658,14 @@ function stableComp(part: YearPart): number {
   switch (part) {
     case YearPart.None:
     case YearPart.Year:
-      return 0;
+      return Resolution.Year;
     case YearPart.H1:
     case YearPart.H2:
-      return 1;
+      return Resolution.Half;
     case YearPart.Q1:
     case YearPart.Q2:
     case YearPart.Q3:
     case YearPart.Q4:
-      return 2;
-    default:
-      return 3;
-  }
-}
-
-/**
- * inverse of `stableComp`
- */
-function reverseStableComp(r: number): Resolution {
-  switch (r) {
-    case 0:
-      return Resolution.Year;
-    case 1:
-      return Resolution.Half;
-    case 2:
       return Resolution.Quarter;
     default:
       return Resolution.Month;

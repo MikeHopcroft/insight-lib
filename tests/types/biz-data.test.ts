@@ -39,7 +39,7 @@ describe('constructing biz date', () => {
 
   test('with TBD', () => {
     expect(new BizDate(YearKind.TBD)).toMatchObject(
-      bdObj(YearKind.TBD, YearPart.None, 9999, 12)
+      bdObj(YearKind.TBD, YearPart.None, 9999, 11)
     );
   });
 });
@@ -131,7 +131,7 @@ describe('comparing biz dates', () => {
 
   test('comparable', () => {
     expect(new BizDate(YearKind.CY, 2022, YearPart.Aug).comparable()).toBe(
-      517772
+      517760
     );
   });
 
@@ -142,8 +142,8 @@ describe('comparing biz dates', () => {
   });
 
   test('from comparable', () => {
-    expect(fromComparable(517736)).toMatchObject(
-      bdObj(YearKind.CY, YearPart.Q2, 2022, 6)
+    expect(fromComparable(517733)).toMatchObject(
+      bdObj(YearKind.FY, YearPart.Q4, 2022, 6)
     );
   });
 
@@ -165,8 +165,8 @@ describe('comparing biz dates', () => {
 
   test('before resolution', () => {
     expect(
-      new BizDate(YearKind.FY, 2023, YearPart.H1).isBefore(
-        new BizDate(YearKind.CY, 2022, YearPart.Dec)
+      new BizDate(YearKind.FY, 2023, YearPart.Dec).isBefore(
+        new BizDate(YearKind.CY, 2022, YearPart.H2)
       )
     ).toBeTruthy();
   });
@@ -243,7 +243,7 @@ describe('parsing biz dates', () => {
 
   test('parse TBD', () => {
     expect(parseBizDate('TBD')).toMatchObject(
-      bdObj(YearKind.TBD, YearPart.None, 9999, 12)
+      bdObj(YearKind.TBD, YearPart.None, 9999, 11)
     );
   });
 
