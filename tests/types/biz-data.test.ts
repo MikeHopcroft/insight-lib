@@ -1,8 +1,11 @@
 import {
   BizDate,
   parseBizDate,
+  tbd,
+  thisMonth,
   YearKind,
   YearPart,
+  unknown,
 } from '../../src/types/biz-date';
 
 function bdObj(k: YearKind, p: YearPart, y: number, m: number): object {
@@ -40,7 +43,7 @@ describe('constructing biz date', () => {
   });
 });
 
-describe('transforming biz date', () => {
+describe('transforming biz dates', () => {
   test('CY to FY', () => {
     expect(
       new BizDate(YearKind.CY, 2022, YearPart.Q3).toFiscalYear()
@@ -107,6 +110,88 @@ describe('transforming biz date', () => {
     expect(new BizDate(YearKind.Unknown).toFiscalYear()).toMatchObject(
       bdObj(YearKind.Unknown, YearPart.None, 9999, 12)
     );
+  });
+});
+
+describe('comparing biz dates', () => {
+  test('are equal', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).equals(
+        new BizDate(YearKind.CY, 2022, YearPart.Sep)
+      )
+    ).toBeTruthy();
+  });
+
+  test('are not equal', () => {
+    expect(
+      new BizDate(YearKind.FY, 2022, YearPart.Aug).equals(thisMonth())
+    ).toBeFalsy();
+  });
+
+  test('comparable', () => {
+    expect(new BizDate(YearKind.CY, 2022, YearPart.Aug).comparable()).toBe(
+      202208
+    );
+  });
+
+  test('after', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isAfter(
+        new BizDate(YearKind.CY, 2022, YearPart.Aug)
+      )
+    ).toBeTruthy();
+  });
+
+  test('before', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isBefore(
+        new BizDate(YearKind.FY, 2023, YearPart.H1)
+      )
+    ).toBeTruthy();
+  });
+
+  test('same month', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isSameMonth(
+        new BizDate(YearKind.FY, 2023, YearPart.Q1)
+      )
+    ).toBeTruthy();
+  });
+
+  test('not after', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isAfter(
+        new BizDate(YearKind.CY, 2022, YearPart.Sep)
+      )
+    ).toBeFalsy();
+  });
+
+  test('not before', () => {
+    expect(
+      new BizDate(YearKind.FY, 2026, YearPart.Year).isBefore(
+        new BizDate(YearKind.CY, 2022, YearPart.Sep)
+      )
+    ).toBeFalsy();
+  });
+
+  test('not same month', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).equals(
+        new BizDate(YearKind.FY, 2022, YearPart.Sep)
+      )
+    ).toBeFalsy();
+  });
+
+  test('before tbd', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isBefore(tbd())
+    ).toBeTruthy();
+  });
+
+  test('before tbd', () => {
+    expect(
+      new BizDate(YearKind.CY, 2022, YearPart.Sep).isBefore(unknown())
+    ).toBeTruthy();
   });
 });
 

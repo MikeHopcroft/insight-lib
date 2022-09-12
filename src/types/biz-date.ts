@@ -185,6 +185,7 @@ export class BizDate {
   // comparison.
   private calendarYear: number;
   private calendarMonth: number;
+  private comp: number;
 
   /**
    * Creates a new BizDate
@@ -218,6 +219,66 @@ export class BizDate {
       this.calendarYear = 9999;
       this.calendarMonth = 12;
     }
+    this.comp = this.calendarYear * 100 + this.calendarMonth;
+  }
+
+  /**
+   * @returns a semi-opaque number that can be used for simple comparison
+   */
+  comparable(): number {
+    return this.comp;
+  }
+
+  /**
+   * @returns -1, 0, or 1, depending on if `this` is before, the same month as,
+   *          or after `to`
+   */
+  compare(to: BizDate): number {
+    const c = this.comp - to.comp;
+    if (c === 0) {
+      return 0;
+    } else if (c < 0) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+
+  /**
+   * @returns true if this BizDate and date have the same representation and
+   *          would produce the same canonical string
+   */
+  equals(date: BizDate): boolean {
+    if (
+      this.year === date.year &&
+      this.part === date.part &&
+      this.calendarYear === date.calendarYear &&
+      this.calendarMonth === date.calendarMonth
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @returns true if this BizDate is after date
+   */
+  isAfter(date: BizDate): boolean {
+    return this.compare(date) > 0;
+  }
+
+  /**
+   * @returns true if this BizDate is before date
+   */
+  isBefore(date: BizDate): boolean {
+    return this.compare(date) < 0;
+  }
+
+  /**
+   * @returns true if this BizDate is the same calendar year and month as date
+   */
+  isSameMonth(date: BizDate): boolean {
+    return this.comp === date.comp;
   }
 
   /**
