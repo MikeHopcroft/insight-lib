@@ -11,17 +11,42 @@ import {
   Token,
 } from 'typescript-parsec';
 
+/**
+ * This is an example regex for the string form of a business date. The parser
+ * is more liberal, in that it also supports swapping the order of the year and
+ * year part.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const regex =
   /^((FY|CY)(\d{4}|\d{2}))( (H(1|2)|Q(1|2|3|4)|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)))?|TBD|Unknown$/;
 
+/**
+ * Business date years can be expressed in calendar years or Microsoft fiscal
+ * years, which start in July.
+ *
+ * The enum order must remain stable. It is used in lookup tables.
+ */
 export enum YearKind {
+  /** Calendar Year */
   CY,
+
+  /** Microsoft Fiscal Year */
   FY,
+
+  /** To Be Determined - the responsible party is working on a date */
   TBD,
+
+  /** the state is not known; it's not even TBD */
   Unknown,
 }
 
+/**
+ * Business dates can be described with resolution from whole years to
+ * specific months.
+ *
+ * The enum order must remain stable. It is used in lookup tables and
+ * parsing. New enum values should be added to the end.
+ */
 export enum YearPart {
   Year,
   H1,
@@ -45,6 +70,11 @@ export enum YearPart {
   None,
 }
 
+/**
+ * en-US display strings for YearPart
+ *
+ * The elements in partStr must remain aligned with the elements in YearPart.
+ */
 const partStr = [
   'Year',
   'H1',
@@ -68,6 +98,9 @@ const partStr = [
   'None',
 ];
 
+/**
+ * enum used to specify transformations in private methods
+ */
 enum Resolution {
   Half,
   Month,
@@ -75,8 +108,12 @@ enum Resolution {
   Year,
 }
 
-// PartsTable is indexable by
-// [month - 1: number][YearKind.CY|FY][Resolution]
+/**
+ * Lookup table for YearParts from month and YearKind
+ *
+ * PartsTable is indexable by
+ * [month - 1: number][YearKind.CY|FY][Resolution]
+ */
 const PartsTable = [
   [
     [YearPart.H1, YearPart.Jan, YearPart.Q1, YearPart.Year],
@@ -128,12 +165,38 @@ const PartsTable = [
   ],
 ];
 
+/**
+ * Supports common 'FY22 H1'-style date formats
+ *
+ * Deliverables and other business concepts in Microsoft are frequently
+ * associated with business dates, like 'FY2023 Q1' or 'CY2022 Nov'. BizDate
+ * provides forgiving parsing of common string representations, creates
+ * canonical string representations, and uses a common internal representation
+ * to allow comparison of any two BizDates.
+ *
+ * For purposes of comparing BizDates, each year part is mapped to the final
+ * month in that year part.
+ */
 export class BizDate {
   private year: YearKind;
   private part: YearPart;
+
+  // BizDate uses calendar year values internally to support efficient
+  // comparison.
   private calendarYear: number;
   private calendarMonth: number;
 
+  /**
+   * Creates a new BizDate
+   *
+   * If `year` is less than 100, the constructor adds 2000 to `year`.
+   *
+   * @param kind fiscal year, calendar year, tbd, or unknown
+   * @param year the year in the context of the kind
+   * @param part the part of the year
+   *
+   * @throws Error, if `year` < 1 or `year` > 9999
+   */
   constructor(
     kind: YearKind,
     year: number = new Date().getUTCFullYear(),
@@ -150,12 +213,16 @@ export class BizDate {
         this.calendarYear = fiscalToCalendarYear(vYear, this.calendarMonth);
       }
     } else {
+      // TBD || Unknown
       this.part = YearPart.None;
       this.calendarYear = 9999;
       this.calendarMonth = 12;
     }
   }
 
+  /**
+   * @returns this BizDate transformed into a calendar year BizDate
+   */
   toCalendarYear(): BizDate {
     if (this.year === YearKind.FY) {
       return new BizDate(
@@ -168,6 +235,9 @@ export class BizDate {
     }
   }
 
+  /**
+   * @returns this BizDate transformed into a fiscal year BizDate
+   */
   toFiscalYear(): BizDate {
     if (this.year === YearKind.CY) {
       return new BizDate(
@@ -180,37 +250,52 @@ export class BizDate {
     }
   }
 
+  /**
+   * @returns this BizDate mapped into H1 or H2
+   */
   toHalf(): BizDate {
     return this.toResolution(Resolution.Half);
   }
 
+  /**
+   * @returns this BizDate mapped to a specific month
+   */
   toMonth(): BizDate {
     return this.toResolution(Resolution.Month);
   }
 
+  /**
+   * Maps this BizDate to a specific YearPart resolution
+   *
+   * `toResolution` and the methods that depend on it are lossy in that the
+   * resulting BizDates have calendar months mapped to the new resolution,
+   * always in the final month of the specified year part.
+   *
+   * @param resolution year, half, quarter, or month
+   * @returns this BizDate mapped to a specific year part
+   */
   private toResolution(resolution: Resolution): BizDate {
-    switch (this.year) {
-      case YearKind.CY:
-        return new BizDate(
-          YearKind.CY,
-          this.calendarYear,
-          yearPartFor(YearKind.CY, this.calendarMonth, resolution)
-        );
-      case YearKind.FY:
-        return new BizDate(
-          YearKind.FY,
-          calenderToFiscalYear(this.calendarYear, this.calendarMonth),
-          yearPartFor(YearKind.FY, this.calendarMonth, resolution)
-        );
-      default:
-        return this;
+    if (this.year === YearKind.CY || this.year === YearKind.FY) {
+      return new BizDate(
+        this.year,
+        calendarTo(this.year, this.calendarYear, this.calendarMonth),
+        yearPartFor(this.year, this.calendarMonth, resolution)
+      );
+    } else {
+      return this;
     }
   }
 
+  /**
+   * @returns this BizDate mapped into Q1, Q2, Q3, or Q4
+   */
   toQuarter(): BizDate {
     return this.toResolution(Resolution.Quarter);
   }
 
+  /**
+   * @returns canonical string format for this BizDate
+   */
   toString(): string {
     switch (this.year) {
       case YearKind.TBD:
@@ -238,61 +323,133 @@ export class BizDate {
     }
   }
 
+  /**
+   * @returns this BizDate mapped only to a year
+   */
   toYear(): BizDate {
     return this.toResolution(Resolution.Year);
   }
 }
 
+/**
+ * Parses a string in the form 'FY2023 Q1' or 'CY22 Sep'
+ *
+ * @param str the string to parse
+ * @returns a BizDate that matches the string description
+ *
+ * @throws Error, if the parse fails
+ */
 export function parseBizDate(str: string): BizDate {
   return parse(str);
 }
 
+/**
+ * @returns a TBD BizDate
+ */
+export function tbd(): BizDate {
+  return new BizDate(YearKind.TBD);
+}
+
+/**
+ * Creates a BizDate for the current half, UTC
+ *
+ * @param yearKind calendar year or fiscal year
+ * @returns a BizDate representing the current half
+ */
 export function thisHalf(yearKind = YearKind.CY): BizDate {
   return thisMonth(yearKind).toHalf();
 }
 
+/**
+ * Creates a BizDate for the current quarter, UTC
+ *
+ * @param yearKind calendar year or fiscal year
+ * @returns a BizDate representing the current quarter
+ */
 export function thisQuarter(yearKind = YearKind.CY): BizDate {
   return thisMonth(yearKind).toQuarter();
 }
 
+/**
+ * Creates a BizDate for the current month, UTC
+ *
+ * @param yearKind calendar year or fiscal year
+ * @returns a BizDate representing the current month
+ */
 export function thisMonth(yearKind = YearKind.CY): BizDate {
+  if (yearKind === YearKind.TBD) {
+    return tbd();
+  }
+  if (yearKind === YearKind.Unknown) {
+    return unknown();
+  }
+
   const dateNow = new Date();
   const yearNow = dateNow.getUTCFullYear();
   const monthNow = dateNow.getUTCMonth() + 1;
-  if (yearKind === YearKind.CY) {
-    return new BizDate(
-      YearKind.CY,
-      yearNow,
-      yearPartFor(yearKind, monthNow, Resolution.Month)
-    );
-  } else {
-    return new BizDate(
-      YearKind.FY,
-      calenderToFiscalYear(yearNow, monthNow),
-      yearPartFor(yearKind, monthNow, Resolution.Month)
-    );
-  }
+  return new BizDate(
+    yearKind,
+    calendarTo(yearKind, yearNow, monthNow),
+    yearPartFor(yearKind, monthNow, Resolution.Month)
+  );
 }
 
+/**
+ * @returns an Unknown BizDate
+ */
+export function unknown(): BizDate {
+  return new BizDate(YearKind.Unknown);
+}
+
+/**
+ * Maps the pair of year kind and year part to the end month of the part
+ *
+ * @param kind CY,FY, TBD, or Unknown
+ * @param part the specific part of the year
+ * @returns the ordinal of the month in [1..12]
+ */
 function calendarMonthFor(kind: YearKind, part: YearPart): number {
   switch (part) {
     case YearPart.H1:
     case YearPart.Q2:
-      return kind === YearKind.CY ? 6 : 12;
+      return kind === YearKind.FY ? 12 : 6;
     case YearPart.Year:
     case YearPart.H2:
     case YearPart.Q4:
     case YearPart.None:
-      return kind === YearKind.CY ? 12 : 6;
+      return kind === YearKind.FY ? 6 : 12;
     case YearPart.Q1:
-      return kind === YearKind.CY ? 3 : 9;
+      return kind === YearKind.FY ? 9 : 3;
     case YearPart.Q3:
-      return kind === YearKind.CY ? 9 : 3;
-    default:
+      return kind === YearKind.FY ? 3 : 9;
+    default: // Month
       return part - 6;
   }
 }
 
+/**
+ * Converts the year from calendar to fiscal or calendar
+ *
+ * @param kind the year kind to convert to
+ * @param year the calendar year to convert
+ * @param month the month of the year
+ * @returns fiscal year, if kind is FY, otherwise year
+ */
+function calendarTo(kind: YearKind, year: number, month: number): number {
+  if (kind === YearKind.FY) {
+    return calenderToFiscalYear(year, month);
+  } else {
+    return year;
+  }
+}
+
+/**
+ * Converts the year from calendar to fiscal
+ *
+ * @param year the calendar year to convert
+ * @param month the month of the year
+ * @returns the fiscal year
+ */
 function calenderToFiscalYear(year: number, month: number): number {
   if (month > 6) {
     return year + 1;
@@ -301,6 +458,13 @@ function calenderToFiscalYear(year: number, month: number): number {
   }
 }
 
+/**
+ * Converts the year from fiscal to calendar
+ *
+ * @param year the calendar year to convert
+ * @param month the month of the year
+ * @returns the calendar year
+ */
 function fiscalToCalendarYear(year: number, month: number): number {
   if (month > 6) {
     return year - 1;
@@ -309,6 +473,14 @@ function fiscalToCalendarYear(year: number, month: number): number {
   }
 }
 
+/**
+ * Maps year parts from calendar to fiscal and from fiscal to calendar
+ *
+ * Specific months, Year, and None are not converted.
+ *
+ * @param part the YearPart to map
+ * @returns the mapped YearPart
+ */
 function reverseYearPart(part: YearPart): number {
   switch (part) {
     case YearPart.H1:
@@ -328,6 +500,16 @@ function reverseYearPart(part: YearPart): number {
   }
 }
 
+/**
+ * Validates that the year falls within a wide, but valid range
+ *
+ * `validateYear` also adds 2000 to values that are >0 and <100.
+ *
+ * @param year the year value to validate
+ * @returns a number in the range [1..9999]
+ *
+ * @throws Error, if year < 1 or year > 9999s
+ */
 function validateYear(year: number): number {
   let y = Math.floor(year);
   if (y < 1) {
@@ -340,6 +522,14 @@ function validateYear(year: number): number {
   return y;
 }
 
+/**
+ * Maps a month to a specific year part
+ *
+ * @param year CY, FY, TBD, or Unknown
+ * @param month the month ordinal in [1..12]
+ * @param res the YearPart resolution
+ * @returns the specified YearPart
+ */
 function yearPartFor(year: YearKind, month: number, res: Resolution): YearPart {
   if (year === YearKind.TBD || year === YearKind.Unknown) {
     return YearPart.None;
@@ -347,8 +537,13 @@ function yearPartFor(year: YearKind, month: number, res: Resolution): YearPart {
   return PartsTable[month - 1][year][res];
 }
 
-// ========== Parser ==========
+// ================================== Parser ==================================
 
+// BizDate uses typescript-parsec for parsing.
+
+// The order of tokens is arranged to align with the order of YearPart. This
+// is convenient for dealing with month tokens. Any new tokens should be added
+// to the end.
 enum TokenKind {
   CY,
   FY,
@@ -454,7 +649,8 @@ const lexer = buildLexer([
 
 /*
 DATE
-  = YEAR PART
+  = YEAR (PART)?
+  = PART YEAR
   = 'TBD'
   = 'UNKOWN'
 */
@@ -482,8 +678,8 @@ YEAR.setPattern(
 /*
 PART
   = [Month]
-  = Half HalfNumber
-  = Quarter QuarterNumber
+  = Half Number in [1..2]
+  = Quarter Number in [1..4]
 */
 PART.setPattern(
   alt(
