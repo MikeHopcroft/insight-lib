@@ -219,7 +219,10 @@ export class BizDate {
       this.calendarYear = 9999;
       this.calendarMonth = 12;
     }
-    this.comp = this.calendarYear * 100 + this.calendarMonth;
+
+    // semi-opaque comparison value, for ease of sorting
+    this.comp =
+      (this.calendarYear * 100 + this.calendarMonth) * 4 + stableComp(part);
   }
 
   /**
@@ -278,7 +281,10 @@ export class BizDate {
    * @returns true if this BizDate is the same calendar year and month as date
    */
   isSameMonth(date: BizDate): boolean {
-    return this.comp === date.comp;
+    return (
+      this.calendarYear === date.calendarYear &&
+      this.calendarMonth === date.calendarMonth
+    );
   }
 
   /**
@@ -558,6 +564,32 @@ function reverseYearPart(part: YearPart): number {
       return YearPart.Q2;
     default:
       return part;
+  }
+}
+
+/**
+ * Value to support stable comparison and sort across different resolutions
+ *
+ * Where two BizDates have the same underlying month, the one with the larger
+ * resolution comes first, as its start date is earlier.
+ *
+ * @param part a year part
+ * @returns a value in [0..3]
+ */
+function stableComp(part: YearPart): number {
+  switch (part) {
+    case YearPart.Year:
+      return 0;
+    case YearPart.H1:
+    case YearPart.H2:
+      return 1;
+    case YearPart.Q1:
+    case YearPart.Q2:
+    case YearPart.Q3:
+    case YearPart.Q4:
+      return 2;
+    default:
+      return 3;
   }
 }
 

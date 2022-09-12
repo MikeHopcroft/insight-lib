@@ -130,7 +130,7 @@ describe('comparing biz dates', () => {
 
   test('comparable', () => {
     expect(new BizDate(YearKind.CY, 2022, YearPart.Aug).comparable()).toBe(
-      202208
+      808835
     );
   });
 
@@ -146,6 +146,14 @@ describe('comparing biz dates', () => {
     expect(
       new BizDate(YearKind.CY, 2022, YearPart.Sep).isBefore(
         new BizDate(YearKind.FY, 2023, YearPart.H1)
+      )
+    ).toBeTruthy();
+  });
+
+  test('before resolution', () => {
+    expect(
+      new BizDate(YearKind.FY, 2023, YearPart.H1).isBefore(
+        new BizDate(YearKind.CY, 2022, YearPart.Dec)
       )
     ).toBeTruthy();
   });
