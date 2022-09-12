@@ -261,6 +261,22 @@ describe('validating valid json documents', () => {
     ).toStrictEqual([true, '']);
   });
 
+  test('valid Update is valid', () => {
+    expect(
+      validateJSONStr(`
+        {
+          "type": "Update",
+          "id": "ABCDEF0123456789",
+          "name": "March Update",
+          "description": "The PG has pushed out the deliverable to the following quarter.",
+          "reported": "FY23 Mar",
+          "indicator": "Red",
+          "status": "At Risk"
+        }
+      `)
+    ).toStrictEqual([true, '']);
+  });
+
   test('valid Work is valid', () => {
     expect(
       validateJSONStr(`

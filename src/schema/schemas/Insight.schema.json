@@ -1,7 +1,7 @@
 {
     "$id": "https://microsoft.com/is/Insight",
     "$schema": "http://json-schema.org/draft-07/schema",
-    "description": "insight node",
+    "description": "Insight node",
     "allOf": [
         {"$ref": "core#/definitions/core"},
         {"$ref": "#/$defs/body"},
