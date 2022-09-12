@@ -134,9 +134,13 @@ export class BizDate {
   private calendarYear: number;
   private calendarMonth: number;
 
-  constructor(kind: YearKind, year: number, part: YearPart) {
+  constructor(
+    kind: YearKind,
+    year: number = new Date().getUTCFullYear(),
+    part: YearPart = YearPart.Year
+  ) {
     this.year = kind;
-    const vYear = validYear(year);
+    const vYear = validateYear(year);
     if (kind === YearKind.CY || kind === YearKind.FY) {
       this.part = part;
       this.calendarMonth = calendarMonthFor(kind, part);
@@ -212,12 +216,23 @@ export class BizDate {
       case YearKind.TBD:
         return 'TBD';
       case YearKind.CY:
-        return `CY${this.calendarYear} ${partStr[this.part]}`;
+        if (this.part === YearPart.Year || this.part === YearPart.None) {
+          return `CY${this.calendarYear}`;
+        } else {
+          return `CY${this.calendarYear} ${partStr[this.part]}`;
+        }
       case YearKind.FY:
-        return `FY${calenderToFiscalYear(
-          this.calendarYear,
-          this.calendarMonth
-        )} ${partStr[this.part]}`;
+        if (this.part === YearPart.Year || this.part === YearPart.None) {
+          return `FY${calenderToFiscalYear(
+            this.calendarYear,
+            this.calendarMonth
+          )}`;
+        } else {
+          return `FY${calenderToFiscalYear(
+            this.calendarYear,
+            this.calendarMonth
+          )} ${partStr[this.part]}`;
+        }
       default:
         return 'Unknown';
     }
@@ -313,10 +328,15 @@ function reverseYearPart(part: YearPart): number {
   }
 }
 
-function validYear(year: number): number {
+function validateYear(year: number): number {
   let y = Math.floor(year);
-  y = y < 0 ? -y : y;
-  y = y > 9999 ? 9999 : y;
+  if (y < 1) {
+    throw new Error(`Years must be whole numbers: ${y}`);
+  }
+  if (y > 9999) {
+    throw new Error(`Years must be less than 10,000: ${y}`);
+  }
+  y = y < 100 ? 2000 + y : y;
   return y;
 }
 
@@ -359,15 +379,7 @@ const PART = rule<TokenKind, YearPart>();
 function applyCY(
   value: [Token<TokenKind.CY>, Token<TokenKind.Number>]
 ): [YearKind, number] {
-  let year = +value[1].text;
-  if (year < 1) {
-    throw new Error(`Years must be whole numbers: ${year}`);
-  }
-  if (year > 9999) {
-    throw new Error(`Years must be less than 10,000: ${year}`);
-  }
-  year = year < 100 ? 2000 + year : year;
-  return [YearKind.CY, year];
+  return [YearKind.CY, validateYear(+value[1].text)];
 }
 
 function applyDate(value: [[YearKind, number], YearPart | undefined]): BizDate {
@@ -378,15 +390,7 @@ function applyDate(value: [[YearKind, number], YearPart | undefined]): BizDate {
 function applyFY(
   value: [Token<TokenKind.FY>, Token<TokenKind.Number>]
 ): [YearKind, number] {
-  let year = +value[1].text;
-  if (year < 1) {
-    throw new Error(`Years must be whole numbers: ${year}`);
-  }
-  if (year > 9999) {
-    throw new Error(`Years must be less than 10,000: ${year}`);
-  }
-  year = year < 100 ? 2000 + year : year;
-  return [YearKind.FY, year];
+  return [YearKind.FY, validateYear(+value[1].text)];
 }
 
 function applyHalf(
@@ -411,6 +415,10 @@ function applyQuarter(
     throw new Error(`There are four quarters in a year: ${n}`);
   }
   return n + 2; // YearPart[3..6]
+}
+
+function applyReverse(value: [YearPart, [YearKind, number]]): BizDate {
+  return applyDate([value[1], value[0]]);
 }
 
 function applyTBD(): BizDate {
@@ -453,6 +461,7 @@ DATE
 DATE.setPattern(
   alt(
     apply(seq(YEAR, opt(PART)), applyDate),
+    apply(seq(PART, YEAR), applyReverse),
     apply(tok(TokenKind.TBD), applyTBD),
     apply(tok(TokenKind.Unknown), applyUnknown)
   )
