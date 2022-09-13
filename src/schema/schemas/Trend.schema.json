@@ -1,9 +1,0 @@
-{
-    "$id": "https://microsoft.com/is/Trend",
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "description": "Trend node",
-    "type": "object",
-    "allOf": [
-        {"$ref": "core"}
-    ]
-}
