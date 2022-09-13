@@ -20,7 +20,6 @@ export function loadTablesAndEdges(store: Store) {
   createTable(store, impacts);
   createTable(store, insights);
   createTable(store, accounts);
-  
   createEdges(store, edges);
 }
 

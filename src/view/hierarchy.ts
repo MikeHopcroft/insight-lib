@@ -1,14 +1,12 @@
 import {
   HierarchyRow,
   Node,
-  NodeFields,
-  Relation,
   RenderCell,
   RenderRow,
   RowDefinition,
 } from './interfaces';
 
-import { Store } from './node-store';
+import {Store} from './node-store';
 
 export class Renderer {
   store: Store;

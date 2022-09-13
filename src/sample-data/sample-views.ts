@@ -4,7 +4,6 @@ import {
   fieldGt,
   otherwise,
   outgoing,
-  outgoingInContext,
   select,
   sum,
 } from '../view/expressions';

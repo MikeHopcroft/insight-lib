@@ -28,12 +28,8 @@ export const tasks: TypedSourceTable<
 export const features: TypedSourceTable<[string]> = {
   id: 'features',
   columns: ['title'],
-  rows: [
-    ['Data driven'],
-    ['Cloud deployment'],
-    ['Interactive graphs'],
-  ],
-}
+  rows: [['Data driven'], ['Cloud deployment'], ['Interactive graphs']],
+};
 
 export const capabilities: TypedSourceTable<[string, string[]]> = {
   id: 'capabilities',
@@ -42,7 +38,7 @@ export const capabilities: TypedSourceTable<[string, string[]]> = {
     ['DataOps', ['Data driven', 'Cloud deployment']],
     ['Adhoc Analysis', ['Data driven', 'Interactive graphs']],
   ],
-}
+};
 
 export const accounts: TypedSourceTable<[string, string, string[]]> = {
   id: 'accounts',
@@ -52,7 +48,7 @@ export const accounts: TypedSourceTable<[string, string, string[]]> = {
     ['Defco', 'marys', ['On Network Security', 'Scalable Architectures']],
     ['G&H Inc', 'pranab', ['Azure Performance']],
   ],
-}
+};
 
 export const insights: TypedSourceTable<[string]> = {
   id: 'insights',
@@ -62,7 +58,7 @@ export const insights: TypedSourceTable<[string]> = {
     ['Azure Performance'],
     ['Scalable Architectures'],
   ],
-}
+};
 
 export const impacts: TypedSourceTable<[string, string, string]> = {
   id: 'impacts',
@@ -72,7 +68,7 @@ export const impacts: TypedSourceTable<[string, string, string]> = {
     ['Impact DEF', 'Defco', 'On Network Security'],
     ['Impact GHI', 'G&H Inc', 'Azure Performance'],
   ],
-}
+};
 
 export interface EdgeDescriptor {
   srcType: NodeType;
