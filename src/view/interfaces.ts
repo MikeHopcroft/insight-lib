@@ -50,7 +50,7 @@ export interface Expression {
   value: (parent: NodeFields, children: NodeFields[]) => any;
 }
 
-interface ColumnDefinition {
+export interface ColumnDefinition {
   // Use field: undefined for a padding cell
   field?: string;
 
@@ -59,7 +59,7 @@ interface ColumnDefinition {
   style?: Styler;
 }
 
-type Formatter = (value: any) => string;
+type Formatter = (value: any) => string | {[key:string]:any};;
 export type Filter = (row: NodeFields) => boolean;
 type Sorter = (a: NodeFields, b: NodeFields) => number;
 type Styler = (row: NodeFields) => Style | undefined;
@@ -90,7 +90,7 @@ export interface Style {
 }
 
 export interface RenderCell {
-  text: string;
+  text: string | {[key:string]:any};
   style?: Style;
 }
 

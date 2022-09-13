@@ -1,4 +1,4 @@
-import {EdgeType, Node, NodeFields, NodeId, NodeType} from './interfaces';
+import {EdgeType, Node, NodeFields, NodeId, NodeType}  from './interfaces';
 
 export class Store {
   nodes = new Map<NodeType, Map<NodeId, Node>>();

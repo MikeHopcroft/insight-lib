@@ -86,12 +86,11 @@ export class Renderer {
     }
 
     const d = rows[0].definition;
+    const {filter, sort} = d;
     let filteredSortedRows = rows;
-    const filter = d.filter;
     if (filter) {
       filteredSortedRows = filteredSortedRows.filter(x => filter(x.fields));
     }
-    const sort = d.sort;
     if (sort) {
       filteredSortedRows = [...filteredSortedRows].sort((a, b) =>
         sort(a.fields, b.fields)
@@ -101,8 +100,11 @@ export class Renderer {
     const render: RenderRow[] = [];
     for (const row of filteredSortedRows) {
       const cells = row.definition.columns.map(c => {
+        const formatter = c.format || nopFormatter;
         // TODO: text is not always a string. Rename to value or convert.
-        const y: RenderCell = {text: c.field ? row.fields[c.field] : ''};
+        const y: RenderCell = {
+          text: c.field ? formatter(row.fields[c.field]) : '',
+        };
         const styler = c.style;
         if (styler) {
           const style = styler(row.fields);
@@ -129,4 +131,8 @@ export class Renderer {
     }
     return render;
   }
+}
+
+function nopFormatter(text: string): string {
+  return text;
 }
