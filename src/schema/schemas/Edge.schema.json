@@ -3,7 +3,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "description": "Industry Solutions graph edge",
     "type": "object",
-    "required": [ "id", "type", "from", "pred", "to" ],
+    "required": [ "id", "type", "from", "predicate", "to" ],
     "properties": {
         "org": {
             "const": "/is"
@@ -17,7 +17,7 @@
         "from": {
             "$ref": "core#/definitions/endPoint"
         },
-        "pred": {
+        "predicate": {
             "type": "string"
         },
         "to": {

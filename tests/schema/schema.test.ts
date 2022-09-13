@@ -330,7 +330,7 @@ describe('validating system json documents', () => {
             "type": "Industry",
             "name": "Retail"
           },
-          "pred": "includes",
+          "predicate": "includes",
           "to": {
             "id": "ABCDEF0123456789",
             "type": "Account",
