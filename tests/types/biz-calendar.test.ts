@@ -6,7 +6,6 @@ import {
   YearKind as K,
   Period as P,
   unknown,
-  fromComparable,
 } from '../../src/types/biz-calendar';
 
 function bdObj(k: K, p: P, y: number, m: number, fy: P = P.Jul): object {
@@ -110,12 +109,6 @@ describe('comparing biz periods', () => {
     expect(
       new BizPeriod(K.FY, 2022, P.Aug).equals(thisMonth())
     ).toBeFalsy();
-  });
-
-  test('from comparable', () => {
-    expect(fromComparable(517733)).toMatchObject(
-      bdObj(K.FY, P.Q4, 2022, 6)
-    );
   });
 
   test('after', () => {
