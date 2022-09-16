@@ -22,7 +22,8 @@ import {
   
   /**
    * Business period years can be expressed in calendar years or fiscal
-   * years.
+   * years. They can also represent dates that are to be determined or
+   * unknown.
    */
   enum YearKind {
     /** Calendar Year */
@@ -111,10 +112,10 @@ import {
      * 
      * @param year the kind and year, use `CY()` and `FY()`
      * @param months start and end month ordinals, relative to the
-     *               calendar or fiscal start, use `H()`, `Q()`, or the
-     *               month-specifid functions 
-     * @param fiscalYearStartMonth using a consistent `FYFactory` is safer
-     *        than using this param directly
+     *        calendar or fiscal start, use `H()`, `Q()`, or the
+     *        month-specifid functions 
+     * @param fiscalYearStartMonth using a consistent `FYPeriodFactory`
+     *        is safer than using this param directly
      */
     constructor(
       year: [YearKind, number] = [YearKind.CY, new Date().getUTCFullYear()],
@@ -168,7 +169,7 @@ import {
     }
 
     /**
-     * @returns true if this Period ends after date
+     * @returns true if this Period ends after date ends
      */
     endsAfter(date: Period): boolean {
       if (this.endYearMonth > date.endYearMonth) {
@@ -312,18 +313,30 @@ import {
       return this.endYearMonth < date.startYearMonth;
     }
 
+    /**
+     * @returns true if this period is relative to a calendar year
+     */
     isCalendarPeriod(): boolean {
       return this.kind === YearKind.CY;
     }
 
+    /**
+     * @returns true if this period is relative to a fiscal year
+     */
     isFiscalPeriod(): boolean {
       return this.kind === YearKind.FY;
     }
 
+    /**
+     * @returns true if this period is to be determined
+     */
     isTBD(): boolean {
       return this.kind === YearKind.TBD;
     }
 
+    /**
+     * @returns true if this period is of kind unknown
+     */
     isUnknown(): boolean {
       return (
         this.kind !== YearKind.CY &&
@@ -334,21 +347,21 @@ import {
 
     /**
      * @returns true if this Period starts the same calendar year and month
-     * as date
+     *          as date
      */
      startsSameMonth(date: Period): boolean {
       return this.startYearMonth === date.startYearMonth;
     }
 
     /**
-     * @returns true if this Period starts after date
+     * @returns true if this Period starts after date ends
      */
      startsAfter(date: Period): boolean {
       return this.startYearMonth > date.startYearMonth;
     }
 
     /**
-     * @returns true if this Period ends after date
+     * @returns true if this Period starts before date starts
      */
      startsBefore(date: Period): boolean {
       return this.startYearMonth < date.startYearMonth;
@@ -685,7 +698,7 @@ import {
     fiscalStart: number
   ): [number, number] {
     const fiscalYear = calendarMonth >= fiscalStart
-      ? calendarYear - 1 
+      ? calendarYear + 1 
       : calendarYear;
     const fiscalMonth = (fiscalStart + calendarMonth - 2) % 12 + 1;
     return [fiscalYear, fiscalMonth];
