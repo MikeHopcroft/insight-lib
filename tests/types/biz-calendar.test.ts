@@ -47,20 +47,20 @@ function bdObj(kind: K, start: number, end: number, fy: number = 7): object {
     kind: kind,
     startYearMonth: start,
     endYearMonth: end,
-    fiscalStartMonth: fy,
+    fiscalYearStartMonth: fy,
   };
 }
 
-describe('constructing biz periods', () => {
-  test('with normal FY', () => {
+describe('constructing business periods', () => {
+  test('fiscal year half', () => {
     expect(FY(2023, H1)).toMatchObject(bdObj(K.FY, 202207, 202212, 7));
   });
 
-  test('with CY', () => {
+  test('calendar year quarter', () => {
     expect(CY(2022, Q4)).toMatchObject(bdObj(K.CY, 202210, 202212, 7));
   });
 
-  test('with month', () => {
+  test('calendar year month', () => {
     expect(CY(2022, Sep)).toMatchObject(bdObj(K.CY, 202209, 202209, 7));
   });
 

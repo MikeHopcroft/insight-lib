@@ -53,6 +53,7 @@ const months = [
 ];
 
 export interface IPeriod {
+  compare(date: IPeriod): number;
   contains(date: IPeriod): boolean;
   endsAfter(date: IPeriod): boolean;
   endsBefore(date: IPeriod): boolean;
@@ -92,31 +93,29 @@ export interface IPeriod {
  * associated with business periods, like 'FY2023 Q2' or 'CY22 Nov'.
  * Period provides forgiving parsing of common string representations,
  * creates canonical string representations, and uses a common internal
- * representation to allow comparison of any two BizPeriods.
- *
- * Period uses compact calendar year values internally to support efficient
- * comparison between Periods.
+ * representation to allow comparison of any twovPeriods.
  */
 export class Period implements IPeriod {
   protected kind: YearKind;
+
+  // Period uses compact calendar year values internally to support efficient
+  // comparison between Periods.
   protected startYearMonth: number;
   protected endYearMonth: number;
-  protected fiscalStartMonth: number;
+  protected fiscalYearStartMonth: number;
   protected cachedString: string | undefined;
 
   /**
    * Creates a new Period
    *
    * The expectation is that the parser will be used much more frequently
-   * than this constructor. The constructor is designed to be used with the
-   * year and period helper functions. They provide input validation and more
-   * literate construction. The constructor will silently adjust inputs into
-   * expected ranges where the helpers will throw Errors.
+   * than this constructor. The constructor is designed to be through the
+   * year and period helper functions. They provide more literate construction.
    *
    * Examples:
-   *    new Period(CY(2023), Sep())
-   *    new Period(FY(2023), H(1))
-   *    new Period(CY(28), Q(3), Apr())
+   *    CY(2023, Sep)
+   *    FY(2023, H1)
+   *    CY(28, Q3, 7)
    *
    * Parser examples:
    *    parsePeriod('CY2023 Sep')
@@ -125,12 +124,12 @@ export class Period implements IPeriod {
    *
    * Periods
    *
-   * @param year the kind and year, use `CY()` and `FY()`
-   * @param months start and end month ordinals, relative to the
-   *        calendar or fiscal start, use `H()`, `Q()`, or the
-   *        month-specifid functions
-   * @param fiscalYearStartMonth using a consistent `FYPeriodFactory`
-   *        is safer than using this param directly
+   * @param kind calendar (CY) or fiscal (FY)
+   * @param year the calendar or fiscal year
+   * @param startMonthOrdinal the start month ordinal relative to the year
+   * @param endMonthOrdinal the end month ordinal relative to the year
+   * @param fiscalYearStartMonth the month a fiscal year starts, defaults to
+   *        7, July
    */
   constructor(
     kind: YearKind = YearKind.CY,
@@ -140,25 +139,47 @@ export class Period implements IPeriod {
     fiscalYearStartMonth: number = 7
   ) {
     this.kind = kind;
-    this.fiscalStartMonth = checkMonth(fiscalYearStartMonth);
+    this.fiscalYearStartMonth = checkMonth(fiscalYearStartMonth);
     const startYear = checkYear(year);
     const startMonth = checkMonth(startMonthOrdinal);
     const endMonth = checkMonth(endMonthOrdinal);
-    const endYear = startMonth <= endMonth ? startYear : startYear + 1;
+    const endYear = startMonth > endMonth ? startYear + 1: startYear ;
 
     if (kind === YearKind.FY) {
       this.startYearMonth = fiscalToCalendar(
         yearMonth(startYear, startMonth),
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
       this.endYearMonth = fiscalToCalendar(
         yearMonth(endYear, endMonth),
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
     } else {
       this.startYearMonth = yearMonth(startYear, startMonth);
       this.endYearMonth = yearMonth(endYear, endMonth);
     }
+  }
+
+  /**
+   * Compare is designed to support sorting of Periods for display
+   * so that longer Periods sort before Periods they contain.
+   * 
+   * @param date the date to compare against
+   * @return < 0  if this should sort before date
+   *         == 0 if this and date should sort together
+   *         > 0  if this should sort after date
+   */
+  compare(date: IPeriod): number {
+    if (this.startsSameMonth(date) && this.endsSameMonth(date)) {
+      return 0;
+    }
+    if (this.startsBefore(date)) {
+      return -1;
+    }
+    if (this.endsBefore(date)) {
+      return -1;
+    }
+    return 1;
   }
 
   /**
@@ -214,7 +235,7 @@ export class Period implements IPeriod {
       this.kind === date.getKind() &&
       this.startYearMonth === date.getStartYearMonth() &&
       this.endYearMonth === date.getEndYearMonth() &&
-      this.fiscalStartMonth === date.getFiscalYearStartMonth()
+      this.fiscalYearStartMonth === date.getFiscalYearStartMonth()
     ) {
       return true;
     }
@@ -243,7 +264,7 @@ export class Period implements IPeriod {
   getEndFiscalMonth(): number {
     return calendarToFiscal(
       ...yearAndMonth(this.endYearMonth),
-      this.fiscalStartMonth
+      this.fiscalYearStartMonth
     )[1];
   }
 
@@ -253,7 +274,7 @@ export class Period implements IPeriod {
   getEndFiscalYear(): number {
     return calendarToFiscal(
       ...yearAndMonth(this.endYearMonth),
-      this.fiscalStartMonth
+      this.fiscalYearStartMonth
     )[0];
   }
 
@@ -270,7 +291,7 @@ export class Period implements IPeriod {
    *          in [1..12]
    */
   getFiscalYearStartMonth(): number {
-    return this.fiscalStartMonth;
+    return this.fiscalYearStartMonth;
   }
 
   /**
@@ -295,7 +316,7 @@ export class Period implements IPeriod {
   getStartFiscalMonth(): number {
     return calendarToFiscal(
       ...yearAndMonth(this.startYearMonth),
-      this.fiscalStartMonth
+      this.fiscalYearStartMonth
     )[1];
   }
 
@@ -305,7 +326,7 @@ export class Period implements IPeriod {
   getStartFiscalYear(): number {
     return calendarToFiscal(
       ...yearAndMonth(this.startYearMonth),
-      this.fiscalStartMonth
+      this.fiscalYearStartMonth
     )[0];
   }
 
@@ -378,7 +399,7 @@ export class Period implements IPeriod {
         YearKind.CY,
         startMonth,
         endMonth,
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
     } else {
       return this;
@@ -392,11 +413,11 @@ export class Period implements IPeriod {
     if (this.isCalendarPeriod()) {
       const [startYear, startMonth] = calendarToFiscal(
         ...yearAndMonth(this.startYearMonth),
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
       const [, endMonth] = calendarToFiscal(
         ...yearAndMonth(this.endYearMonth),
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
 
       return new Period(
@@ -404,7 +425,7 @@ export class Period implements IPeriod {
         startYear,
         startMonth,
         endMonth,
-        this.fiscalStartMonth
+        this.fiscalYearStartMonth
       );
     } else {
       return this;
@@ -425,7 +446,7 @@ export class Period implements IPeriod {
     const kindStr = this.isFiscalPeriod() ? 'FY' : 'CY';
     const [fiscalYear, fiscalMonth] = calendarToFiscal(
       ...yearAndMonth(this.startYearMonth),
-      this.fiscalStartMonth
+      this.fiscalYearStartMonth
     );
 
     return '';
@@ -445,13 +466,14 @@ export class Period implements IPeriod {
 }
 
 export class Month extends Period implements IPeriod {
-  constructor(kind = YearKind.CY, year: number, quarter: number) {
-    if (quarter < 1 || quarter > 4) {
-      throw new Error(`There are four quarters in a year: ${quarter}`);
-    }
-    const endMonth = quarter * 3;
-    const startMonth = endMonth - 2;
-    super(kind, year, startMonth, endMonth);
+  constructor(
+    kind = YearKind.CY,
+    year: number,
+    ordinal: number,
+    fiscalYearStartMonth: number = 7
+  ) {
+    const month = checkMonth(ordinal);
+    super(kind, year, month, month, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -475,21 +497,26 @@ export class Month extends Period implements IPeriod {
     let [year, month] = yearAndMonth(this.endYearMonth);
     if (this.isFiscalPeriod()) {
       pre = 'FY';
-      [year, month] = calendarToFiscal(year, month, this.fiscalStartMonth);
+      [year, month] = calendarToFiscal(year, month, this.fiscalYearStartMonth);
     }
-    this.cachedString = `${pre}${year} Q${month / 3}`;
+    this.cachedString = `${pre}${year} ${MONTHS[month]}`;
     return this.cachedString;
   }
 }
 
 export class Quarter extends Period implements IPeriod {
-  constructor(kind = YearKind.CY, year: number, quarter: number) {
+  constructor(
+    kind = YearKind.CY,
+    year: number,
+    quarter: number,
+    fiscalYearStartMonth: number = 7
+  ) {
     if (quarter < 1 || quarter > 4) {
       throw new Error(`There are four quarters in a year: ${quarter}`);
     }
     const endMonth = quarter * 3;
     const startMonth = endMonth - 2;
-    super(kind, year, startMonth, endMonth);
+    super(kind, year, startMonth, endMonth, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -513,7 +540,7 @@ export class Quarter extends Period implements IPeriod {
     let [year, month] = yearAndMonth(this.endYearMonth);
     if (this.isFiscalPeriod()) {
       pre = 'FY';
-      [year, month] = calendarToFiscal(year, month, this.fiscalStartMonth);
+      [year, month] = calendarToFiscal(year, month, this.fiscalYearStartMonth);
     }
     this.cachedString = `${pre}${year} Q${month / 3}`;
     return this.cachedString;
@@ -521,13 +548,18 @@ export class Quarter extends Period implements IPeriod {
 }
 
 export class Half extends Period implements IPeriod {
-  constructor(kind = YearKind.CY, year: number, half: number) {
+  constructor(
+    kind = YearKind.CY,
+    year: number,
+    half: number,
+    fiscalYearStartMonth: number = 7
+  ) {
     if (half < 1 || half > 2) {
       throw new Error(`There are two halves in a year: ${half}`);
     }
     const endMonth = half * 6;
     const startMonth = endMonth - 5;
-    super(kind, year, startMonth, endMonth);
+    super(kind, year, startMonth, endMonth, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -551,7 +583,7 @@ export class Half extends Period implements IPeriod {
     let [year, month] = yearAndMonth(this.endYearMonth);
     if (this.isFiscalPeriod()) {
       pre = 'FY';
-      [year, month] = calendarToFiscal(year, month, this.fiscalStartMonth);
+      [year, month] = calendarToFiscal(year, month, this.fiscalYearStartMonth);
     }
     this.cachedString = `${pre}${year} H${month / 6}`;
     return this.cachedString;
@@ -559,8 +591,12 @@ export class Half extends Period implements IPeriod {
 }
 
 export class Year extends Period implements IPeriod {
-  constructor(kind = YearKind.CY, year: number) {
-    super(kind, year, 1, 12);
+  constructor(
+    kind = YearKind.CY,
+    year: number,
+    fiscalYearStartMonth: number = 7
+  ) {
+    super(kind, year, 1, 12, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -585,7 +621,7 @@ export class Year extends Period implements IPeriod {
       this.cachedString = `FY${
         calendarToFiscal(
           ...yearAndMonth(this.startYearMonth),
-          this.fiscalStartMonth
+          this.fiscalYearStartMonth
         )[0]
       }`;
     }
@@ -594,8 +630,8 @@ export class Year extends Period implements IPeriod {
 }
 
 export class TBD extends Period implements IPeriod {
-  constructor(kind = YearKind.CY) {
-    super(kind, 9999, 11, 11);
+  constructor(kind = YearKind.CY, fiscalYearStartMonth: number = 7) {
+    super(kind, 9999, 11, 11, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -612,8 +648,8 @@ export class TBD extends Period implements IPeriod {
 }
 
 export class Unknown extends Period implements IPeriod {
-  constructor(kind = YearKind.CY) {
-    super(kind, 9999, 12, 12);
+  constructor(kind = YearKind.CY, fiscalYearStartMonth: number = 7) {
+    super(kind, 9999, 12, 12, fiscalYearStartMonth);
   }
 
   toCalendar(): IPeriod {
@@ -660,14 +696,14 @@ export function CY(
   year: number,
   func: (year: number, kind: YearKind) => IPeriod = Y
 ): IPeriod {
-  return func(YearKind.CY, year);
+  return func(year, YearKind.CY);
 }
 
 export function FY(
   year: number,
   func: (year: number, kind: YearKind) => IPeriod = Y
 ): IPeriod {
-  return func(YearKind.FY, year);
+  return func(year, YearKind.FY);
 }
 
 export function Jan(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -867,6 +903,12 @@ function calendarToFiscal(
   return [fiscalYear, fiscalMonth];
 }
 
+/**
+ * @param month month ordinal to validate
+ * @returns month if it is valid
+ * 
+ * @throws Error if month is not valid
+ */
 function checkMonth(month: number): number {
   if (1 > month || month > 12) {
     throw new Error(`${month} is not a month`);
@@ -874,6 +916,12 @@ function checkMonth(month: number): number {
   return month;
 }
 
+/**
+ * @param year year to validate
+ * @returns year if it is valid
+ * 
+ * @throws Error if year is not valid, year + 2000 if year is < 100
+ */
 function checkYear(year: number): number {
   if (1 > year || year > 9999) {
     throw new Error(`${year} is not a valid year`);
