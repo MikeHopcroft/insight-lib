@@ -24,7 +24,7 @@ import {
    * Business period years can be expressed in calendar years or fiscal
    * years.
    */
-  export enum YearKind {
+  enum YearKind {
     /** Calendar Year */
     CY,
   
@@ -43,62 +43,72 @@ import {
    * end months relative to the start month
    */
   const periodInfo = [
-    { str: 'None', len: 0, end: 0},
-    { str: 'Jan', len: 1, end: 1},
-    { str: 'Feb', len: 1, end: 2},
-    { str: 'Mar', len: 1, end: 3},
-    { str: 'Apr', len: 1, end: 4},
-    { str: 'May', len: 1, end: 5},
-    { str: 'Jun', len: 1, end: 6},
-    { str: 'Jul', len: 1, end: 7},
-    { str: 'Aug', len: 1, end: 8},
-    { str: 'Sep', len: 1, end: 9},
-    { str: 'Oct', len: 1, end: 10},
-    { str: 'Nov', len: 1, end: 11},
-    { str: 'Dec', len: 1, end: 12},
-    { str: 'Q1', len: 2, end: 3},
-    { str: 'Q2', len: 2, end: 6},
-    { str: 'Q3', len: 2, end: 9},
-    { str: 'Q4', len: 2, end: 12},
-    { str: 'H1', len: 4, end: 6},
-    { str: 'H2', len: 4, end: 12},
-    { str: 'Year', len: 12, end: 12},
+    'None',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+    'Q1',
+    'Q2',
+    'Q3',
+    'Q4',
+    'H1',
+    'H2',
+    'Year',
   ];
   const FIRST_MONTH = 1;
   const FIRST_QUARTER = 13;
   const FIRST_HALF = 17;
+  const FIRST_YEAR = 18;
   
   /**
    * Supports common 'FY22 H1'-style date formats
    *
    * Deliverables and other business concepts in Microsoft are frequently
-   * associated with business periods, like 'FY2023 Q1' or 'CY2022 Nov'.
+   * associated with business periods, like 'FY2023 Q2' or 'CY22 Nov'.
    * Period provides forgiving parsing of common string representations,
    * creates canonical string representations, and uses a common internal
    * representation to allow comparison of any two BizPeriods.
    * 
-   * Period uses calendar year values internally to support efficient
+   * Period uses compact calendar year values internally to support efficient
    * comparison between Periods.
    */
   export class Period {
     private kind: YearKind;
-    private startMonth: number;
-    private endMonth: number;
+    private startYearMonth: number;
+    private endYearMonth: number;
     private fiscalStartMonth: number;
+    private cachedString = '';
   
     /**
      * Creates a new Period
      * 
-     * This constructor is designed to be used with the year and
-     * period helper functions. They provide input validation and
-     * more literate construction. The expectation is that most
-     * use cases will prefer the parser.
+     * The expectation is that the parser will be used much more frequently
+     * than this constructor. The constructor is designed to be used with the
+     * year and period helper functions. They provide input validation and more
+     * literate construction. The constructor will silently adjust inputs into
+     * expected ranges where the helpers will throw Errors.
      * 
      * Examples:
      *    new Period(CY(2023), Sep())
      *    new Period(FY(2023), H(1))
-     *    new Period(CY(2028), Q(3), Apr())
+     *    new Period(CY(28), Q(3), Apr())
+     * 
+     * Parser examples:
+     *    parsePeriod('CY2023 Sep')
+     *    parsePeriod('FY2023 H1')
+     *    parsePeriod('CY28 Q3')
      *
+     * Periods 
+     * 
      * @param year the kind and year, use `CY()` and `FY()`
      * @param months start and end month ordinals, relative to the
      *               calendar or fiscal start, use `H()`, `Q()`, or the
@@ -112,30 +122,34 @@ import {
       fiscalYearStartMonth: number = Jul()[0]
     ) {
       this.kind = year[0];
-      this.fiscalStartMonth = fiscalYearStartMonth;
+      this.fiscalStartMonth = safeMonth(fiscalYearStartMonth);
+      const startYear = year[1] > 0 ? year[1] % 10000 : 1982;
+      const startMonth = safeMonth(months[0]);
+      const endMonth = safeMonth(months[1]);
+      const endYear = startMonth <= endMonth ? startYear : startYear + 1;
 
       switch (this.kind) {
         case YearKind.TBD:
-          this.startMonth = 999911;
-          this.endMonth = 999911;
+          this.startYearMonth = 999911;
+          this.endYearMonth = 999911;
           break;
         case YearKind.CY:
-            this.startMonth = yearMonth(year[1], months[0]);
-            this.endMonth = yearMonth(year[1], months[1]);
+            this.startYearMonth = yearMonth(startYear, startMonth);
+            this.endYearMonth = yearMonth(endYear, endMonth);
           break;
         case YearKind.FY:
-          this.startMonth = fiscalToCalendar(
-            yearMonth(year[1], months[0]),
+          this.startYearMonth = fiscalToCalendar(
+            yearMonth(startYear, startMonth),
             this.fiscalStartMonth
           );
-          this.endMonth = fiscalToCalendar(
-            yearMonth(year[1], months[1]),
+          this.endYearMonth = fiscalToCalendar(
+            yearMonth(endYear, endMonth),
             this.fiscalStartMonth
           ); 
           break;
         default:
-          this.startMonth = 999912;
-          this.endMonth = 999912;
+          this.startYearMonth = 999912;
+          this.endYearMonth = 999912;
       }
     }
 
@@ -144,8 +158,8 @@ import {
      */
      contains(date: Period): boolean {
       if (
-        this.startMonth <= date.startMonth &&
-        date.endMonth <= this.endMonth
+        this.startYearMonth <= date.startYearMonth &&
+        date.endYearMonth <= this.endYearMonth
       ) {
         return true;
       } else {
@@ -157,7 +171,7 @@ import {
      * @returns true if this Period ends after date
      */
     endsAfter(date: Period): boolean {
-      if (this.endMonth > date.endMonth) {
+      if (this.endYearMonth > date.endYearMonth) {
         return true;
       } else {
         return false;
@@ -168,7 +182,7 @@ import {
      * @returns true if this Period ends before date starts
      */
     endsBefore(date: Period): boolean {
-      if (this.endMonth < date.startMonth) {
+      if (this.endYearMonth < date.startYearMonth) {
         return true;
       } else {
         return false;
@@ -180,7 +194,7 @@ import {
      *          as date
      */
      endsSameMonth(date: Period): boolean {
-      return this.endMonth === date.endMonth;
+      return this.endYearMonth === date.endYearMonth;
     }
   
     /**
@@ -190,8 +204,8 @@ import {
     equals(date: Period): boolean {
       if (
         this.kind === date.kind &&
-        this.startMonth === date.startMonth &&
-        this.endMonth === date.endMonth &&
+        this.startYearMonth === date.startYearMonth &&
+        this.endYearMonth === date.endYearMonth &&
         this.fiscalStartMonth === date.fiscalStartMonth
       ) {
         return true;
@@ -203,38 +217,45 @@ import {
      * @returns the calendar month associated with the end of this Period
      */
     getEndCalendarMonth(): number {
-      return yearAndMonth(this.endMonth)[1];
+      return yearAndMonth(this.endYearMonth)[1];
     }
   
     /**
      * @returns the calendar year associated with the end of this Period
      */
     getEndCalendarYear(): number {
-      return yearAndMonth(this.endMonth)[0];
+      return yearAndMonth(this.endYearMonth)[0];
     }
   
     /**
      * @returns the fiscal year associated with the end of this Period
      */
     getEndFiscalYear(): number {
-      return yearAndMonth(calendarToFiscal(
-        this.endMonth, this.fiscalStartMonth
-      ))[0];
-    }
-  
-    /**
-     * @returns the `YearKind` associated with this Period
-     */
-    getKind(): YearKind {
-      return this.kind;
+      return calendarToFiscal(
+        ...yearAndMonth(this.endYearMonth), this.fiscalStartMonth
+      )[0];
     }
     
     /**
      * @returns the month associated with the end of this Period
      */
     getEndMonth(): Period {
-      const [calYear, calMonth] = yearAndMonth(this.endMonth);
-      return new Period();
+      const [calYear, calMonth] = yearAndMonth(this.endYearMonth);
+      const endCalMonth = new Period(
+        CY(calYear),
+        Month(calMonth),
+        this.fiscalStartMonth
+      );
+      switch (this.kind) {
+        case YearKind.CY:
+          return endCalMonth;
+        case YearKind.FY:
+          return endCalMonth.toFiscal();
+        case YearKind.TBD:
+          return tbdPeriod();
+        default:
+          return unknownPeriod();
+      }
     }
 
     /**
@@ -248,38 +269,67 @@ import {
      * @returns the calendar year associated with the start of this BizPeriod
      */
      getStartCalendarYear(): number {
-      return yearAndMonth(this.startMonth)[0];
+      return yearAndMonth(this.startYearMonth)[0];
     }
 
     /**
      * @returns the fiscal year associated with the start of this Period
      */
      getStartFiscalYear(): number {
-      return yearAndMonth(calendarToFiscal(
-        this.startMonth, this.fiscalStartMonth
-      ))[0];
+      return calendarToFiscal(
+        ...yearAndMonth(this.startYearMonth), this.fiscalStartMonth
+      )[0];
     }
  
     /**
      * @returns the month associated with the start of this Period
      */
     getStartMonth(): Period {
-      const [calYear, calMonth] = yearAndMonth(this.endMonth);
-      return new Period();
+      const [calYear, calMonth] = yearAndMonth(this.startYearMonth);
+      const startCalMonth = new Period(
+        CY(calYear),
+        [calMonth, calMonth],
+        this.fiscalStartMonth
+      );
+      if (this.isFiscalPeriod()) {
+        return startCalMonth.toFiscal();
+      } else {
+        return startCalMonth;
+      }
     }
   
     /**
      * @returns true if this Period starts after date ends
      */
     isAfter(date: Period): boolean {
-      return this.startMonth > date.endMonth;
+      return this.startYearMonth > date.endYearMonth;
     }
   
     /**
      * @returns true if this Period ends before date starts
      */
     isBefore(date: Period): boolean {
-      return this.endMonth < date.startMonth;
+      return this.endYearMonth < date.startYearMonth;
+    }
+
+    isCalendarPeriod(): boolean {
+      return this.kind === YearKind.CY;
+    }
+
+    isFiscalPeriod(): boolean {
+      return this.kind === YearKind.FY;
+    }
+
+    isTBD(): boolean {
+      return this.kind === YearKind.TBD;
+    }
+
+    isUnknown(): boolean {
+      return (
+        this.kind !== YearKind.CY &&
+        this.kind !== YearKind.FY &&
+        this.kind !== YearKind.TBD
+      );
     }
 
     /**
@@ -287,74 +337,78 @@ import {
      * as date
      */
      startsSameMonth(date: Period): boolean {
-      return this.startMonth === date.startMonth;
+      return this.startYearMonth === date.startYearMonth;
     }
 
     /**
      * @returns true if this Period starts after date
      */
      startsAfter(date: Period): boolean {
-      return this.startMonth > date.startMonth;
+      return this.startYearMonth > date.startYearMonth;
     }
 
     /**
      * @returns true if this Period ends after date
      */
      startsBefore(date: Period): boolean {
-      return this.startMonth < date.startMonth;
+      return this.startYearMonth < date.startYearMonth;
     }
   
     /**
      * @returns this Period transformed into a calendar year Period
      */
     toCalendar(): Period {
-      if (this.kind === YearKind.FY) {
-        return new Period();
+      if (this.isFiscalPeriod()) {
+        const [startYear, startMonth] = yearAndMonth(this.startYearMonth);
+        const [, endMonth] = yearAndMonth(this.endYearMonth);
+        return new Period(CY(startYear), [startMonth, endMonth]);
       } else {
         return this;
       }
-    }
-    
-    /**
-     * @returns this BizDate mapped to a specific month
-     */
-    toEndMonth(): Period {
-      return new Period();
     }
 
     /**
      * @returns this Period transformed into a fiscal year Period
      */
      toFiscal(): Period {
-      if (this.kind === YearKind.CY) {
-        return new Period();
+      if (this.isCalendarPeriod()) {
+        return this.toFiscalYearThatStartsIn(this.fiscalStartMonth);
       } else {
         return this;
       }
     }
 
-    toFiscalYearThatStartsIn(fiscalStart: number) {
-      return new Period();
+    toFiscalYearThatStartsIn(fiscalStart: number): Period {
+      if (this.isTBD() || this.isUnknown()) {
+        return this;
+      }
+
+      const [startYear, startMonth] = calendarToFiscal(
+        ...yearAndMonth(this.startYearMonth),
+        fiscalStart
+      );
+      const [, endMonth] = calendarToFiscal(
+        ...yearAndMonth(this.endYearMonth),
+        fiscalStart
+      );
+
+      return new Period(FY(startYear), [startMonth, endMonth], fiscalStart);
     }
 
     /**
      * @returns this BizDate mapped to a specific month
      */
-     toMonths(): Period[] {
+    toMonths(): Period[] {
       return [new Period()];
     }
 
     /**
-     * @returns this BizDate mapped to a specific month
+     * @returns canonical short string format for this Period
      */
-    toStartMonth(): Period {
-      return new Period();
-    }
-  
-    /**
-     * @returns canonical string format for this BizDate
-     */
-    toString(): string {
+     toShortString(): string {
+      if (this.cachedString !== undefined && this.cachedString !== '') {
+        return this.cachedString;
+      }
       switch (this.kind) {
         case YearKind.TBD:
           return 'TBD';
@@ -364,6 +418,29 @@ import {
         default:
           return 'Unknown';
       }
+    }
+  
+    /**
+     * @returns canonical string format for this Period
+     */
+    toString(): string {
+      if (this.cachedString !== undefined && this.cachedString !== '') {
+        return this.cachedString;
+      }
+      if (this.isTBD()) {
+        return 'TBD';
+      }
+      if (this.isUnknown()) {
+        return 'Unknown';
+      }
+      const kindStr = this.isFiscalPeriod() ? 'FY': 'CY';
+      const [fiscalYear, fiscalMonth] = calendarToFiscal(
+        ...yearAndMonth(this.startYearMonth),
+        this.fiscalStartMonth
+      );
+
+      
+      return '';
     }
   }
 
@@ -398,7 +475,7 @@ import {
     parse(str: string): Period {
       let bp = parse(str);
       if (
-        bp.getKind() == YearKind.FY &&
+        bp.isFiscalPeriod() &&
         bp.getFiscalYearStartMonth() != this.fiscalYearStartMonth
       ) {
         return bp.toFiscalYearThatStartsIn(this.fiscalYearStartMonth);
@@ -423,7 +500,7 @@ import {
       throw new Error(`${y} is not a valid year in [1..9999]`);
     }
     y = y < 100 ? 2000 + y : y;
-    return [YearKind.CY, y];
+    return [YearKind.FY, y];
   }
 
   export function TBD(): [YearKind, number] {
@@ -448,6 +525,10 @@ import {
     }
     let end = quarter * 3; 
     return [end - 2, end];
+  }
+
+  export function Month(ordinal: number): [number, number] {
+    return [ordinal, ordinal];
   }
 
   export function Jan(): [number, number] {
@@ -591,14 +672,47 @@ import {
     return new Period(Unknown());
   }
 
-  function calendarToFiscal(calendarYearMonth: number, fiscalStart: number): number {
-    const [year, month] = yearAndMonth(calendarYearMonth);
-    return yearMonth(0, 0);
+  /**
+   * @param calendarYear the calendar year
+   * @param calendarMonth the month ordinal, in [1..12]
+   * @param fiscalStart the month ordinal, in [1..12], for the first month of the
+   *        fiscal year relative to the calendar year
+   * @returns the fiscal year and month
+   */
+  function calendarToFiscal(
+    calendarYear: number,
+    calendarMonth: number,
+    fiscalStart: number
+  ): [number, number] {
+    const fiscalYear = calendarMonth >= fiscalStart
+      ? calendarYear - 1 
+      : calendarYear;
+    const fiscalMonth = (fiscalStart + calendarMonth - 2) % 12 + 1;
+    return [fiscalYear, fiscalMonth];
   }
 
+  /**
+   * @param fiscalYearMonth the fiscal year and month ordinal, in [1..12], where
+   *        1 is aligned with fiscalStart
+   * @param fiscalStart the month ordinal, in [1..12], for the first month of the
+   *        fiscal year relative to the calendar year 
+   * @returns the calendar year and month
+   */
   function fiscalToCalendar(fiscalYearMonth: number, fiscalStart: number): number {
     const [year, month] = yearAndMonth(fiscalYearMonth);
-    return yearMonth(0, 0);
+    const calendarYear = fiscalStart + month <= 13 ? year - 1 : year;
+    const calendarMonth = (fiscalStart - 2 + month) % 12 + 1;
+    return yearMonth(calendarYear, calendarMonth);
+  }
+  
+  function safeMonth(month: number): number {
+    if (month < 0) {
+      return 1;
+    } else if (month > 12) {
+      return 12;
+    } else {
+      return month;
+    }
   }
 
   function yearAndMonth(yearMonth: number): [number, number] {
@@ -650,7 +764,11 @@ import {
   }
   
   function applyDate(value: [[YearKind, number], [number, number] | undefined]): Period {
-    return new Period(value[0], value[1]);
+    if (value[0][0] === YearKind.CY) {
+      return new Period(CY(value[0][1]), value[1])
+    } else {
+      return new Period(FY(value[0][1]), value[1]);
+    }
   }
   
   function applyFY(

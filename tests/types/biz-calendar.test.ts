@@ -21,9 +21,15 @@ import {
   FYPeriodFactory,
   PeriodParser,
   parsePeriod,
-  thisMonthPeriod,
-  YearKind as K
+  thisMonthPeriod
 } from '../../src/types/biz-calendar';
+
+enum K {
+  CY,
+  FY,
+  TBD,
+  Unknown,
+}
 
 function bdObj(
   kind: K,
@@ -33,9 +39,9 @@ function bdObj(
 ): object {
   return {
     kind: kind,
-    startMonth: start,
-    endMonth: end,
-    fiscalYearStartMonth: fy,
+    startYearMonth: start,
+    endYearMonth: end,
+    fiscalStartMonth: fy,
   };
 }
 
@@ -79,7 +85,7 @@ describe('transforming biz periods', () => {
   });
 
   test('FY Half to end Month', () => {
-    expect(new Period(FY(2023), H(2)).toEndMonth()).toMatchObject(
+    expect(new Period(FY(2023), H(2)).getEndMonth()).toMatchObject(
       bdObj(K.FY, 202306, 202306, 7)
     );
   });
@@ -142,16 +148,16 @@ describe('comparing biz periods', () => {
 
   test('before', () => {
     expect(
-      new Period(CY(2022), Sep()).isBefore(
-        new Period(FY(2023), H(1))
+      new Period(CY(2022), Aug()).isBefore(
+        new Period(FY(2023), Q(2))
       )
     ).toBeTruthy();
   });
 
   test('before resolution', () => {
     expect(
-      new Period(FY(2023), Dec()).isBefore(
-        new Period(CY(2022), H(2))
+      new Period(CY(2022), Dec()).isBefore(
+        new Period(FY(2023), H(2))
       )
     ).toBeTruthy();
   });
@@ -204,7 +210,7 @@ describe('comparing biz periods', () => {
 describe('parsing biz periods', () => {
   test('parse CY', () => {
     expect(parsePeriod('CY2023 May')).toMatchObject(
-      bdObj(K.CY, 202305, 20235, 7)
+      bdObj(K.CY, 202305, 202305, 7)
     );
   });
 
@@ -216,7 +222,7 @@ describe('parsing biz periods', () => {
 
   test('parse short FY', () => {
     expect(parsePeriod('FY24 Q3')).toMatchObject(
-      bdObj(K.FY, 202404, 202406, 7)
+      bdObj(K.FY, 202401, 202403, 7)
     );
   });
 
