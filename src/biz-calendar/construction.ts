@@ -1,165 +1,94 @@
-import {
-  Half,
-  Month,
-  Quarter,
-  Year,
-  _TBD,
-  _Unknown,
-  YearKind,
-} from './core';
+import {Half, Month, Quarter, Year, _TBD, _Unknown, YearKind} from './core';
 import {IPeriod} from './interface';
 import {calendarToFiscal} from './math';
 
 export function CY(
   year: number,
-  func: (
-    year: number,
-    kind: YearKind
-  ) => IPeriod = Y
+  func: (year: number, kind: YearKind) => IPeriod = Y
 ): IPeriod {
   return func(year, YearKind.CY);
 }
 
 export function FY(
   year: number,
-  func: (
-    year: number,
-    kind: YearKind
-  ) => IPeriod = Y
+  func: (year: number, kind: YearKind) => IPeriod = Y
 ): IPeriod {
   return func(year, YearKind.FY);
 }
 
-export function Jan(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Jan(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 1);
 }
 
-export function Feb(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Feb(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 2);
 }
 
-export function Mar(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Mar(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 3);
 }
 
-export function Apr(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Apr(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 4);
 }
 
-export function May(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function May(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 5);
 }
 
-export function Jun(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Jun(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 6);
 }
 
-export function Jul(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Jul(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 7);
 }
 
-export function Aug(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Aug(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 8);
 }
 
-export function Sep(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Sep(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 9);
 }
 
-export function Oct(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Oct(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 10);
 }
 
-export function Nov(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Nov(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 11);
 }
 
-export function Dec(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Dec(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 12);
 }
 
-export function Q1(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 1);
 }
 
-export function Q2(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 2);
 }
 
-export function Q3(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 3);
 }
 
-export function Q4(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 4);
 }
 
-export function H1(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Half(kind, year, 1);
 }
 
-export function H2(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Half(kind, year, 2);
 }
 
-export function Y(
-  year: number,
-  kind: YearKind = YearKind.CY
-): IPeriod {
+export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Year(kind, year);
 }
 

@@ -22,7 +22,7 @@ export function calendarToFiscal(
  *
  * @throws Error if month is not valid
  */
- export function checkMonth(month: number): number {
+export function checkMonth(month: number): number {
   if (1 > month || month > 12) {
     throw new Error(`${month} is not a month`);
   }
@@ -35,7 +35,7 @@ export function calendarToFiscal(
  *
  * @throws Error if year is not valid, year + 2000 if year is < 100
  */
- export function checkYear(year: number): number {
+export function checkYear(year: number): number {
   if (1 > year || year > 9999) {
     throw new Error(`${year} is not a valid year`);
   }
@@ -53,14 +53,13 @@ export function calendarToFiscal(
  *        fiscal year relative to the calendar year
  * @returns the calendar year and month
  */
- export function fiscalToCalendar(
+export function fiscalToCalendar(
   fiscalYear: number,
   fiscalMonth: number,
   fiscalStart: number
 ): [number, number] {
-  const calendarYear = fiscalStart + fiscalMonth <= 13 ?
-    fiscalYear - 1 :
-    fiscalYear;
+  const calendarYear =
+    fiscalStart + fiscalMonth <= 13 ? fiscalYear - 1 : fiscalYear;
   let calendarMonth = fiscalMonth - fiscalStart + 1;
   calendarMonth = calendarMonth < 1 ? 12 + calendarMonth : calendarMonth;
   return [calendarYear, calendarMonth];

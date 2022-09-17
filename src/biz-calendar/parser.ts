@@ -23,12 +23,8 @@ import {
   TBD,
   Unknown,
 } from './construction';
-import {
-  YearKind
-} from './core';
-import {
-  IPeriod,
-} from './interface';
+import {YearKind} from './core';
+import {IPeriod} from './interface';
 import {
   alt,
   apply,
@@ -50,7 +46,7 @@ import {
  *
  * @throws Error, if the parse fails
  */
- export function parsePeriod(str: string): IPeriod {
+export function parsePeriod(str: string): IPeriod {
   return parse(str);
 }
 

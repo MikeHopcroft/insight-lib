@@ -29,5 +29,3 @@ export interface IPeriod {
   getEndYearMonth(): number;
   getStartYearMonth(): number;
 }
-
-
