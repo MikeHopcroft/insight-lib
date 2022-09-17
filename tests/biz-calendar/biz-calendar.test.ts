@@ -1,9 +1,4 @@
 import {
-  IPeriod,
-  Period,
-  Month,
-  Quarter,
-  Year,
   TBD,
   Unknown,
   CY,
@@ -29,20 +24,15 @@ import {
   Y,
   PeriodParser,
   parsePeriod,
-  currentHalf,
-  currentQuarter,
   currentMonth,
-  currentYear,
-} from '../../src/types/biz-calendar';
+} from '../../src/biz-calendar';
 
 enum K {
   CY,
   FY,
-  TBD,
-  Unknown,
 }
 
-function bdObj(kind: K, start: number, end: number, fy: number = 7): object {
+function bdObj(kind: K, start: number, end: number, fy = 7): object {
   return {
     kind: kind,
     startYearMonth: start,
@@ -52,6 +42,20 @@ function bdObj(kind: K, start: number, end: number, fy: number = 7): object {
 }
 
 describe('constructing business periods', () => {
+  test('fiscal year', () => {
+    expect(FY(2024, Y, 10)).toMatchInlineSnapshot(
+      bdObj(K.FY, 202310, 202409, 10),
+      `
+      {
+        "endYearMonth": 202409,
+        "fiscalYearStartMonth": 10,
+        "kind": 1,
+        "startYearMonth": 202310,
+      }
+    `
+    );
+  });
+
   test('fiscal year half', () => {
     expect(FY(2023, H1)).toMatchObject(bdObj(K.FY, 202207, 202212, 7));
   });
@@ -64,19 +68,23 @@ describe('constructing business periods', () => {
     expect(CY(2022, Sep)).toMatchObject(bdObj(K.CY, 202209, 202209, 7));
   });
 
-  test('with TBD', () => {
-    expect(new TBD()).toMatchObject(bdObj(K.TBD, 999911, 999911, 7));
+  test('TBD', () => {
+    expect(new TBD()).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
+  });
+
+  test('Unknown', () => {
+    expect(new Unknown(10)).toMatchObject(bdObj(K.CY, 999912, 999912, 10));
   });
 });
 
-describe('transforming biz periods', () => {
-  test('CY to FY', () => {
+describe('transforming business periods', () => {
+  test('CY Quarter to FY Quarter', () => {
     expect(CY(2022, Q3).toFiscal()).toMatchObject(
       bdObj(K.FY, 202207, 202209, 7)
     );
   });
 
-  test('FY to CY', () => {
+  test('FY Half to CY Half', () => {
     expect(FY(2023, H2).toCalendar()).toMatchObject(
       bdObj(K.CY, 202301, 202306, 7)
     );
@@ -88,16 +96,24 @@ describe('transforming biz periods', () => {
     );
   });
 
-  test('CY to string', () => {
+  test('CY Month to string', () => {
     expect(CY(2022, Sep).toString()).toBe('CY2022 Sep');
   });
 
-  test('FY to string', () => {
+  test('FY Quarter to string', () => {
     expect(FY(2023, Q2).toString()).toBe('FY2023 Q2');
   });
 
-  test('Year to string', () => {
+  test('Calendar Year to string', () => {
     expect(CY(2022, Y).toString()).toBe('CY2022');
+  });
+
+  test('Calender Half to Fiscal Half to string', () => {
+    expect(CY(25, H2).toFiscal().toString()).toBe('FY2026 H1');
+  });
+  
+  test('Calendar Year to Period string', () => {
+    expect(CY(2023).toFiscal().toString()).toBe('FY2023 Jan - FY2024 Dec')
   });
 
   test('TBD to string', () => {
@@ -110,12 +126,44 @@ describe('transforming biz periods', () => {
 
   test('Unknown to FY', () => {
     expect(new Unknown().toFiscal()).toMatchObject(
-      bdObj(K.Unknown, 999912, 999912, 7)
+      bdObj(K.CY, 999912, 999912, 7)
     );
   });
 });
 
 describe('comparing biz periods', () => {
+  test('compare Month before Month', () => {
+    expect(CY(23, Jan).compare(CY(23, Feb))).toBeLessThan(0);
+  });
+
+  test('compare Half before overlapping Quarter', () => {
+    expect(CY(23, H1).compare(CY(23, Q2))).toBeLessThan(0);
+  });
+
+  test('compare Month contained in Quarter', () => {
+    expect(FY(24, Q4).compare(CY(2024, May))).toBeLessThan(0);
+  });
+
+  test('compare same Month', () => {
+    expect(FY(25, Jun).compare(CY(2025, Jun))).toBe(0);
+  });
+
+  test('compare Month after Half', () => {
+    expect(CY(2023, Mar).compare(FY(2023, H1))).toBeGreaterThan(0);
+  });
+
+  test('compare Month in Quarter', () => {
+    expect(CY(3000, Nov).compare(FY(3001, Q2))).toBeGreaterThan(0);
+  });
+
+  test('Year contains Month', () => {
+    expect(CY(2023).contains(FY(2023, Apr))).toBeTruthy();
+  });
+
+  test('Half does not contain Month', () => {
+    expect(FY(2024, H2).contains(CY(2023, Jul))).toBeFalsy();
+  })
+
   test('are equal', () => {
     expect(CY(2022, Sep).equals(CY(2022, Sep))).toBeTruthy();
   });
@@ -185,12 +233,12 @@ describe('parsing biz periods', () => {
   });
 
   test('parse TBD', () => {
-    expect(parsePeriod('TBD')).toMatchObject(bdObj(K.TBD, 999911, 999911, 7));
+    expect(parsePeriod('TBD')).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
   });
 
   test('parse Unknown', () => {
     expect(parsePeriod('Unknown')).toMatchObject(
-      bdObj(K.Unknown, 999912, 999912, 7)
+      bdObj(K.CY, 999912, 999912, 7)
     );
   });
 
