@@ -12,7 +12,6 @@ export interface IPeriod {
   getEndFiscalMonth(): number;
   getEndFiscalYear(): number;
   getEndMonth(): Month;
-  getFiscalYearStartMonth(): number;
   getStartCalendarMonth(): number;
   getStartCalendarYear(): number;
   getStartFiscalMonth(): number;

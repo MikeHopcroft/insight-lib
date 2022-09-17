@@ -20,10 +20,10 @@ import {
   Oct,
   Nov,
   Dec,
-} from './construction';
-import {
   TBD,
   Unknown,
+} from './construction';
+import {
   YearKind
 } from './core';
 import {
@@ -52,25 +52,6 @@ import {
  */
  export function parsePeriod(str: string): IPeriod {
   return parse(str);
-}
-
-/**
- * Use PeriodParser instead of calling the parse function directly to provide
- * a non-default fiscal year.
- */
- export class PeriodParser {
-  private fiscalYearStartMonth: number;
-
-  constructor(fiscalYearStartMonth = 7) {
-    if (1 > fiscalYearStartMonth && fiscalYearStartMonth > 12) {
-      throw new Error(`${fiscalYearStartMonth} is not a month`);
-    }
-    this.fiscalYearStartMonth = fiscalYearStartMonth;
-  }
-
-  parse(str: string): IPeriod {
-    return parse(str);
-  }
 }
 
 function parse(expr: string): IPeriod {
@@ -206,11 +187,11 @@ function applyReverse(
 }
 
 function applyTBD(): IPeriod {
-  return new TBD();
+  return TBD();
 }
 
 function applyUnknown(): IPeriod {
-  return new Unknown();
+  return Unknown();
 }
 
 const lexer = buildLexer([

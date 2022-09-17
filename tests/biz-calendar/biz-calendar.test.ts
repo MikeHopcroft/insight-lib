@@ -22,7 +22,6 @@ import {
   H1,
   H2,
   Y,
-  PeriodParser,
   parsePeriod,
   currentMonth,
 } from '../../src/biz-calendar';
@@ -43,7 +42,7 @@ function bdObj(kind: K, start: number, end: number, fy = 7): object {
 
 describe('constructing business periods', () => {
   test('fiscal year', () => {
-    expect(FY(2024, Y, 10)).toMatchInlineSnapshot(
+    expect(FY(2024, Y)).toMatchInlineSnapshot(
       bdObj(K.FY, 202310, 202409, 10),
       `
       {
@@ -69,11 +68,11 @@ describe('constructing business periods', () => {
   });
 
   test('TBD', () => {
-    expect(new TBD()).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
+    expect(TBD()).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
   });
 
   test('Unknown', () => {
-    expect(new Unknown(10)).toMatchObject(bdObj(K.CY, 999912, 999912, 10));
+    expect(Unknown()).toMatchObject(bdObj(K.CY, 999912, 999912, 10));
   });
 });
 
@@ -117,15 +116,15 @@ describe('transforming business periods', () => {
   });
 
   test('TBD to string', () => {
-    expect(new TBD().toString()).toBe('TBD');
+    expect(TBD().toString()).toBe('TBD');
   });
 
   test('Unknown to string', () => {
-    expect(new Unknown().toString()).toBe('Unknown');
+    expect(Unknown().toString()).toBe('Unknown');
   });
 
   test('Unknown to FY', () => {
-    expect(new Unknown().toFiscal()).toMatchObject(
+    expect(Unknown().toFiscal()).toMatchObject(
       bdObj(K.CY, 999912, 999912, 7)
     );
   });
@@ -201,11 +200,11 @@ describe('comparing biz periods', () => {
   });
 
   test('before tbd', () => {
-    expect(CY(2022, Sep).isBefore(new TBD())).toBeTruthy();
+    expect(CY(2022, Sep).isBefore(TBD())).toBeTruthy();
   });
 
   test('before tbd', () => {
-    expect(CY(2022, Sep).isBefore(new Unknown())).toBeTruthy();
+    expect(CY(2022, Sep).isBefore(Unknown())).toBeTruthy();
   });
 });
 
