@@ -195,4 +195,9 @@ export interface IPeriod {
  */
 export class PeriodConfig {
   static fiscalYearStartMonth = 7;
+  static stringHalfAndQuarterPad = ' ';
+  static stringMonthPad = ' ';
+  static stringRangePad = ' ';
+  static stringShortYear = false;
+  static stringTBDPad = '';
 }

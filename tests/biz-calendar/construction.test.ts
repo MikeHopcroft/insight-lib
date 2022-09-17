@@ -72,6 +72,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Month);
     expect(month.isCalendarPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -80,6 +82,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Month);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -88,6 +92,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Quarter);
     expect(month.isCalendarPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -96,6 +102,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Quarter);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -104,6 +112,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Half);
     expect(month.isCalendarPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -112,6 +122,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Half);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -120,6 +132,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Year);
     expect(month.isCalendarPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 
@@ -128,6 +142,8 @@ describe('constructing current business periods', () => {
     expect(month).toBeInstanceOf(Year);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
+    expect(month.getStartYearMonth()).toBeGreaterThan(202000);
+    expect(month.getEndYearMonth()).toBeLessThan(210000);
     expect(month.getEndYearMonth()).toBeGreaterThan(202000);
   });
 });

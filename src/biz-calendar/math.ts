@@ -1,4 +1,5 @@
 import {YearKind} from './core';
+import { PeriodConfig } from './interface';
 
 /**
  * @param calendarYear the calendar year
@@ -86,4 +87,12 @@ export function yearAndMonth(yearMonth: number): [number, number] {
 
 export function yearMonth(year: number, month: number): number {
   return year * 100 + month;
+}
+
+export function ifShortYear(year: number): number {
+  if (PeriodConfig.stringShortYear) {
+    return Math.floor(year / 100);
+  } else {
+    return year;
+  }
 }

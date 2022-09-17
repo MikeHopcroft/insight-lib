@@ -5,6 +5,7 @@ import {
   checkMonth,
   checkYear,
   fiscalToCalendar,
+  ifShortYear,
   yearAndMonth,
   yearMonth,
 } from './math';
@@ -46,18 +47,11 @@ export class Period implements IPeriod {
   protected cachedString: string | undefined;
 
   /**
-   * Creates a new Period
+   * Creates a new Period for the range described
    *
    * The expectation is that the parser will be used much more frequently
    * than this constructor. The constructor is designed to be used through the
    * year and period helper functions. They provide more literate construction.
-   *
-   *
-   * Helper function examples:
-   *    CY(2023, Sep)
-   *    FY(2023, H1)
-   *    CY(28, Q3)
-   *    FY(23)
    *
    * Parser examples:
    *    parsePeriod('CY2023 Sep')
@@ -70,23 +64,27 @@ export class Period implements IPeriod {
    * even if the Period represents a fiscal year period.
    *
    * @param kind calendar (CY) or fiscal (FY)
-   * @param year the calendar year in which the Period starts
+   * @param startYearShortOrLong the calendar year in which the Period starts
    * @param startMonthOrdinal the calendar start month ordinal
+   * @param endYearShortOrLong the calendar year in which the Period ends
    * @param endMonthOrdinal the calendar end month ordinal
    *
    * @throws Error if any of the values are out of range
    */
   constructor(
     kind: YearKind = YearKind.CY,
-    year: number = new Date().getUTCFullYear(),
+    startYearShortOrLong: number = new Date().getUTCFullYear(),
     startMonthOrdinal = 1,
+    endYearShortOrLong = 0,
     endMonthOrdinal = 12
   ) {
     this.kind = checkKind(kind);
-    const startYear = checkYear(year);
+    const startYear = checkYear(startYearShortOrLong);
     const startMonth = checkMonth(startMonthOrdinal);
     const endMonth = checkMonth(endMonthOrdinal);
-    const endYear = startMonth > endMonth ? startYear + 1 : startYear;
+    const endYear = endYearShortOrLong === 0 ?
+      startMonth > endMonth ? startYear + 1 : startYear :
+      checkYear(endYearShortOrLong);
 
     this.startYearMonth = yearMonth(startYear, startMonth);
     this.endYearMonth = yearMonth(endYear, endMonth);
@@ -101,6 +99,11 @@ export class Period implements IPeriod {
       return 1;
     }
 
+    // Overlap at beginning
+    if (this.startsBefore(date)) {
+      return -1;
+    }
+
     // Complete overlap
     if (this.startsSameMonth(date) && this.endsSameMonth(date)) {
       return 0;
@@ -109,9 +112,6 @@ export class Period implements IPeriod {
     // Overlapping cases for Gantt-like containment order
     if (this.contains(date)) {
       return -1
-    }
-    if (this.startsBefore(date)) {
-      return -1;
     }
     // Ends After
     return 1;
@@ -236,10 +236,10 @@ export class Period implements IPeriod {
 
   toCalendar(): IPeriod {
     if (this.isFiscalPeriod()) {
-      const [startYear, startMonth] = yearAndMonth(this.startYearMonth);
-      const [, endMonth] = yearAndMonth(this.endYearMonth);
-
-      return new Period(YearKind.CY, startYear, startMonth, endMonth);
+      return new Period(
+        ...yearAndMonth(this.startYearMonth),
+        ...yearAndMonth(this.endYearMonth)
+      )
     } else {
       return this;
     }
@@ -247,10 +247,11 @@ export class Period implements IPeriod {
 
   toFiscal(): IPeriod {
     if (this.isCalendarPeriod()) {
-      const [startYear, startMonth] = yearAndMonth(this.startYearMonth);
-      const [, endMonth] = yearAndMonth(this.endYearMonth);
-
-      return new Period(YearKind.FY, startYear, startMonth, endMonth);
+      return new Period(
+        YearKind.FY,
+        ...yearAndMonth(this.startYearMonth),
+        ...yearAndMonth(this.endYearMonth)
+      );
     } else {
       return this;
     }
@@ -284,12 +285,12 @@ export class Period implements IPeriod {
     }
     if (startYear === endYear) {
       if (startMonth === endMonth) {
-        this.cachedString = `${pre}${startYear} ${months[startMonth]}`;
+        this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}`;
       } else {
-        this.cachedString = `${pre}${startYear} ${months[startMonth]}-${months[endMonth]}`;
+        this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}${PeriodConfig.stringRangePad}-${PeriodConfig.stringRangePad}${months[endMonth]}`;
       }
     } else {
-      this.cachedString = `${pre}${startYear} ${months[startMonth]} - ${pre}${endYear} ${months[endMonth]}`;
+      this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}${PeriodConfig.stringRangePad}-${PeriodConfig.stringRangePad}${pre}${ifShortYear(endYear)}${PeriodConfig.stringMonthPad}${months[endMonth]}`;
     }
 
     return this.cachedString;
@@ -310,7 +311,7 @@ export class Period implements IPeriod {
 export class Month extends Period implements IPeriod {
   constructor(kind = YearKind.CY, year: number, ordinal: number) {
     const month = checkMonth(ordinal);
-    super(kind, year, month, month);
+    super(kind, year, month, 0, month);
   }
 
   toCalendar(): IPeriod {
@@ -322,11 +323,7 @@ export class Month extends Period implements IPeriod {
 
   toFiscal(): IPeriod {
     if (this.isCalendarPeriod()) {
-      const [year, month] = calendarToFiscal(
-        ...yearAndMonth(this.startYearMonth),
-        PeriodConfig.fiscalYearStartMonth
-      );
-      return new Month(YearKind.FY, year, month);
+      return new Month(YearKind.FY, ...yearAndMonth(this.startYearMonth));
     }
     return this;
   }
@@ -346,7 +343,7 @@ export class Month extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${year} ${months[month]}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringMonthPad}${months[month]}`;
     return this.cachedString;
   }
 }
@@ -365,7 +362,7 @@ export class Quarter extends Period implements IPeriod {
         ? fiscalToCalendar(year, month, PeriodConfig.fiscalYearStartMonth)
         : [year, month];
     const startMonth = endMonth - 2;
-    super(kind, calendarYear, startMonth, endMonth);
+    super(kind, calendarYear, startMonth, 0, endMonth);
   }
 
   /**
@@ -391,11 +388,10 @@ export class Quarter extends Period implements IPeriod {
   toFiscal(): IPeriod {
     if (this.isCalendarPeriod()) {
       if (PeriodConfig.fiscalYearStartMonth % 3 === 1) {
-        const [year, month] = calendarToFiscal(
-          ...yearAndMonth(this.startYearMonth),
-          PeriodConfig.fiscalYearStartMonth
-        );
-        return new Quarter(YearKind.FY, year, Math.ceil(month / 3));
+        return new Quarter(
+          YearKind.FY,
+          this.getStartCalendarYear(),
+          Math.ceil(this.getStartFiscalMonth() / 3));
       } else {
         return super.toCalendar();
       }
@@ -418,7 +414,7 @@ export class Quarter extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${year} Q${Math.ceil(month / 3)}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringHalfAndQuarterPad}Q${Math.ceil(month / 3)}`;
     return this.cachedString;
   }
 }
@@ -437,7 +433,7 @@ export class Half extends Period implements IPeriod {
         ? fiscalToCalendar(year, month, PeriodConfig.fiscalYearStartMonth)
         : [year, month];
     const startMonth = endMonth - 5;
-    super(kind, calendarYear, startMonth, endMonth);
+    super(kind, calendarYear, startMonth, 0, endMonth);
   }
 
   /**
@@ -490,7 +486,7 @@ export class Half extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${year} H${Math.ceil(month / 6)}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringHalfAndQuarterPad}H${Math.ceil(month / 6)}`;
     return this.cachedString;
   }
 }
@@ -506,7 +502,7 @@ export class Year extends Period implements IPeriod {
         : [year, 1];
     let endMonth = (startMonth + 11) % 12;
     endMonth = endMonth === 0 ? 12 : endMonth;
-    super(kind, calendarYear, startMonth, endMonth);
+    super(kind, calendarYear, startMonth, 0, endMonth);
   }
 
   /**
@@ -520,7 +516,7 @@ export class Year extends Period implements IPeriod {
       if (PeriodConfig.fiscalYearStartMonth === 1) {
         return new Year(YearKind.CY, year);
       } else {
-        return new Period(YearKind.CY, year, startMonth, endMonth);
+        return new Period(YearKind.CY, year, startMonth, 0, endMonth);
       }
     }
     return this;
@@ -538,7 +534,7 @@ export class Year extends Period implements IPeriod {
       if (PeriodConfig.fiscalYearStartMonth === 1) {
         return new Year(YearKind.FY, startYear);
       } else {
-        return new Period(YearKind.FY, startYear, startMonth, endMonth);
+        return new Period(YearKind.FY, startYear, startMonth, 0, endMonth);
       }
     }
     return this;
@@ -549,13 +545,15 @@ export class Year extends Period implements IPeriod {
       return this.cachedString;
     }
     if (this.isCalendarPeriod()) {
-      this.cachedString = `CY${yearAndMonth(this.startYearMonth)[0]}`;
+      this.cachedString = `CY${ifShortYear(yearAndMonth(this.startYearMonth)[0])}`;
     } else {
       this.cachedString = `FY${
-        calendarToFiscal(
-          ...yearAndMonth(this.startYearMonth),
-          PeriodConfig.fiscalYearStartMonth
-        )[0]
+        ifShortYear(
+          calendarToFiscal(
+            ...yearAndMonth(this.startYearMonth),
+            PeriodConfig.fiscalYearStartMonth
+          )[0]
+        )
       }`;
     }
     return this.cachedString;
@@ -564,7 +562,7 @@ export class Year extends Period implements IPeriod {
 
 export class _TBD extends Period implements IPeriod {
   constructor() {
-    super(YearKind.CY, 9999, 11, 11);
+    super(YearKind.CY, 9999, 11, 0, 11);
   }
 
   toCalendar(): IPeriod {
@@ -576,13 +574,13 @@ export class _TBD extends Period implements IPeriod {
   }
 
   toString(): string {
-    return 'TBD';
+    return `${PeriodConfig.stringTBDPad}TBD`;
   }
 }
 
 export class _Unknown extends Period implements IPeriod {
   constructor() {
-    super(YearKind.CY, 9999, 12, 12);
+    super(YearKind.CY, 9999, 12, 0, 12);
   }
 
   toCalendar(): IPeriod {

@@ -2,52 +2,121 @@ import {Half, Month, Quarter, Year, _TBD, _Unknown, YearKind} from './core';
 import {IPeriod} from './interface';
 import {calendarToFiscal} from './math';
 
-export function CY(
-  year: number,
-  func: (year: number, kind: YearKind) => IPeriod = Y
-): IPeriod {
-  return func(year, YearKind.CY);
+type periodFunc = (year: number, kind: YearKind) => IPeriod;
+
+/**
+ * Part of a literate interface for constructing new calendar years 
+ * 
+ * Helper function examples:
+ *    CY(2023, Sep)
+ *    CY(23, H2)
+ *    CY(2023, Q3)
+ *    CY(23)
+ * 
+ * @param year the calendar year
+ * @param part the period function corresponding to the desired period
+ * @returns the new period described by the combination of the calendar year
+ *          and the period function
+ */
+export function CY(year: number, part: periodFunc = Y): IPeriod {
+  return part(year, YearKind.CY);
 }
 
-export function FY(
-  year: number,
-  func: (year: number, kind: YearKind) => IPeriod = Y
-): IPeriod {
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * Helper function examples:
+ *    FY(23, Sep)
+ *    FY(2023, H1)
+ *    FY(23, Q1)
+ *    FY(2023)
+ * 
+ * @param year the fiscal year
+ * @param func the period function corresponding to the desired period
+ * @returns the new period described by the combination of the fiscal year
+ *          and the period function
+ */
+export function FY(year: number, func: periodFunc = Y): IPeriod {
   return func(year, YearKind.FY);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Jan(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 1);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Feb(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 2);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Mar(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 3);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Apr(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 4);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function May(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 5);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Jun(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 6);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Jul(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 7);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Aug(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 8);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Sep(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 9);
 }
@@ -56,46 +125,101 @@ export function Oct(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 10);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Nov(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 11);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Dec(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 12);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 1);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 2);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 3);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Quarter(kind, year, 4);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Half(kind, year, 1);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Half(kind, year, 2);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Year(kind, year);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function TBD(): IPeriod {
   return new _TBD();
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ * 
+ * See CY() and FY() for examples.
+ */
 export function Unknown(): IPeriod {
   return new _Unknown();
 }
