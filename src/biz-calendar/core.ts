@@ -69,19 +69,18 @@ export class Period implements IPeriod {
    * Examples:
    *    CY(2023, Sep)
    *    FY(2023, H1)
-   *    CY(28, Q3, 7)
+   *    CY(28, Q3)
    *
    * Parser examples:
    *    parsePeriod('CY2023 Sep')
    *    parsePeriod('FY2023 H1')
    *    parsePeriod('CY28 Q3')
    *
-   * Periods
    *
    * @param kind calendar (CY) or fiscal (FY)
-   * @param year the calendar or fiscal year
-   * @param startMonthOrdinal the start month ordinal relative to the year
-   * @param endMonthOrdinal the end month ordinal relative to the year
+   * @param year the calendar
+   * @param startMonthOrdinal the calendar start month ordinal
+   * @param endMonthOrdinal the calendar end month ordinal
    */
   constructor(
     kind: YearKind = YearKind.CY,
@@ -95,19 +94,8 @@ export class Period implements IPeriod {
     const endMonth = checkMonth(endMonthOrdinal);
     const endYear = startMonth > endMonth ? startYear + 1 : startYear;
 
-    if (kind === YearKind.FY) {
-      this.startYearMonth = fiscalToCalendar(
-        yearMonth(startYear, startMonth),
-        PeriodConfig.fiscalYearStartMonth
-      );
-      this.endYearMonth = fiscalToCalendar(
-        yearMonth(endYear, endMonth),
-        PeriodConfig.fiscalYearStartMonth
-      );
-    } else {
-      this.startYearMonth = yearMonth(startYear, startMonth);
-      this.endYearMonth = yearMonth(endYear, endMonth);
-    }
+    this.startYearMonth = yearMonth(startYear, startMonth);
+    this.endYearMonth = yearMonth(endYear, endMonth);
   }
 
   /**
@@ -182,7 +170,10 @@ export class Period implements IPeriod {
    */
   equals(date: IPeriod): boolean {
     if (
-      this.kind === date.getKind() &&
+      (
+        this.isFiscalPeriod() === date.isFiscalPeriod() ||
+        this.isCalendarPeriod() === date.isCalendarPeriod()
+      ) &&
       this.startYearMonth === date.getStartYearMonth() &&
       this.endYearMonth === date.getEndYearMonth()
     ) {
@@ -458,17 +449,12 @@ export class Period implements IPeriod {
     ordinal: number
   ) {
     let month = checkMonth(ordinal);
-    if (kind === YearKind.FY) {
-      month = (month + PeriodConfig.fiscalYearStartMonth - 1) % 12;
-      month = month === 0 ? 12 : month;
-    }
     super(kind, year, month, month);
   }
 
   toCalendar(): IPeriod {
     if (this.isFiscalPeriod()) {
-      const [year, month] = yearAndMonth(this.startYearMonth);
-      return new Month(YearKind.CY, year, month);
+      return new Month(YearKind.CY, ...yearAndMonth(this.startYearMonth));
     }
     return this;
   }
@@ -512,9 +498,12 @@ export class Quarter extends Period implements IPeriod {
     if (quarter < 1 || quarter > 4) {
       throw new Error(`There are four quarters in a year: ${quarter}`);
     }
-    const endMonth = quarter * 3;
+    let month = quarter * 3;
+    let [calendarYear, endMonth] = kind === YearKind.FY ?
+      fiscalToCalendar(year, month, PeriodConfig.fiscalYearStartMonth) :
+      [year, month];
     const startMonth = endMonth - 2;
-    super(kind, year, startMonth, endMonth);
+    super(kind, calendarYear, startMonth, endMonth);
   }
 
   /**
@@ -588,9 +577,12 @@ export class Half extends Period implements IPeriod {
     if (half < 1 || half > 2) {
       throw new Error(`There are two halves in a year: ${half}`);
     }
-    const endMonth = half * 6;
+    const month = half * 6;
+    let [calendarYear, endMonth] = kind === YearKind.FY ?
+      fiscalToCalendar(year, month, PeriodConfig.fiscalYearStartMonth) :
+      [year, month];
     const startMonth = endMonth - 5;
-    super(kind, year, startMonth, endMonth);
+    super(kind, calendarYear, startMonth, endMonth);
   }
 
   /**
@@ -657,7 +649,12 @@ export class Half extends Period implements IPeriod {
  */
 export class Year extends Period implements IPeriod {
   constructor(kind = YearKind.CY, year: number) {
-    super(kind, year, 1, 12);
+    let [calendarYear, startMonth] = kind === YearKind.FY ?
+      fiscalToCalendar(year, 1, PeriodConfig.fiscalYearStartMonth) :
+      [year, 1];
+    let endMonth = (startMonth + 11) % 12;
+    endMonth = endMonth === 0 ? 12 : endMonth;
+    super(kind, calendarYear, startMonth, endMonth);
   }
 
   /**

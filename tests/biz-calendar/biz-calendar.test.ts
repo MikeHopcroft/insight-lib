@@ -31,67 +31,58 @@ enum K {
   FY,
 }
 
-function bdObj(kind: K, start: number, end: number, fy = 7): object {
+function bdObj(kind: K, start: number, end: number): object {
   return {
     kind: kind,
     startYearMonth: start,
     endYearMonth: end,
-    fiscalYearStartMonth: fy,
   };
 }
 
 describe('constructing business periods', () => {
   test('fiscal year', () => {
-    expect(FY(2024, Y)).toMatchInlineSnapshot(
-      bdObj(K.FY, 202310, 202409, 10),
-      `
-      {
-        "endYearMonth": 202409,
-        "fiscalYearStartMonth": 10,
-        "kind": 1,
-        "startYearMonth": 202310,
-      }
-    `
+    expect(FY(2024)).toMatchObject(
+      bdObj(K.FY, 202310, 202409)
     );
   });
 
   test('fiscal year half', () => {
-    expect(FY(2023, H1)).toMatchObject(bdObj(K.FY, 202207, 202212, 7));
+    expect(FY(2023, H1)).toMatchObject(bdObj(K.FY, 202207, 202212));
   });
 
   test('calendar year quarter', () => {
-    expect(CY(2022, Q4)).toMatchObject(bdObj(K.CY, 202210, 202212, 7));
+    expect(CY(2022, Q4)).toMatchObject(bdObj(K.CY, 202210, 202212));
   });
 
   test('calendar year month', () => {
-    expect(CY(2022, Sep)).toMatchObject(bdObj(K.CY, 202209, 202209, 7));
+    expect(CY(2022, Sep)).toMatchObject(bdObj(K.CY, 202209, 202209));
   });
 
   test('TBD', () => {
-    expect(TBD()).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
+    expect(TBD()).toMatchObject(bdObj(K.CY, 999911, 999911));
   });
 
   test('Unknown', () => {
-    expect(Unknown()).toMatchObject(bdObj(K.CY, 999912, 999912, 10));
+    expect(Unknown()).toMatchObject(bdObj(K.CY, 999912, 999912));
   });
 });
 
 describe('transforming business periods', () => {
   test('CY Quarter to FY Quarter', () => {
     expect(CY(2022, Q3).toFiscal()).toMatchObject(
-      bdObj(K.FY, 202207, 202209, 7)
+      bdObj(K.FY, 202207, 202209)
     );
   });
 
   test('FY Half to CY Half', () => {
     expect(FY(2023, H2).toCalendar()).toMatchObject(
-      bdObj(K.CY, 202301, 202306, 7)
+      bdObj(K.CY, 202301, 202306)
     );
   });
 
   test('FY Half to end Month', () => {
     expect(FY(2023, H2).getEndMonth()).toMatchObject(
-      bdObj(K.FY, 202306, 202306, 7)
+      bdObj(K.FY, 202306, 202306)
     );
   });
 
@@ -125,7 +116,7 @@ describe('transforming business periods', () => {
 
   test('Unknown to FY', () => {
     expect(Unknown().toFiscal()).toMatchObject(
-      bdObj(K.CY, 999912, 999912, 7)
+      bdObj(K.CY, 999912, 999912)
     );
   });
 });
@@ -211,45 +202,45 @@ describe('comparing biz periods', () => {
 describe('parsing biz periods', () => {
   test('parse CY', () => {
     expect(parsePeriod('CY2023 May')).toMatchObject(
-      bdObj(K.CY, 202305, 202305, 7)
+      bdObj(K.CY, 202305, 202305)
     );
   });
 
   test('parse FY', () => {
     expect(parsePeriod('FY2023 Q1')).toMatchObject(
-      bdObj(K.FY, 202207, 202209, 7)
+      bdObj(K.FY, 202207, 202209)
     );
   });
 
   test('parse short FY', () => {
     expect(parsePeriod('FY24 Q3')).toMatchObject(
-      bdObj(K.FY, 202401, 202403, 7)
+      bdObj(K.FY, 202401, 202403)
     );
   });
 
   test('parse shorter FY', () => {
-    expect(parsePeriod('FY24')).toMatchObject(bdObj(K.FY, 202307, 202406, 7));
+    expect(parsePeriod('FY24')).toMatchObject(bdObj(K.FY, 202307, 202406));
   });
 
   test('parse TBD', () => {
-    expect(parsePeriod('TBD')).toMatchObject(bdObj(K.CY, 999911, 999911, 7));
+    expect(parsePeriod('TBD')).toMatchObject(bdObj(K.CY, 999911, 999911));
   });
 
   test('parse Unknown', () => {
     expect(parsePeriod('Unknown')).toMatchObject(
-      bdObj(K.CY, 999912, 999912, 7)
+      bdObj(K.CY, 999912, 999912)
     );
   });
 
   test('loose parse', () => {
     expect(parsePeriod(' CY 23  H 2 ')).toMatchObject(
-      bdObj(K.CY, 202307, 202312, 7)
+      bdObj(K.CY, 202307, 202312)
     );
   });
 
   test('reverse parse', () => {
     expect(parsePeriod('Q3 FY2023')).toMatchObject(
-      bdObj(K.FY, 202301, 202303, 7)
+      bdObj(K.FY, 202301, 202303)
     );
   });
 });

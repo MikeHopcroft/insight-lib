@@ -7,12 +7,8 @@ import {
   _Unknown,
   YearKind,
 } from './core';
-import {
-  IPeriod,
-} from './interface';
-import {
-  calendarToFiscal,
-} from './math';
+import {IPeriod} from './interface';
+import {calendarToFiscal} from './math';
 
 export function CY(
   year: number,
@@ -24,7 +20,7 @@ export function CY(
   return func(year, YearKind.CY);
 }
 
-export function FY<T = Month>(
+export function FY(
   year: number,
   func: (
     year: number,
@@ -57,128 +53,112 @@ export function Mar(
 
 export function Apr(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 4);
 }
 
 export function May(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 5);
 }
 
 export function Jun(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 6);
 }
 
 export function Jul(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 7);
 }
 
 export function Aug(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 8);
 }
 
 export function Sep(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 9);
 }
 
 export function Oct(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 10);
 }
 
 export function Nov(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 11);
 }
 
 export function Dec(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Month(kind, year, 12);
 }
 
 export function Q1(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Quarter(kind, year, 1);
 }
 
 export function Q2(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Quarter(kind, year, 2);
 }
 
 export function Q3(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Quarter(kind, year, 3);
 }
 
 export function Q4(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Quarter(kind, year, 4);
 }
 
 export function H1(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Half(kind, year, 1);
 }
 
 export function H2(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Half(kind, year, 2);
 }
 
 export function Y(
   year: number,
-  kind: YearKind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind: YearKind = YearKind.CY
 ): IPeriod {
   return new Year(kind, year);
 }

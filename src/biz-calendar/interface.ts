@@ -1,5 +1,3 @@
-import {Month, YearKind} from './core';
-
 export interface IPeriod {
   compare(date: IPeriod): number;
   contains(date: IPeriod): boolean;
@@ -11,12 +9,12 @@ export interface IPeriod {
   getEndCalendarYear(): number;
   getEndFiscalMonth(): number;
   getEndFiscalYear(): number;
-  getEndMonth(): Month;
+  getEndMonth(): IPeriod;
   getStartCalendarMonth(): number;
   getStartCalendarYear(): number;
   getStartFiscalMonth(): number;
   getStartFiscalYear(): number;
-  getStartMonth(): Month;
+  getStartMonth(): IPeriod;
   isAfter(date: IPeriod): boolean;
   isBefore(date: IPeriod): boolean;
   isCalendarPeriod(): boolean;
@@ -26,10 +24,9 @@ export interface IPeriod {
   startsSameMonth(date: IPeriod): boolean;
   toCalendar(): IPeriod;
   toFiscal(): IPeriod;
-  toMonths(): Month[];
+  toMonths(): IPeriod[];
   toString(): string;
   getEndYearMonth(): number;
-  getKind(): YearKind;
   getStartYearMonth(): number;
 }
 

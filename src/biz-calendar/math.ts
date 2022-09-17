@@ -53,15 +53,17 @@ export function calendarToFiscal(
  *        fiscal year relative to the calendar year
  * @returns the calendar year and month
  */
-export function fiscalToCalendar(
-  fiscalYearMonth: number,
+ export function fiscalToCalendar(
+  fiscalYear: number,
+  fiscalMonth: number,
   fiscalStart: number
-): number {
-  const [year, month] = yearAndMonth(fiscalYearMonth);
-  const calendarYear = fiscalStart + month <= 13 ? year - 1 : year;
-  let calendarMonth = month - fiscalStart + 1;
-  calendarMonth = calendarMonth < 1 ? 12 - calendarMonth : calendarMonth;
-  return yearMonth(calendarYear, calendarMonth);
+): [number, number] {
+  const calendarYear = fiscalStart + fiscalMonth <= 13 ?
+    fiscalYear - 1 :
+    fiscalYear;
+  let calendarMonth = fiscalMonth - fiscalStart + 1;
+  calendarMonth = calendarMonth < 1 ? 12 + calendarMonth : calendarMonth;
+  return [calendarYear, calendarMonth];
 }
 
 export function yearAndMonth(yearMonth: number): [number, number] {
