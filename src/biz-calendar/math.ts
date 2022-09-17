@@ -1,7 +1,9 @@
 import {YearKind} from './core';
-import { PeriodConfig } from './interface';
+import {PeriodConfig} from './interface';
 
 /**
+ * Computes the fiscal year and fiscal month from calendar year and month
+ *
  * @param calendarYear the calendar year
  * @param calendarMonth the month ordinal, in [1..12]
  * @param fiscalStart the month ordinal, in [1..12], for the first month of the
@@ -13,9 +15,15 @@ export function calendarToFiscal(
   calendarMonth: number,
   fiscalStart: number
 ): [number, number] {
+  if (fiscalStart === 1) {
+    return [calendarYear, calendarMonth];
+  }
+  let fiscalMonth = calendarMonth - (fiscalStart - 1);
+  if (fiscalMonth < 1) {
+    fiscalMonth = 12 + fiscalMonth;
+  }
   const fiscalYear =
     calendarMonth >= fiscalStart ? calendarYear + 1 : calendarYear;
-  const fiscalMonth = ((fiscalStart + calendarMonth - 2) % 12) + 1;
   return [fiscalYear, fiscalMonth];
 }
 
@@ -52,7 +60,7 @@ export function checkMonth(month: number): number {
  * @throws Error if year is not valid, year + 2000 if year is < 100
  */
 export function checkYear(year: number): number {
-  if (1 > year || year > 9999) {
+  if (0 > year || year > 9999) {
     throw new Error(`${year} is not a valid year`);
   }
   if (year < 100) {
@@ -63,36 +71,56 @@ export function checkYear(year: number): number {
 }
 
 /**
- * @param fiscalYearMonth the fiscal year and month ordinal, in [1..12], where
- *        1 is aligned with fiscalStart
+ * Computes the calendar year and calendar month from fiscal year and month
+ *
+ * @param fiscalYear the fiscal year
+ * @param fiscalMonth the month ordinal, in [1..12], where 1 is the fiscal
+ *        start month
  * @param fiscalStart the month ordinal, in [1..12], for the first month of the
  *        fiscal year relative to the calendar year
- * @returns the calendar year and month
+ * @returns the fiscal year and month
  */
 export function fiscalToCalendar(
   fiscalYear: number,
   fiscalMonth: number,
   fiscalStart: number
 ): [number, number] {
+  if (fiscalStart === 1) {
+    return [fiscalYear, fiscalMonth];
+  }
   const calendarYear =
     fiscalStart + fiscalMonth <= 13 ? fiscalYear - 1 : fiscalYear;
-  let calendarMonth = fiscalMonth - fiscalStart + 1;
-  calendarMonth = calendarMonth < 1 ? 12 + calendarMonth : calendarMonth;
+  let calendarMonth = fiscalStart - 1 + fiscalMonth;
+  if (calendarMonth > 12) {
+    calendarMonth = calendarMonth % 12;
+    if (calendarMonth === 0) {
+      calendarMonth = 1;
+    }
+  }
   return [calendarYear, calendarMonth];
 }
 
+/**
+ * @returns the short form of year, if PeriodConfig.stringShortYear is true
+ */
+export function ifShortYear(year: number): number {
+  if (PeriodConfig.stringShortYear) {
+    return year % 100;
+  } else {
+    return year;
+  }
+}
+
+/**
+ * Inverse of yearMonth
+ */
 export function yearAndMonth(yearMonth: number): [number, number] {
   return [Math.floor(yearMonth / 100), yearMonth % 100];
 }
 
+/**
+ * Inverse of yearAndMonth
+ */
 export function yearMonth(year: number, month: number): number {
   return year * 100 + month;
-}
-
-export function ifShortYear(year: number): number {
-  if (PeriodConfig.stringShortYear) {
-    return Math.floor(year / 100);
-  } else {
-    return year;
-  }
 }

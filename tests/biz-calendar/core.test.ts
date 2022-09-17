@@ -24,19 +24,7 @@ import {
   Y,
   currentMonth,
 } from '../../src/biz-calendar';
-
-export enum K {
-  CY,
-  FY,
-}
-
-export function pObj(kind: K, start: number, end: number): object {
-  return {
-    kind: kind,
-    startYearMonth: start,
-    endYearMonth: end,
-  };
-}
+import {K, pObj} from './test-support';
 
 describe('transforming business periods', () => {
   test('CY Quarter to FY Quarter', () => {

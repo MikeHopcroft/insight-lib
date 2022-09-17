@@ -41,8 +41,16 @@ import {
 /**
  * Parses a string in the form 'FY2023 Q1' or 'CY22 Sep'
  *
+ * Parser examples:
+ *    parsePeriod('CY2023 Sep')
+ *    parsePeriod('FY2023 H1')
+ *    parsePeriod('CY28 Q3')
+ *    parsePeriod('FY23')
+ *    parsePeriod('H2 FY24')
+ *    parsePeriod('FY 2026   Q2')
+ *
  * @param str the string to parse
- * @returns a BizDate that matches the string description
+ * @returns a period that matches the string description
  *
  * @throws Error, if the parse fails
  */

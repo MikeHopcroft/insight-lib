@@ -34,7 +34,7 @@ import {
   Year,
   YearKind,
 } from '../../src/biz-calendar/core';
-import {K, pObj} from './core.test';
+import {K, pObj} from './test-support';
 
 describe('constructing business periods', () => {
   test('fiscal year', () => {

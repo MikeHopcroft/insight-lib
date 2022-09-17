@@ -1,5 +1,5 @@
 import {parsePeriod} from '../../src/biz-calendar';
-import {K, pObj} from './core.test';
+import {K, pObj} from './test-support';
 
 describe('parsing biz periods', () => {
   test('parse CY', () => {
