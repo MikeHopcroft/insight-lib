@@ -5,14 +5,14 @@ import {calendarToFiscal} from './math';
 type periodFunc = (year: number, kind: YearKind) => IPeriod;
 
 /**
- * Part of a literate interface for constructing new calendar years 
- * 
+ * Part of a literate interface for constructing new calendar years
+ *
  * Helper function examples:
  *    CY(2023, Sep)
  *    CY(23, H2)
  *    CY(2023, Q3)
  *    CY(23)
- * 
+ *
  * @param year the calendar year
  * @param part the period function corresponding to the desired period
  * @returns the new period described by the combination of the calendar year
@@ -24,13 +24,13 @@ export function CY(year: number, part: periodFunc = Y): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * Helper function examples:
  *    FY(23, Sep)
  *    FY(2023, H1)
  *    FY(23, Q1)
  *    FY(2023)
- * 
+ *
  * @param year the fiscal year
  * @param func the period function corresponding to the desired period
  * @returns the new period described by the combination of the fiscal year
@@ -42,7 +42,7 @@ export function FY(year: number, func: periodFunc = Y): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Jan(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -51,7 +51,7 @@ export function Jan(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Feb(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -60,7 +60,7 @@ export function Feb(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Mar(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -69,7 +69,7 @@ export function Mar(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Apr(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -78,7 +78,7 @@ export function Apr(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function May(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -87,7 +87,7 @@ export function May(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Jun(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -96,7 +96,7 @@ export function Jun(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Jul(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -105,7 +105,7 @@ export function Jul(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Aug(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -114,20 +114,25 @@ export function Aug(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Sep(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 9);
 }
 
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
 export function Oct(year: number, kind: YearKind = YearKind.CY): IPeriod {
   return new Month(kind, year, 10);
 }
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Nov(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -136,7 +141,7 @@ export function Nov(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Dec(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -145,7 +150,7 @@ export function Dec(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -154,7 +159,7 @@ export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -163,7 +168,7 @@ export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -172,7 +177,7 @@ export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -181,7 +186,7 @@ export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -190,7 +195,7 @@ export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -199,7 +204,7 @@ export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
@@ -208,7 +213,7 @@ export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function TBD(): IPeriod {
@@ -217,7 +222,7 @@ export function TBD(): IPeriod {
 
 /**
  * Part of a literate interface for constructing new fiscal years
- * 
+ *
  * See CY() and FY() for examples.
  */
 export function Unknown(): IPeriod {

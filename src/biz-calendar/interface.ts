@@ -8,7 +8,6 @@
  * representation to allow comparison of any twovPeriods.
  */
 export interface IPeriod {
-
   /**
    * compare is designed to support sorting of Periods for display
    * so that longer Periods sort before Periods they contain.
@@ -27,18 +26,18 @@ export interface IPeriod {
 
   /**
    * The Periods may overlap
-   * 
+   *
    * @returns true if this period ends after date ends
    */
   endsAfter(date: IPeriod): boolean;
 
   /**
    * The Periods map overlap
-   * 
+   *
    * @returns true if this period ends before date ends
    */
   endsBefore(date: IPeriod): boolean;
-  
+
   /**
    * @returns true if this period ends the same calendar year and month
    *          as date
@@ -75,7 +74,7 @@ export interface IPeriod {
 
   /**
    * The end month maintains the CY/FY kind of this period
-   * 
+   *
    * @returns the month associated with the end of this period
    */
   getEndMonth(): IPeriod;
@@ -104,21 +103,21 @@ export interface IPeriod {
 
   /**
    * The start month maintains the CY/FY kind of this period
-   * 
+   *
    * @returns the month associated with the start of this period
    */
   getStartMonth(): IPeriod;
 
   /**
    * The periods do not overlap
-   * 
+   *
    * @returns true if this period starts after date ends
    */
   isAfter(date: IPeriod): boolean;
 
   /**
    * The periods do not overlap
-   * 
+   *
    * @returns true if this period ends before date starts
    */
   isBefore(date: IPeriod): boolean;
@@ -135,18 +134,18 @@ export interface IPeriod {
 
   /**
    * The periods may overlap
-   * 
+   *
    * @returns true if this Period starts after date starts
    */
   startsAfter(date: IPeriod): boolean;
 
   /**
    * The periods may overlap
-   * 
+   *
    * @returns true if this Period starts before date starts
    */
   startsBefore(date: IPeriod): boolean;
-  
+
   /**
    * @returns true if this Period starts the same calendar year and month
    *          as date
@@ -159,18 +158,18 @@ export interface IPeriod {
    *
    * Depending on the fiscal start year alignment with calendar years, the
    * period returned may be a month range, instead of a named range like 'H1'.
-   * 
+   *
    * @returns this period transformed into a calendar year period
    */
   toCalendar(): IPeriod;
 
-/**
+  /**
    * Transforms the period to a fiscal period representing the same date
    * range. If the period is already a fiscal date, toFiscal returns this.
    *
    * Depending on the fiscal start year alignment with calendar years, the
    * period returned may be a month range, instead of a named range like 'H1'.
-   * 
+   *
    * @returns this period transformed into a fiscal year period
    */
   toFiscal(): IPeriod;

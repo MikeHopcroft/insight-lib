@@ -76,9 +76,12 @@ export class Period implements IPeriod {
     const startYear = checkYear(startYearShortOrLong);
     const startMonth = checkMonth(startMonthOrdinal);
     const endMonth = checkMonth(endMonthOrdinal);
-    const endYear = endYearShortOrLong === -1 ?
-      startMonth > endMonth ? startYear + 1 : startYear :
-      checkYear(endYearShortOrLong);
+    const endYear =
+      endYearShortOrLong === -1
+        ? startMonth > endMonth
+          ? startYear + 1
+          : startYear
+        : checkYear(endYearShortOrLong);
 
     this.startYearMonth = yearMonth(startYear, startMonth);
     this.endYearMonth = yearMonth(endYear, endMonth);
@@ -102,10 +105,10 @@ export class Period implements IPeriod {
     if (this.startsSameMonth(date) && this.endsSameMonth(date)) {
       return 0;
     }
-  
+
     // Overlapping cases for Gantt-like containment order
     if (this.contains(date)) {
-      return -1
+      return -1;
     }
     // Ends After
     return 1;
@@ -169,7 +172,8 @@ export class Period implements IPeriod {
   }
 
   getEndMonth(): Month {
-    let [year, month] = yearAndMonth(this.endYearMonth);
+    let year = this.getEndCalendarYear();
+    const month = this.getEndCalendarMonth();
     if (this.kind === YearKind.FY) {
       year = this.getEndFiscalYear();
     }
@@ -199,7 +203,8 @@ export class Period implements IPeriod {
   }
 
   getStartMonth(): Month {
-    let [year, month] = yearAndMonth(this.startYearMonth);
+    let year = this.getStartCalendarYear();
+    const month = this.getStartCalendarMonth();
     if (this.kind === YearKind.FY) {
       year = this.getStartFiscalYear();
     }
@@ -239,7 +244,7 @@ export class Period implements IPeriod {
       return new Period(
         ...yearAndMonth(this.startYearMonth),
         ...yearAndMonth(this.endYearMonth)
-      )
+      );
     } else {
       return this;
     }
@@ -272,25 +277,29 @@ export class Period implements IPeriod {
     let [endYear, endMonth] = yearAndMonth(this.endYearMonth);
     if (this.isFiscalPeriod()) {
       pre = 'FY';
-      [startYear] = calendarToFiscal(
-        startYear,
-        startMonth,
-        PeriodConfig.fiscalYearStartMonth
-      );
-      [endYear] = calendarToFiscal(
-        endYear,
-        endMonth,
-        PeriodConfig.fiscalYearStartMonth
-      );
+      startYear = this.getStartFiscalYear();
+      endYear = this.getEndFiscalYear();
     }
     if (startYear === endYear) {
       if (startMonth === endMonth) {
-        this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}`;
+        this.cachedString = `${pre}${ifShortYear(startYear)}${
+          PeriodConfig.stringMonthPad
+        }${months[startMonth]}`;
       } else {
-        this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}${PeriodConfig.stringRangePad}-${PeriodConfig.stringRangePad}${months[endMonth]}`;
+        this.cachedString = `${pre}${ifShortYear(startYear)}${
+          PeriodConfig.stringMonthPad
+        }${months[startMonth]}${PeriodConfig.stringRangePad}-${
+          PeriodConfig.stringRangePad
+        }${months[endMonth]}`;
       }
     } else {
-      this.cachedString = `${pre}${ifShortYear(startYear)}${PeriodConfig.stringMonthPad}${months[startMonth]}${PeriodConfig.stringRangePad}-${PeriodConfig.stringRangePad}${pre}${ifShortYear(endYear)}${PeriodConfig.stringMonthPad}${months[endMonth]}`;
+      this.cachedString = `${pre}${ifShortYear(startYear)}${
+        PeriodConfig.stringMonthPad
+      }${months[startMonth]}${PeriodConfig.stringRangePad}-${
+        PeriodConfig.stringRangePad
+      }${pre}${ifShortYear(endYear)}${PeriodConfig.stringMonthPad}${
+        months[endMonth]
+      }`;
     }
 
     return this.cachedString;
@@ -311,9 +320,12 @@ export class Period implements IPeriod {
 export class Month extends Period implements IPeriod {
   constructor(kind = YearKind.CY, year: number, ordinal: number) {
     const month = checkMonth(ordinal);
-    const calendarYear = kind === YearKind.FY ?
-      fiscalToCalendar(year, month, PeriodConfig.fiscalYearStartMonth)[0] :
-      year;
+    const calendarYear =
+      kind === YearKind.FY
+        ? month >= PeriodConfig.fiscalYearStartMonth
+          ? year - 1
+          : year
+        : year;
     super(kind, calendarYear, month, -1, month);
   }
 
@@ -346,7 +358,9 @@ export class Month extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringMonthPad}${months[month]}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${
+      PeriodConfig.stringMonthPad
+    }${months[month]}`;
     return this.cachedString;
   }
 }
@@ -394,7 +408,8 @@ export class Quarter extends Period implements IPeriod {
         return new Quarter(
           YearKind.FY,
           this.getStartFiscalYear(),
-          Math.ceil(this.getStartFiscalMonth() / 3));
+          Math.ceil(this.getStartFiscalMonth() / 3)
+        );
       } else {
         return super.toCalendar();
       }
@@ -417,7 +432,9 @@ export class Quarter extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringHalfAndQuarterPad}Q${Math.ceil(month / 3)}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${
+      PeriodConfig.stringHalfAndQuarterPad
+    }Q${Math.ceil(month / 3)}`;
     return this.cachedString;
   }
 }
@@ -489,7 +506,9 @@ export class Half extends Period implements IPeriod {
         PeriodConfig.fiscalYearStartMonth
       );
     }
-    this.cachedString = `${pre}${ifShortYear(year)}${PeriodConfig.stringHalfAndQuarterPad}H${Math.ceil(month / 6)}`;
+    this.cachedString = `${pre}${ifShortYear(year)}${
+      PeriodConfig.stringHalfAndQuarterPad
+    }H${Math.ceil(month / 6)}`;
     return this.cachedString;
   }
 }
@@ -548,16 +567,16 @@ export class Year extends Period implements IPeriod {
       return this.cachedString;
     }
     if (this.isCalendarPeriod()) {
-      this.cachedString = `CY${ifShortYear(yearAndMonth(this.startYearMonth)[0])}`;
+      this.cachedString = `CY${ifShortYear(
+        yearAndMonth(this.startYearMonth)[0]
+      )}`;
     } else {
-      this.cachedString = `FY${
-        ifShortYear(
-          calendarToFiscal(
-            ...yearAndMonth(this.startYearMonth),
-            PeriodConfig.fiscalYearStartMonth
-          )[0]
-        )
-      }`;
+      this.cachedString = `FY${ifShortYear(
+        calendarToFiscal(
+          ...yearAndMonth(this.startYearMonth),
+          PeriodConfig.fiscalYearStartMonth
+        )[0]
+      )}`;
     }
     return this.cachedString;
   }

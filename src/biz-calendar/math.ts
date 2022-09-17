@@ -34,7 +34,7 @@ export function calendarToFiscal(
  * @throws Error if not CY or FY
  */
 export function checkKind(kind: YearKind): YearKind {
-  if (kind != YearKind.CY && kind != YearKind.FY) {
+  if (kind !== YearKind.CY && kind !== YearKind.FY) {
     throw new Error(`${kind} is not a valid YearKind`);
   }
   return kind;
