@@ -42,7 +42,7 @@ function bdObj(kind: K, start: number, end: number): object {
 describe('constructing business periods', () => {
   test('fiscal year', () => {
     expect(FY(2024)).toMatchObject(
-      bdObj(K.FY, 202310, 202409)
+      bdObj(K.FY, 202307, 202406)
     );
   });
 
