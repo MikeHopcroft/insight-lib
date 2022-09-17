@@ -1,3 +1,13 @@
+/*
+ * Supports common 'FY22 H1'-style date formats
+ *
+ * Deliverables and other business concepts in Microsoft are frequently
+ * associated with business periods, like 'FY2023 Q2' or 'CY22 Nov'.
+ * biz-calendar provides forgiving parsing of common string representations,
+ * creates canonical string representations, and uses a common internal
+ * representation to allow comparison of any twovPeriods.
+ */
+
 /**
  * This is an example regex for the string form of a business period. The parser
  * is more liberal, in that it also supports swapping the order of the year and

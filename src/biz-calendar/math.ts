@@ -1,3 +1,5 @@
+import {YearKind} from './core';
+
 /**
  * @param calendarYear the calendar year
  * @param calendarMonth the month ordinal, in [1..12]
@@ -14,6 +16,19 @@ export function calendarToFiscal(
     calendarMonth >= fiscalStart ? calendarYear + 1 : calendarYear;
   const fiscalMonth = ((fiscalStart + calendarMonth - 2) % 12) + 1;
   return [fiscalYear, fiscalMonth];
+}
+
+/**
+ * @param kind a YearKind
+ * @returns kind if it is valid
+ *
+ * @throws Error if not CY or FY
+ */
+export function checkKind(kind: YearKind): YearKind {
+  if (kind != YearKind.CY && kind != YearKind.FY) {
+    throw new Error(`${kind} is not a valid YearKind`);
+  }
+  return kind;
 }
 
 /**
