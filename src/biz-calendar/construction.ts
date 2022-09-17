@@ -1,5 +1,5 @@
 import {Half, Month, Quarter, Year, _TBD, _Unknown, YearKind} from './core';
-import {IPeriod} from './interface';
+import {IPeriod, PeriodConfig} from './interface';
 import {calendarToFiscal} from './math';
 
 type periodFunc = (year: number, kind: YearKind) => IPeriod;
@@ -236,8 +236,7 @@ export function Unknown(): IPeriod {
  * @returns a Period representing the current half
  */
 export function currentHalf(
-  kind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind = YearKind.CY
 ): Half {
   const date = new Date();
   let year = date.getUTCFullYear();
@@ -246,7 +245,7 @@ export function currentHalf(
     [year, monthOrdinal] = calendarToFiscal(
       year,
       monthOrdinal,
-      fiscalYearStartMonth
+      PeriodConfig.fiscalYearStartMonth
     );
   }
   return new Half(kind, year, Math.ceil(monthOrdinal / 6));
@@ -259,14 +258,16 @@ export function currentHalf(
  * @returns a Period representing the current month
  */
 export function currentMonth(
-  kind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind = YearKind.CY
 ): Month {
   const date = new Date();
   let year = date.getUTCFullYear();
   const monthOrdinal = date.getUTCMonth() + 1;
   if (kind === YearKind.FY) {
-    [year] = calendarToFiscal(year, monthOrdinal, fiscalYearStartMonth);
+    [year] = calendarToFiscal(
+      year, monthOrdinal,
+      PeriodConfig.fiscalYearStartMonth
+    );
   }
   return new Month(kind, year, monthOrdinal);
 }
@@ -278,8 +279,7 @@ export function currentMonth(
  * @returns a Period representing the current quarter
  */
 export function currentQuarter(
-  kind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind = YearKind.CY
 ): Quarter {
   const date = new Date();
   let year = date.getUTCFullYear();
@@ -288,7 +288,7 @@ export function currentQuarter(
     [year, monthOrdinal] = calendarToFiscal(
       year,
       monthOrdinal,
-      fiscalYearStartMonth
+      PeriodConfig.fiscalYearStartMonth
     );
   }
   return new Quarter(kind, year, Math.ceil(monthOrdinal / 3));
@@ -301,8 +301,7 @@ export function currentQuarter(
  * @returns a Period representing the current year
  */
 export function currentYear(
-  kind = YearKind.CY,
-  fiscalYearStartMonth = 7
+  kind = YearKind.CY
 ): Year {
   const date = new Date();
   let year = date.getUTCFullYear();
@@ -310,7 +309,7 @@ export function currentYear(
     [year] = calendarToFiscal(
       year,
       date.getUTCMonth() + 1,
-      fiscalYearStartMonth
+      PeriodConfig.fiscalYearStartMonth
     );
   }
   return new Year(kind, year);

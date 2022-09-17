@@ -348,15 +348,15 @@ export class Month extends Period implements IPeriod {
       return this.cachedString;
     }
 
-    let pre = 'CY';
-    let [year, month] = yearAndMonth(this.endYearMonth);
-    if (this.isFiscalPeriod()) {
+    let pre = '';
+    let year = 0;
+    const month = this.getStartCalendarMonth();
+    if (this.isCalendarPeriod()) {
+      pre = 'CY';
+      year = this.getStartCalendarYear();
+    } else {
       pre = 'FY';
-      [year, month] = calendarToFiscal(
-        year,
-        month,
-        PeriodConfig.fiscalYearStartMonth
-      );
+      year = this.getStartFiscalYear();
     }
     this.cachedString = `${pre}${ifShortYear(year)}${
       PeriodConfig.stringMonthPad
