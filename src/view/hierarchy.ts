@@ -6,17 +6,17 @@ import {
   RowDefinition,
 } from './interfaces';
 
-import {Store} from './node-store';
+import {NodeStore} from './node-store';
 
 export class Renderer {
-  store: Store;
+  store: NodeStore;
 
-  constructor(store: Store) {
+  constructor(store: NodeStore) {
     this.store = store;
   }
 
   buildHierarchy(root: RowDefinition): HierarchyRow[] {
-    const nodes = this.store.getNodes(root.type);
+    const nodes = this.store.getNodesWithType(root.type);
     return this.buildHierarchyInternal(0, root, nodes, []);
   }
 

@@ -1,5 +1,5 @@
 import {Node} from '../view/interfaces';
-import {Store} from '../view/node-store';
+import {NodeStore} from '../view/node-store';
 
 import {
   accounts,
@@ -13,7 +13,7 @@ import {
   TypedSourceTable,
 } from './sample-data';
 
-export function loadTablesAndEdges(store: Store) {
+export function loadTablesAndEdges(store: NodeStore) {
   createTable(store, tasks);
   createTable(store, features);
   createTable(store, capabilities);
@@ -24,7 +24,7 @@ export function loadTablesAndEdges(store: Store) {
 }
 
 function createTable<T extends any[]>(
-  store: Store,
+  store: NodeStore,
   table: TypedSourceTable<T>
 ) {
   const type = table.id;
@@ -45,15 +45,15 @@ function createFields<T extends any[]>(
   return result;
 }
 
-function createEdges(store: Store, edges: EdgeDescriptor[]) {
+function createEdges(store: NodeStore, edges: EdgeDescriptor[]) {
   for (const edge of edges) {
     createEdge(store, edge);
   }
 }
 
-function createEdge(store: Store, edge: EdgeDescriptor) {
-  const srcNodes = store.getNodes(edge.srcType);
-  const destNodes = store.getNodes(edge.destType);
+function createEdge(store: NodeStore, edge: EdgeDescriptor) {
+  const srcNodes = store.getNodesWithType(edge.srcType);
+  const destNodes = store.getNodesWithType(edge.destType);
 
   // Group destNodes by edge.destColumn
   const index = new Map<string, Node[]>();

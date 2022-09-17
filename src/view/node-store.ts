@@ -1,6 +1,6 @@
 import {EdgeType, Node, NodeFields, NodeId, NodeType}  from './interfaces';
 
-export class Store {
+export class NodeStore {
   nodes = new Map<NodeType, Map<NodeId, Node>>();
 
   getNode(type: NodeType, id: NodeId): Node | undefined {
@@ -11,7 +11,7 @@ export class Store {
     return undefined;
   }
 
-  getNodes(type: NodeType): Node[] {
+  getNodesWithType(type: NodeType): Node[] {
     const a = this.nodes.get(type);
     if (a) {
       return [...a.values()];
@@ -26,19 +26,21 @@ export class Store {
   }
 
   createEdge(type: EdgeType, from: Node, to: Node) {
+    // Add to outgoing edges to `from` node.
     let fromNodes = from.outgoing[type];
     if (!fromNodes) {
       fromNodes = [];
       from.outgoing[type] = fromNodes;
     }
-    fromNodes.push({type, node: to});
+    fromNodes.push({type, to, from});
 
+    // Add to incoming edges of `to` node.
     let toNodes = to.incoming[type];
     if (!toNodes) {
       toNodes = [];
       to.incoming[type] = toNodes;
     }
-    toNodes.push({type, node: from});
+    toNodes.push({type, to: from, from: to});
   }
 
   private addNode(node: Node) {

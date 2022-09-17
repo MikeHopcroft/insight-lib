@@ -93,7 +93,7 @@ export function outgoing(
     const node = context[context.length - 1];
     const edges = node.outgoing[type];
     if (edges) {
-      return {childRowDefinition, children: edges.map(c => c.node)};
+      return {childRowDefinition, children: edges.map(c => c.to)};
     } else {
       return {childRowDefinition, children: []};
     }
@@ -110,11 +110,11 @@ export function outgoingInContext(
     const edges = node.outgoing[type];
     if (edges) {
       const children = edges
-        .map(c => c.node)
+        .map(c => c.to)
         .filter(child => {
           const edges2 = child.incoming[direct];
           if (edges2) {
-            const ancestor = edges2[0].node;
+            const ancestor = edges2[0].to;
             return context.includes(ancestor);
           }
           return false;

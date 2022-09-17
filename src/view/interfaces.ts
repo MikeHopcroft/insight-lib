@@ -19,7 +19,8 @@ export type EdgeType = string;
 
 export interface Edge {
   type: EdgeType;
-  node: Node;
+  from: Node;
+  to: Node;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

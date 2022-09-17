@@ -1,7 +1,7 @@
 import {outgoingInContext} from '../view/expressions';
 import {Renderer} from '../view/hierarchy';
 import {RowDefinition} from '../view/interfaces';
-import {Store} from '../view/node-store';
+import {NodeStore} from '../view/node-store';
 import {renderRowsToString} from '../view/row-to-string';
 import {loadTablesAndEdges} from '../sample-data/sample-loader';
 import {
@@ -11,7 +11,7 @@ import {
   insightImpactView,
 } from '../sample-data/sample-views';
 
-function render(store: Store, view: RowDefinition) {
+function render(store: NodeStore, view: RowDefinition) {
   const renderer = new Renderer(store);
   const viewRows = renderer.buildHierarchy(view);
   // console.log(JSON.stringify(viewRows, null, 2));
@@ -25,7 +25,7 @@ function render(store: Store, view: RowDefinition) {
 }
 
 function go() {
-  const store = new Store();
+  const store = new NodeStore();
   loadTablesAndEdges(store);
 
   // Render plain hierarchical view
