@@ -222,16 +222,8 @@ export class Period implements IPeriod {
    * @returns the month associated with the end of this Period
    */
   getEndMonth(): Month {
-    if (this.isFiscalPeriod()) {
-      const [year, month] = calendarToFiscal(
-        ...yearAndMonth(this.endYearMonth),
-        PeriodConfig.fiscalYearStartMonth
-      );
-      return new Month(YearKind.FY, year, month);
-    } else {
-      const [year, month] = yearAndMonth(this.endYearMonth);
-      return new Month(this.kind, year, month);
-    }
+    const [year, month] = yearAndMonth(this.endYearMonth);
+    return new Month(this.kind, year, month);
   }
 
   /**
@@ -274,16 +266,8 @@ export class Period implements IPeriod {
    * @returns the month associated with the start of this Period
    */
   getStartMonth(): Month {
-    if (this.isFiscalPeriod()) {
-      const [year, month] = calendarToFiscal(
-        ...yearAndMonth(this.startYearMonth),
-        PeriodConfig.fiscalYearStartMonth
-      );
-      return new Month(YearKind.FY, year, month);
-    } else {
-      const [year, month] = yearAndMonth(this.startYearMonth);
-      return new Month(this.kind, year, month);
-    }
+    const [year, month] = yearAndMonth(this.startYearMonth);
+    return new Month(this.kind, year, month);
   }
 
   /**
