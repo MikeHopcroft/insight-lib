@@ -19,6 +19,7 @@ import {
   Oct,
   Nov,
   Dec,
+  Range,
   Q1,
   Q2,
   Q3,
@@ -100,28 +101,35 @@ describe('configuring padding', () => {
 describe('parsing non-default padded strings', () => {
   test('parse compact form', () => {
     setConfig(7, ' ', '', '', true, '');
-    expect(parsePeriod(FY(2023, Q1).toString())).
-      toMatchObject(pObj(K.FY, 202207, 202209));
-    expect(parsePeriod(CY(2023, H2).toString())).
-      toMatchObject(pObj(K.CY, 202307, 202312));
-    expect(parsePeriod(FY(2023, Oct).toString())).
-      toMatchObject(pObj(K.FY, 202210, 202210));
-    // expect(parsePeriod(CY(2023).toFiscal().toString())).
-    //   toMatchObject(pObj(K.FY, 202207, 202306));
+    expect(parsePeriod(FY(2023, Q1).toString())).toMatchObject(
+      pObj(K.FY, 202207, 202209)
+    );
+    expect(parsePeriod(CY(2023, H2).toString())).toMatchObject(
+      pObj(K.CY, 202307, 202312)
+    );
+    expect(parsePeriod(FY(2023, Oct).toString())).toMatchObject(
+      pObj(K.FY, 202210, 202210)
+    );
+    expect(parsePeriod(CY(2023).toFiscal().toString())).toMatchObject(
+      pObj(K.FY, 202301, 202312)
+    );
     setConfig();
-  })
+  });
 
   test('parse mixed form', () => {
-    setConfig(7, '\t', ' ', '\t', false, ' ');
-    expect(parsePeriod(FY(2023, Q1).toString())).
-      toMatchObject(pObj(K.FY, 202207, 202209));
-    expect(parsePeriod(CY(2023, H2).toString())).
-      toMatchObject(pObj(K.CY, 202307, 202312));
-    expect(parsePeriod(FY(2023, Oct).toString())).
-      toMatchObject(pObj(K.FY, 202210, 202210));
-    // expect(parsePeriod(CY(2023).toFiscal().toString())).
-    //   toMatchObject(pObj(K.FY, 202207, 202306));
+    setConfig(7, '\t', '\n', '\t', false, ' ');
+    expect(parsePeriod(FY(2023, Q1).toString())).toMatchObject(
+      pObj(K.FY, 202207, 202209)
+    );
+    expect(parsePeriod(CY(2023, H2).toString())).toMatchObject(
+      pObj(K.CY, 202307, 202312)
+    );
+    expect(parsePeriod(FY(2023, Oct).toString())).toMatchObject(
+      pObj(K.FY, 202210, 202210)
+    );
+    expect(
+      parsePeriod(CY(2023, Range(Mar, Jun)).toFiscal().toString())
+    ).toMatchObject(pObj(K.FY, 202303, 202306));
     setConfig();
-  })
-
+  });
 });

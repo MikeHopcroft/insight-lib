@@ -25,7 +25,6 @@ import {
   Unknown,
   periodFunction,
 } from './construction';
-import {Period, YearKind} from './core';
 import {IPeriod} from './interface';
 import {
   alt,
@@ -150,10 +149,7 @@ function applyMonth(value: number): periodFunction {
 function applyMonthRange(
   value: [number, Token<TokenKind.Dash>, number]
 ): periodFunction {
-  return Range(
-    MONTH_BUILDERS[value[0] - 1],
-    MONTH_BUILDERS[value[2] - 1]
-  )
+  return Range(MONTH_BUILDERS[value[0] - 1], MONTH_BUILDERS[value[2] - 1]);
 }
 
 function applyMonthToken(value: Token<any>): number {
@@ -180,7 +176,9 @@ function applyQuarter(
   return QUARTER_BUILDERS[n - 1];
 }
 
-function applyReverse(value: [periodFunction, [yearFunction, number]]): IPeriod {
+function applyReverse(
+  value: [periodFunction, [yearFunction, number]]
+): IPeriod {
   return applyDate([value[1], value[0]]);
 }
 

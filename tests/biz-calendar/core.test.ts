@@ -26,7 +26,7 @@ import {
   Y,
   currentMonth,
 } from '../../src/biz-calendar';
-import { Period } from '../../src/biz-calendar/core';
+import {Period} from '../../src/biz-calendar/core';
 import {K, pObj} from './test-support';
 
 describe('transforming business periods', () => {
@@ -158,12 +158,14 @@ describe('comparing biz periods', () => {
 describe('direct Period tests', () => {
   test('FY with end month ordinal before start month ordinal', () => {
     expect(new Period(1, 2021, 10, -1, 1)).toMatchObject(
-      pObj(K.FY, 202110, 202201));
+      pObj(K.FY, 202110, 202201)
+    );
   });
 
   test('FY with explict end month ordinal before start month ordinal', () => {
     expect(new Period(1, 2021, 10, 2022, 1)).toMatchObject(
-      pObj(K.FY, 202110, 202201));
+      pObj(K.FY, 202110, 202201)
+    );
   });
 
   test('CY with explicit end month ordinal before start month ordinal', () => {

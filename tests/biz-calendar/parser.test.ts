@@ -55,7 +55,7 @@ describe('parsing biz periods with ranges', () => {
       pObj(K.FY, 202202, 202209)
     );
   });
-  
+
   test('parse fiscal month range across calendar year end', () => {
     expect(parsePeriod('FY22 Oct-Jan')).toMatchObject(
       pObj(K.FY, 202110, 202201)
@@ -82,12 +82,14 @@ describe('parsing biz periods with ranges', () => {
 
   test('parse loosely formatted date range', () => {
     expect(parsePeriod('FY2023 Q1 -FY2025 Q2')).toMatchObject(
-      pObj(K.FY, 202207, 202412));
+      pObj(K.FY, 202207, 202412)
+    );
   });
 
   test('parse compact date range with different year kinds', () => {
     expect(parsePeriod('FY2037H2-NovCY42')).toMatchObject(
-      pObj(K.FY, 203701, 204211));
+      pObj(K.FY, 203701, 204211)
+    );
   });
 });
 

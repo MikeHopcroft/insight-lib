@@ -71,27 +71,19 @@ describe('constructing business periods', () => {
 
 describe('constructing periods with month ranges', () => {
   test('basic month range', () => {
-    expect(CY(22, Range(Feb, Sep))).toMatchObject(
-      pObj(K.CY, 202202, 202209)
-    );
+    expect(CY(22, Range(Feb, Sep))).toMatchObject(pObj(K.CY, 202202, 202209));
   });
 
   test('basic fiscal month range', () => {
-    expect(FY(22, Range(Feb, May))).toMatchObject(
-      pObj(K.FY, 202202, 202205)
-    );
+    expect(FY(22, Range(Feb, May))).toMatchObject(pObj(K.FY, 202202, 202205));
   });
-  
+
   test('fiscal month range across calendar year end', () => {
-    expect(FY(2022, Range(Oct, Jan))).toMatchObject(
-      pObj(K.FY, 202110, 202201)
-    );
+    expect(FY(2022, Range(Oct, Jan))).toMatchObject(pObj(K.FY, 202110, 202201));
   });
 
   test('calendar month range across calendar year end', () => {
-    expect(CY(22, Range(Oct, Jan))).toMatchObject(
-      pObj(K.CY, 202210, 202301)
-    );
+    expect(CY(22, Range(Oct, Jan))).toMatchObject(pObj(K.CY, 202210, 202301));
   });
 });
 

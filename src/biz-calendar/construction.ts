@@ -243,8 +243,8 @@ export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
  * See CY() and FY() for examples.
  */
 export function Range(
-    start: periodFunction,
-    end: periodFunction
+  start: periodFunction,
+  end: periodFunction
 ): periodFunction {
   const startMonth = months[start.name];
   const endMonth = months[end.name];

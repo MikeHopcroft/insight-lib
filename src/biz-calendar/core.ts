@@ -235,12 +235,12 @@ export class Period implements IPeriod {
     if (this.startsBefore(period)) {
       [startYear, startMonth] = yearAndMonth(this.getStartYearMonth());
     } else {
-      [startYear, startMonth] = yearAndMonth(period.getStartYearMonth())
+      [startYear, startMonth] = yearAndMonth(period.getStartYearMonth());
     }
     if (this.endsAfter(period)) {
       [endYear, endMonth] = yearAndMonth(this.getStartYearMonth());
     } else {
-      [endYear, endMonth] = yearAndMonth(period.getStartYearMonth())
+      [endYear, endMonth] = yearAndMonth(period.getStartYearMonth());
     }
     return new Period(this.kind, startYear, startMonth, endYear, endMonth);
   }
@@ -251,9 +251,11 @@ export class Period implements IPeriod {
         this.kind,
         ...yearAndMonth(from.getStartYearMonth()),
         ...yearAndMonth(this.getEndYearMonth())
-      )
+      );
     } else {
-      throw new Error('`from` must start before `this` and `this` must end after `from`')
+      throw new Error(
+        '`from` must start before `this` and `this` must end after `from`'
+      );
     }
   }
 
@@ -263,9 +265,11 @@ export class Period implements IPeriod {
         this.kind,
         ...yearAndMonth(this.getStartYearMonth()),
         ...yearAndMonth(to.getEndYearMonth())
-      )
+      );
     } else {
-      throw new Error('`this` must start before `to` and `to` must end after `this`')
+      throw new Error(
+        '`this` must start before `to` and `to` must end after `this`'
+      );
     }
   }
 
