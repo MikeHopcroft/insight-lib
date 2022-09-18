@@ -1,8 +1,32 @@
-import {Half, Month, Quarter, Year, _TBD, _Unknown, YearKind} from './core';
+import {
+  Half,
+  Month,
+  Period,
+  Quarter,
+  Year,
+  _TBD,
+  _Unknown,
+  YearKind,
+} from './core';
 import {IPeriod, PeriodConfig} from './interface';
 import {calendarToFiscal} from './math';
 
-type periodFunc = (year: number, kind: YearKind) => IPeriod;
+export type periodFunction = (year: number, kind: YearKind) => IPeriod;
+
+const months: {[key: string]: number} = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+};
 
 /**
  * Part of a literate interface for constructing new calendar years
@@ -12,13 +36,14 @@ type periodFunc = (year: number, kind: YearKind) => IPeriod;
  *    CY(23, H2)
  *    CY(2023, Q3)
  *    CY(23)
+ *    CY(2022, Range(Jan, Mar))
  *
  * @param year the calendar year
  * @param part the period function corresponding to the desired period
  * @returns the new period described by the combination of the calendar year
  *          and the period function
  */
-export function CY(year: number, part: periodFunc = Y): IPeriod {
+export function CY(year: number, part: periodFunction = Y): IPeriod {
   return part(year, YearKind.CY);
 }
 
@@ -30,13 +55,14 @@ export function CY(year: number, part: periodFunc = Y): IPeriod {
  *    FY(2023, H1)
  *    FY(23, Q1)
  *    FY(2023)
+ *    FY(2023, Range(Oct, Nov))
  *
  * @param year the fiscal year
  * @param func the period function corresponding to the desired period
  * @returns the new period described by the combination of the fiscal year
  *          and the period function
  */
-export function FY(year: number, func: periodFunc = Y): IPeriod {
+export function FY(year: number, func: periodFunction = Y): IPeriod {
   return func(year, YearKind.FY);
 }
 
@@ -216,6 +242,22 @@ export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
  *
  * See CY() and FY() for examples.
  */
+export function Range(
+    start: periodFunction,
+    end: periodFunction
+): periodFunction {
+  const startMonth = months[start.name];
+  const endMonth = months[end.name];
+  return (year: number, kind: YearKind): IPeriod => {
+    return new Period(kind, year, startMonth, -1, endMonth);
+  };
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
 export function TBD(): IPeriod {
   return new _TBD();
 }
@@ -235,9 +277,7 @@ export function Unknown(): IPeriod {
  * @param kind calendar year or fiscal year
  * @returns a Period representing the current half
  */
-export function currentHalf(
-  kind = YearKind.CY
-): Half {
+export function currentHalf(kind = YearKind.CY): Half {
   const date = new Date();
   let year = date.getUTCFullYear();
   let monthOrdinal = date.getUTCMonth() + 1;
@@ -257,15 +297,14 @@ export function currentHalf(
  * @param kind calendar year or fiscal year
  * @returns a Period representing the current month
  */
-export function currentMonth(
-  kind = YearKind.CY
-): Month {
+export function currentMonth(kind = YearKind.CY): Month {
   const date = new Date();
   let year = date.getUTCFullYear();
   const monthOrdinal = date.getUTCMonth() + 1;
   if (kind === YearKind.FY) {
     [year] = calendarToFiscal(
-      year, monthOrdinal,
+      year,
+      monthOrdinal,
       PeriodConfig.fiscalYearStartMonth
     );
   }
@@ -278,9 +317,7 @@ export function currentMonth(
  * @param kind calendar year or fiscal year
  * @returns a Period representing the current quarter
  */
-export function currentQuarter(
-  kind = YearKind.CY
-): Quarter {
+export function currentQuarter(kind = YearKind.CY): Quarter {
   const date = new Date();
   let year = date.getUTCFullYear();
   let monthOrdinal = date.getUTCMonth() + 1;
@@ -300,9 +337,7 @@ export function currentQuarter(
  * @param kind calendar year or fiscal year
  * @returns a Period representing the current year
  */
-export function currentYear(
-  kind = YearKind.CY
-): Year {
+export function currentYear(kind = YearKind.CY): Year {
   const date = new Date();
   let year = date.getUTCFullYear();
   if (kind === YearKind.FY) {

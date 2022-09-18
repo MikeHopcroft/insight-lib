@@ -37,6 +37,61 @@ describe('parsing biz periods', () => {
   });
 });
 
+describe('parsing biz periods with ranges', () => {
+  test('parse basic month range', () => {
+    expect(parsePeriod('CY22 Feb-Sep')).toMatchObject(
+      pObj(K.CY, 202202, 202209)
+    );
+  });
+
+  test('parse basic fiscal month range', () => {
+    expect(parsePeriod('FY22 Feb-May')).toMatchObject(
+      pObj(K.FY, 202202, 202205)
+    );
+  });
+
+  test('parsing basic fiscal month range across fiscal year should throw Error', () => {
+    const badFiscalRange = () => {
+      parsePeriod('FY22 Feb-Sep');
+    };
+    expect(badFiscalRange).toThrowError();
+  });
+  
+  test('parse fiscal month range across calendar year end', () => {
+    expect(parsePeriod('FY22 Oct-Jan')).toMatchObject(
+      pObj(K.FY, 202110, 202201)
+    );
+  });
+
+  test('parse calendar month range across calendar year end', () => {
+    expect(parsePeriod('CY22 Oct-Jan')).toMatchObject(
+      pObj(K.CY, 202210, 202301)
+    );
+  });
+
+  test('parse reverse month range', () => {
+    expect(parsePeriod('Mar-Aug CY2022')).toMatchObject(
+      pObj(K.CY, 202203, 202208)
+    );
+  });
+
+  test('parse date range', () => {
+    expect(parsePeriod('CY1985 H1 - CY01 Q3')).toMatchObject(
+      pObj(K.CY, 198501, 200109)
+    );
+  });
+
+  test('parse loosely formatted date range', () => {
+    expect(parsePeriod('FY2023 Q1 -FY2025 Q2')).toMatchObject(
+      pObj(K.FY, 202207, 202412));
+  });
+
+  test('parse compact date range with different year kinds', () => {
+    expect(parsePeriod('FY2037H2-NovCY42')).toMatchObject(
+      pObj(K.FY, 203701, 204211));
+  });
+});
+
 describe('parsing errors', () => {
   test('no year kind', () => {
     const noK = () => {

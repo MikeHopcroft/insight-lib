@@ -227,6 +227,48 @@ export class Period implements IPeriod {
     return this.kind === YearKind.FY;
   }
 
+  newPeriodCombinedWith(period: IPeriod): IPeriod {
+    let startYear = 0;
+    let startMonth = 0;
+    let endYear = 0;
+    let endMonth = 0;
+    if (this.startsBefore(period)) {
+      [startYear, startMonth] = yearAndMonth(this.getStartYearMonth());
+    } else {
+      [startYear, startMonth] = yearAndMonth(period.getStartYearMonth())
+    }
+    if (this.endsAfter(period)) {
+      [endYear, endMonth] = yearAndMonth(this.getStartYearMonth());
+    } else {
+      [endYear, endMonth] = yearAndMonth(period.getStartYearMonth())
+    }
+    return new Period(this.kind, startYear, startMonth, endYear, endMonth);
+  }
+
+  newPeriodFrom(from: IPeriod): IPeriod {
+    if (from.startsBefore(this) && this.endsAfter(from)) {
+      return new Period(
+        this.kind,
+        ...yearAndMonth(from.getStartYearMonth()),
+        ...yearAndMonth(this.getEndYearMonth())
+      )
+    } else {
+      throw new Error('`from` must start before `this` and `this` must end after `from`')
+    }
+  }
+
+  newPeriodTo(to: IPeriod): IPeriod {
+    if (this.startsBefore(to) && to.endsAfter(this)) {
+      return new Period(
+        this.kind,
+        ...yearAndMonth(this.getStartYearMonth()),
+        ...yearAndMonth(to.getEndYearMonth())
+      )
+    } else {
+      throw new Error('`this` must start before `to` and `to` must end after `this`')
+    }
+  }
+
   startsAfter(date: IPeriod): boolean {
     return this.startYearMonth > date.getStartYearMonth();
   }

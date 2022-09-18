@@ -22,8 +22,9 @@ import {
   Dec,
   TBD,
   Unknown,
+  periodFunction,
 } from './construction';
-import {YearKind} from './core';
+import {Period, YearKind} from './core';
 import {IPeriod} from './interface';
 import {
   alt,
@@ -48,6 +49,8 @@ import {
  *    parsePeriod('FY23')
  *    parsePeriod('H2 FY24')
  *    parsePeriod('FY 2026   Q2')
+ *    parsePeriod('FY24 Jun-Oct');
+ *    parsePeriod('FY2061 Q1 - CY2072 H2')
  *
  * @param str the string to parse
  * @returns a period that matches the string description
@@ -56,10 +59,6 @@ import {
  */
 export function parsePeriod(str: string): IPeriod {
   return parse(str);
-}
-
-function parse(expr: string): IPeriod {
-  return expectSingleResult(expectEOF(DATE.parse(lexer.parse(expr))));
 }
 
 enum TokenKind {
@@ -82,6 +81,7 @@ enum TokenKind {
   Oct,
   Nov,
   Dec,
+  Dash,
   Space,
 }
 
@@ -101,36 +101,22 @@ const MONTH_BUILDERs = [
 ];
 const QUARTER_BUILDERS = [Q1, Q2, Q3, Q4];
 
+type yearFunction = (year: number, func: periodFunction) => IPeriod;
+
 const DATE = rule<TokenKind, IPeriod>();
-const YEAR = rule<
-  TokenKind,
-  [
-    (year: number, func: (year: number, kind: YearKind) => IPeriod) => IPeriod,
-    number
-  ]
->();
-const PART = rule<TokenKind, (year: number, kind: YearKind) => IPeriod>();
+const MONTH = rule<TokenKind, number>();
+const PART = rule<TokenKind, periodFunction>();
+const PERIOD = rule<TokenKind, IPeriod>();
+const YEAR = rule<TokenKind, [yearFunction, number]>();
 
 function applyCY(
   value: [Token<TokenKind.CY>, Token<TokenKind.Number>]
-): [
-  (year: number, func: (year: number, kind: YearKind) => IPeriod) => IPeriod,
-  number
-] {
+): [yearFunction, number] {
   return [CY, +value[1].text];
 }
 
 function applyDate(
-  value: [
-    [
-      (
-        year: number,
-        func: (year: number, kind: YearKind) => IPeriod
-      ) => IPeriod,
-      number
-    ],
-    ((year: number, kind: YearKind) => IPeriod) | undefined
-  ]
+  value: [[yearFunction, number], periodFunction | undefined]
 ): IPeriod {
   const func = value[1] === undefined ? Y : value[1];
   return value[0][0](value[0][1], func);
@@ -138,16 +124,13 @@ function applyDate(
 
 function applyFY(
   value: [Token<TokenKind.FY>, Token<TokenKind.Number>]
-): [
-  (year: number, func: (year: number, kind: YearKind) => IPeriod) => IPeriod,
-  number
-] {
+): [yearFunction, number] {
   return [FY, +value[1].text];
 }
 
 function applyHalf(
   value: [Token<TokenKind.Half>, Token<TokenKind.Number>]
-): (year: number, kind: YearKind) => IPeriod {
+): periodFunction {
   const n = +value[1].text;
   if (n < 1 || n > 2) {
     throw new Error(`There are two halves in a year: ${n}`);
@@ -159,15 +142,37 @@ function applyHalf(
   }
 }
 
-function applyMonth(
-  value: Token<any>
-): (year: number, kind: YearKind) => IPeriod {
-  return MONTH_BUILDERs[value.kind - 7];
+function applyMonth(value: number): periodFunction {
+  return MONTH_BUILDERs[value - 1]; // month ordinal to builders index
+}
+
+function applyMonthRange(
+  value: [number, Token<TokenKind.Dash>, number]
+): periodFunction {
+  const startMonth = value[0];
+  const endMonth = value[2];
+  return (year: number, kind: YearKind): IPeriod => {
+    return new Period(kind, year, startMonth, -1, endMonth);
+  };
+}
+
+function applyMonthToken(value: Token<any>): number {
+  return value.kind - 6; // token index to month ordinal
+}
+
+function applyPeriodToDate(value: IPeriod): IPeriod {
+  return value;
+}
+
+function applyPeriodToDateRange(
+  value: [IPeriod, Token<TokenKind.Dash>, IPeriod]
+): IPeriod {
+  return value[0].newPeriodTo(value[2]);
 }
 
 function applyQuarter(
   value: [Token<TokenKind.Quarter>, Token<TokenKind.Number>]
-): (year: number, kind: YearKind) => IPeriod {
+): periodFunction {
   const n = +value[1].text;
   if (n < 1 || n > 4) {
     throw new Error(`There are four quarters in a year: ${n}`);
@@ -175,18 +180,7 @@ function applyQuarter(
   return QUARTER_BUILDERS[n - 1];
 }
 
-function applyReverse(
-  value: [
-    (year: number, kind: YearKind) => IPeriod,
-    [
-      (
-        year: number,
-        func: (year: number, kind: YearKind) => IPeriod
-      ) => IPeriod,
-      number
-    ]
-  ]
-): IPeriod {
+function applyReverse(value: [periodFunction, [yearFunction, number]]): IPeriod {
   return applyDate([value[1], value[0]]);
 }
 
@@ -218,22 +212,34 @@ const lexer = buildLexer([
   [true, /^Oct/g, TokenKind.Oct],
   [true, /^Nov/g, TokenKind.Nov],
   [true, /^Dec/g, TokenKind.Dec],
+  [true, /^-/g, TokenKind.Dash],
   [false, /^\s/g, TokenKind.Space],
 ]);
+
+/*
+PERIOD
+  = DATE (- DATE)?
+  = 'TBD'
+  = 'UNKOWN'
+*/
+PERIOD.setPattern(
+  alt(
+    apply(DATE, applyPeriodToDate),
+    apply(seq(DATE, tok(TokenKind.Dash), DATE), applyPeriodToDateRange),
+    apply(tok(TokenKind.TBD), applyTBD),
+    apply(tok(TokenKind.Unknown), applyUnknown)
+  )
+);
 
 /*
 DATE
   = YEAR (PART)?
   = PART YEAR
-  = 'TBD'
-  = 'UNKOWN'
 */
 DATE.setPattern(
   alt(
     apply(seq(YEAR, opt(PART)), applyDate),
-    apply(seq(PART, YEAR), applyReverse),
-    apply(tok(TokenKind.TBD), applyTBD),
-    apply(tok(TokenKind.Unknown), applyUnknown)
+    apply(seq(PART, YEAR), applyReverse)
   )
 );
 
@@ -251,25 +257,36 @@ YEAR.setPattern(
 
 /*
 PART
-  = [Month]
-  = Half Number in [1..2]
-  = Quarter Number in [1..4]
+  = Half [1..2]
+  = Quarter [1..4]
+  = [Month] (- [Month])?
 */
 PART.setPattern(
   alt(
-    apply(tok(TokenKind.Jan), applyMonth),
-    apply(tok(TokenKind.Feb), applyMonth),
-    apply(tok(TokenKind.Mar), applyMonth),
-    apply(tok(TokenKind.Apr), applyMonth),
-    apply(tok(TokenKind.May), applyMonth),
-    apply(tok(TokenKind.Jun), applyMonth),
-    apply(tok(TokenKind.Jul), applyMonth),
-    apply(tok(TokenKind.Aug), applyMonth),
-    apply(tok(TokenKind.Sep), applyMonth),
-    apply(tok(TokenKind.Oct), applyMonth),
-    apply(tok(TokenKind.Nov), applyMonth),
-    apply(tok(TokenKind.Dec), applyMonth),
     apply(seq(tok(TokenKind.Half), tok(TokenKind.Number)), applyHalf),
-    apply(seq(tok(TokenKind.Quarter), tok(TokenKind.Number)), applyQuarter)
+    apply(seq(tok(TokenKind.Quarter), tok(TokenKind.Number)), applyQuarter),
+    apply(MONTH, applyMonth),
+    apply(seq(MONTH, tok(TokenKind.Dash), MONTH), applyMonthRange)
   )
 );
+
+MONTH.setPattern(
+  alt(
+    apply(tok(TokenKind.Jan), applyMonthToken),
+    apply(tok(TokenKind.Feb), applyMonthToken),
+    apply(tok(TokenKind.Mar), applyMonthToken),
+    apply(tok(TokenKind.Apr), applyMonthToken),
+    apply(tok(TokenKind.May), applyMonthToken),
+    apply(tok(TokenKind.Jun), applyMonthToken),
+    apply(tok(TokenKind.Jul), applyMonthToken),
+    apply(tok(TokenKind.Aug), applyMonthToken),
+    apply(tok(TokenKind.Sep), applyMonthToken),
+    apply(tok(TokenKind.Oct), applyMonthToken),
+    apply(tok(TokenKind.Nov), applyMonthToken),
+    apply(tok(TokenKind.Dec), applyMonthToken)
+  )
+);
+
+function parse(expr: string): IPeriod {
+  return expectSingleResult(expectEOF(PERIOD.parse(lexer.parse(expr))));
+}
