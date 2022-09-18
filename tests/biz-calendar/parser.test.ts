@@ -51,10 +51,9 @@ describe('parsing biz periods with ranges', () => {
   });
 
   test('parsing basic fiscal month range across fiscal year should throw Error', () => {
-    const badFiscalRange = () => {
-      parsePeriod('FY22 Feb-Sep');
-    };
-    expect(badFiscalRange).toThrowError();
+    expect(parsePeriod('FY22 Feb-Sep')).toMatchObject(
+      pObj(K.FY, 202202, 202209)
+    );
   });
   
   test('parse fiscal month range across calendar year end', () => {

@@ -249,7 +249,13 @@ export function Range(
   const startMonth = months[start.name];
   const endMonth = months[end.name];
   return (year: number, kind: YearKind): IPeriod => {
-    return new Period(kind, year, startMonth, -1, endMonth);
+    const calendarYear =
+      kind === YearKind.FY
+        ? startMonth >= PeriodConfig.fiscalYearStartMonth
+          ? year - 1
+          : year
+        : year;
+    return new Period(kind, calendarYear, startMonth, -1, endMonth);
   };
 }
 

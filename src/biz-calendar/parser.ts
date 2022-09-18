@@ -20,6 +20,7 @@ import {
   Oct,
   Nov,
   Dec,
+  Range,
   TBD,
   Unknown,
   periodFunction,
@@ -85,7 +86,7 @@ enum TokenKind {
   Space,
 }
 
-const MONTH_BUILDERs = [
+const MONTH_BUILDERS = [
   Jan,
   Feb,
   Mar,
@@ -143,17 +144,16 @@ function applyHalf(
 }
 
 function applyMonth(value: number): periodFunction {
-  return MONTH_BUILDERs[value - 1]; // month ordinal to builders index
+  return MONTH_BUILDERS[value - 1]; // month ordinal to builders index
 }
 
 function applyMonthRange(
   value: [number, Token<TokenKind.Dash>, number]
 ): periodFunction {
-  const startMonth = value[0];
-  const endMonth = value[2];
-  return (year: number, kind: YearKind): IPeriod => {
-    return new Period(kind, year, startMonth, -1, endMonth);
-  };
+  return Range(
+    MONTH_BUILDERS[value[0] - 1],
+    MONTH_BUILDERS[value[2] - 1]
+  )
 }
 
 function applyMonthToken(value: Token<any>): number {
