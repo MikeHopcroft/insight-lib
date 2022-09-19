@@ -131,7 +131,7 @@ describe('comparing biz periods', () => {
     expect(FY(2024, Q4).startsBefore(CY(2024, May))).toBeTruthy();
   });
 
-  test('doesn\'t start before', () => {
+  test("doesn't start before", () => {
     expect(CY(2025, H1).startsBefore(FY(2025, Dec))).toBeFalsy();
   });
 
@@ -139,7 +139,7 @@ describe('comparing biz periods', () => {
     expect(FY(2024, Jun).startsAfter(CY(2024, Q2))).toBeTruthy();
   });
 
-  test('doesn\'t start after', () => {
+  test("doesn't start after", () => {
     expect(CY(1985, Jul).startsAfter(FY(1986, H1))).toBeFalsy();
   });
 
@@ -147,7 +147,7 @@ describe('comparing biz periods', () => {
     expect(FY(2023, H1).endsAfter(FY(2023, Q1))).toBeTruthy();
   });
 
-  test('doesn\'t end after', () => {
+  test("doesn't end after", () => {
     expect(CY(2025, Q4).endsAfter(FY(2027, H1))).toBeFalsy();
   });
 
@@ -155,7 +155,7 @@ describe('comparing biz periods', () => {
     expect(FY(2056, Q1).endsBefore(FY(2056, H1))).toBeTruthy();
   });
 
-  test('doesn\'t end before', () => {
+  test("doesn't end before", () => {
     expect(CY(2024, H1).endsBefore(CY(2024, Range(Jan, May)))).toBeFalsy();
   });
 
@@ -188,7 +188,7 @@ describe('combining and splitting periods', () => {
   test('CY Quarter to start month', () => {
     expect(CY(2019, Q4).getStartMonth()).toMatchObject(
       pObj(K.CY, 201910, 201910)
-    )
+    );
   });
 
   test('FY Half to end Month', () => {

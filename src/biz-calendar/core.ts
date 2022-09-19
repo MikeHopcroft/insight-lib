@@ -252,29 +252,29 @@ export class Period implements IPeriod {
   }
 
   newPeriodFrom(from: IPeriod): IPeriod {
-    if (from.startsBefore(this) && this.endsAfter(from)) {
+    if (this.startsBefore(from) || from.endsAfter(this)) {
+      throw new Error(
+        '`from` must start before `this` and `this` must end after `from`'
+      );
+    } else {
       return new Period(
         this.kind,
         ...yearAndMonth(from.getStartYearMonth()),
         ...yearAndMonth(this.getEndYearMonth())
       );
-    } else {
-      throw new Error(
-        '`from` must start before `this` and `this` must end after `from`'
-      );
     }
   }
 
   newPeriodTo(to: IPeriod): IPeriod {
-    if (this.startsBefore(to) && to.endsAfter(this)) {
+    if (to.startsBefore(this) || this.endsAfter(to)) {
+      throw new Error(
+        '`this` must start before `to` and `to` must end after `this`'
+      );
+    } else {
       return new Period(
         this.kind,
         ...yearAndMonth(this.getStartYearMonth()),
         ...yearAndMonth(to.getEndYearMonth())
-      );
-    } else {
-      throw new Error(
-        '`this` must start before `to` and `to` must end after `this`'
       );
     }
   }
