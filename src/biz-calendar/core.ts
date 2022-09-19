@@ -388,27 +388,6 @@ export class Month extends Period implements IPeriod {
     }
     return this;
   }
-
-  toString(): string {
-    if (this.cachedString !== undefined) {
-      return this.cachedString;
-    }
-
-    let pre = '';
-    let year = 0;
-    const month = this.getStartCalendarMonth();
-    if (this.isCalendarPeriod()) {
-      pre = 'CY';
-      year = this.getStartCalendarYear();
-    } else {
-      pre = 'FY';
-      year = this.getStartFiscalYear();
-    }
-    this.cachedString = `${pre}${ifShortYear(year)}${
-      PeriodConfig.stringMonthPad
-    }${months[month]}`;
-    return this.cachedString;
-  }
 }
 
 /**
