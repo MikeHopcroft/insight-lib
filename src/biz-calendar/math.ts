@@ -60,7 +60,7 @@ export function checkMonth(month: number): number {
  * @throws Error if year is not valid, year + 2000 if year is < 100
  */
 export function checkYear(year: number): number {
-  if (0 > year || year > 9999) {
+  if (-1 > year || year > 9999) {
     throw new Error(`${year} is not a valid year`);
   }
   if (year < 100) {

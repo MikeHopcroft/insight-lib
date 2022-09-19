@@ -59,7 +59,7 @@ describe('checking Period inputs', () => {
   });
 
   test('checking lowest year', () => {
-    expect(checkYear(0)).toBe(2000);
+    expect(checkYear(-1)).toBe(1999); // FY0 -> FY2000 -> CY1999
   });
 
   test('checking normal year', () => {
@@ -76,7 +76,7 @@ describe('checking Period inputs', () => {
 
   test('checking negative year', () => {
     const negativeYear = () => {
-      checkYear(-1);
+      checkYear(-2);
     };
     expect(negativeYear).toThrowError();
   });
