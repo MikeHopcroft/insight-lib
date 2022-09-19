@@ -1,4 +1,32 @@
-import {parsePeriod} from '../../src/biz-calendar';
+/* eslint @typescript-eslint/no-unused-vars: 0 */
+
+import {
+  TBD,
+  Unknown,
+  CY,
+  FY,
+  Jan,
+  Feb,
+  Mar,
+  Apr,
+  May,
+  Jun,
+  Jul,
+  Aug,
+  Sep,
+  Oct,
+  Nov,
+  Dec,
+  Q1,
+  Q2,
+  Q3,
+  Q4,
+  H1,
+  H2,
+  Y,
+  Range,
+  parsePeriod,
+} from '../../src/biz-calendar';
 import {K, pObj} from './test-support';
 
 describe('parsing biz periods', () => {
@@ -90,6 +118,32 @@ describe('parsing biz periods with ranges', () => {
     expect(parsePeriod('FY2037H2-NovCY42')).toMatchObject(
       pObj(K.FY, 203701, 204211)
     );
+  });
+});
+
+describe('parsing matches construction', () => {
+  test('objects and toString match', () => {
+    const periodPairs = [
+      [FY(0), parsePeriod('FY0')],
+      [CY(11), parsePeriod('CY11')],
+      [FY(23, Sep), parsePeriod('FY23 Sep')],
+      [CY(2056, Q1), parsePeriod('CY2056 Q1')],
+      [FY(1982, H2), parsePeriod('FY1982 H2')],
+      [FY(23, Range(Jul, Oct)), parsePeriod('FY23 Jul-Oct')],
+      [CY(2042, Range(Nov, Apr)), parsePeriod('CY2042 Nov-Apr')],
+      [
+        FY(19, Feb).newPeriodTo(CY(2023, Jan)),
+        parsePeriod('FY19 Feb - CY2023 Jan'),
+      ],
+      [
+        FY(56, Range(Mar, Oct)).newPeriodTo(FY(3099, Range(Dec, May))),
+        parsePeriod('FY56 Mar - Oct - FY3099 Dec - May'),
+      ],
+    ];
+    for (const pair of periodPairs) {
+      expect(pair[0]).toMatchObject(pair[1]);
+      expect(pair[0].toString()).toBe(pair[1].toString());
+    }
   });
 });
 

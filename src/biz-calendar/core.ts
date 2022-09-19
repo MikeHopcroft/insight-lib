@@ -570,7 +570,7 @@ export class Year extends Period implements IPeriod {
         : [year, 1];
     let endMonth = (startMonth + 11) % 12;
     endMonth = endMonth === 0 ? 12 : endMonth;
-    super(kind, calendarYear, startMonth, -1, endMonth);
+    super(kind, calendarYear == -1 ? 1999 : calendarYear, startMonth, -1, endMonth);
   }
 
   /**

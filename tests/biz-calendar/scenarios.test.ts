@@ -63,7 +63,6 @@ describe('sorting periods for display', () => {
     });
     let previous: Node = {id: 0, name: 'zeroith', date: '', period: undefined};
     for (const o of sorted) {
-      console.log(o);
       expect(o.id - previous.id).toBe(1);
       previous = o;
     }
