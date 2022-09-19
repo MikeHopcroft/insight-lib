@@ -244,9 +244,9 @@ export class Period implements IPeriod {
       [startYear, startMonth] = yearAndMonth(period.getStartYearMonth());
     }
     if (this.endsAfter(period)) {
-      [endYear, endMonth] = yearAndMonth(this.getStartYearMonth());
+      [endYear, endMonth] = yearAndMonth(this.getEndYearMonth());
     } else {
-      [endYear, endMonth] = yearAndMonth(period.getStartYearMonth());
+      [endYear, endMonth] = yearAndMonth(period.getEndYearMonth());
     }
     return new Period(this.kind, startYear, startMonth, endYear, endMonth);
   }

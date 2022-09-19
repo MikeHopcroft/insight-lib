@@ -185,6 +185,24 @@ describe('comparing biz periods', () => {
 });
 
 describe('combining and splitting periods', () => {
+  test('Combine two months', () => {
+    expect(FY(23, Oct).newPeriodTo(FY(23, Nov))).toMatchObject(
+      pObj(K.FY, 202210, 202211)
+    );
+  });
+
+  test('Combine two ranges', () => {
+    expect(CY(22, Range(Dec, Mar)).newPeriodFrom(FY(2018))).toMatchObject(
+      pObj(K.CY, 201707, 202303)
+    );
+  });
+
+  test('combine overlapping periods', () => {
+    expect(CY(2024).newPeriodCombinedWith(FY(2024))).toMatchObject(
+      pObj(K.CY, 202307, 202412)
+    );
+  });
+
   test('CY Quarter to start month', () => {
     expect(CY(2019, Q4).getStartMonth()).toMatchObject(
       pObj(K.CY, 201910, 201910)
