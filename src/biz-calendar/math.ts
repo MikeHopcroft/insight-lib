@@ -124,3 +124,14 @@ export function yearAndMonth(yearMonth: number): [number, number] {
 export function yearMonth(year: number, month: number): number {
   return year * 100 + month;
 }
+
+/**
+ * Incrementer for YearMonths
+ */
+export function tickMonth(yearMonth: number): number {
+  let nextMonth = yearMonth + 1;
+  if (nextMonth % 100 === 13) {
+    nextMonth += 88;
+  }
+  return nextMonth;
+}

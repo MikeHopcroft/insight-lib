@@ -6,6 +6,7 @@ import {
   checkYear,
   fiscalToCalendar,
   ifShortYear,
+  tickMonth,
   yearAndMonth,
   yearMonth,
 } from './math';
@@ -85,6 +86,11 @@ export class Period implements IPeriod {
 
     this.startYearMonth = yearMonth(startYear, startMonth);
     this.endYearMonth = yearMonth(endYear, endMonth);
+    if (this.startYearMonth > this.endYearMonth) {
+      throw new Error(
+        `The period cannot end (${this.endYearMonth}) after it starts (${this.startYearMonth})`
+      );
+    }
   }
 
   compare(date: IPeriod): number {
@@ -308,8 +314,16 @@ export class Period implements IPeriod {
     }
   }
 
-  toMonths(): Period[] {
-    return [new Period()];
+  toMonths(): Month[] {
+    const months: Month[] = [];
+    for (
+      let month = this.startYearMonth;
+      month <= this.endYearMonth;
+      month = tickMonth(month)
+    ) {
+      months.push(new Month(this.kind, ...yearAndMonth(month)));
+    }
+    return months;
   }
 
   toString(): string {

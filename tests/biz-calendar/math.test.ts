@@ -8,6 +8,7 @@ import {
   fiscalToCalendar,
   yearAndMonth,
   yearMonth,
+  tickMonth,
 } from '../../src/biz-calendar/math';
 import {K} from './test-support';
 
@@ -215,6 +216,16 @@ describe('years and months and yearMonths', () => {
 
   test('are inverse', () => {
     expect(yearMonth(...yearAndMonth(202407))).toBe(202407);
+  });
+});
+
+describe('incrementing months', () => {
+  test('basic tick', () => {
+    expect(tickMonth(202003)).toBe(202004);
+  });
+
+  test('annual roll over tick', () => {
+    expect(tickMonth(202312)).toBe(202401);
   });
 });
 

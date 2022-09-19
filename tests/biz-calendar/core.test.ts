@@ -155,6 +155,39 @@ describe('comparing biz periods', () => {
   });
 });
 
+describe('combining and splitting periods', () => {
+  test('months from month', () => {
+    expect(FY(20, May).toMonths()).toMatchObject([pObj(K.FY, 202005, 202005)]);
+  });
+
+  test('months from quarter', () => {
+    expect(CY(2028, Q3).toMonths()).toMatchObject([
+      pObj(K.CY, 202807, 202807),
+      pObj(K.CY, 202808, 202808),
+      pObj(K.CY, 202809, 202809),
+    ]);
+  });
+
+  test('months from half', () => {
+    expect(FY(12, H2).toMonths()).toMatchObject([
+      pObj(K.FY, 201201, 201201),
+      pObj(K.FY, 201202, 201202),
+      pObj(K.FY, 201203, 201203),
+      pObj(K.FY, 201204, 201204),
+      pObj(K.FY, 201205, 201205),
+      pObj(K.FY, 201206, 201206),
+    ]);
+  });
+
+  test('months from long arbitrary range', () => {
+    const range = CY(2000).newPeriodTo(CY(2020, Nov)).toMonths();
+    expect(range.length).toBe(251);
+    expect(range[0]).toMatchObject(pObj(K.CY, 200001, 200001));
+    expect(range[133]).toMatchObject(pObj(K.CY, 201102, 201102));
+    expect(range[250]).toMatchObject(pObj(K.CY, 202011, 202011));
+  });
+});
+
 describe('direct Period tests', () => {
   test('FY with end month ordinal before start month ordinal', () => {
     expect(new Period(1, 2021, 10, -1, 1)).toMatchObject(
