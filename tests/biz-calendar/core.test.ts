@@ -24,6 +24,7 @@ import {
   H1,
   H2,
   Y,
+  Range,
   currentMonth,
 } from '../../src/biz-calendar';
 import {Period} from '../../src/biz-calendar/core';
@@ -37,13 +38,9 @@ describe('transforming business periods', () => {
   test('FY Half to CY Half', () => {
     expect(FY(2023, H2).toCalendar()).toMatchObject(pObj(K.CY, 202301, 202306));
   });
+});
 
-  test('FY Half to end Month', () => {
-    expect(FY(2023, H2).getEndMonth()).toMatchObject(
-      pObj(K.FY, 202306, 202306)
-    );
-  });
-
+describe('business periods to strings', () => {
   test('CY Month to string', () => {
     expect(CY(2022, Sep).toString()).toBe('CY2022 Sep');
   });
@@ -130,6 +127,38 @@ describe('comparing biz periods', () => {
     expect(CY(2022, Dec).isBefore(FY(2023, H2))).toBeTruthy();
   });
 
+  test('starts before', () => {
+    expect(FY(2024, Q4).startsBefore(CY(2024, May))).toBeTruthy();
+  });
+
+  test('doesn\'t start before', () => {
+    expect(CY(2025, H1).startsBefore(FY(2025, Dec))).toBeFalsy();
+  });
+
+  test('starts after', () => {
+    expect(FY(2024, Jun).startsAfter(CY(2024, Q2))).toBeTruthy();
+  });
+
+  test('doesn\'t start after', () => {
+    expect(CY(1985, Jul).startsAfter(FY(1986, H1))).toBeFalsy();
+  });
+
+  test('ends after', () => {
+    expect(FY(2023, H1).endsAfter(FY(2023, Q1))).toBeTruthy();
+  });
+
+  test('doesn\'t end after', () => {
+    expect(CY(2025, Q4).endsAfter(FY(2027, H1))).toBeFalsy();
+  });
+
+  test('ends before', () => {
+    expect(FY(2056, Q1).endsBefore(FY(2056, H1))).toBeTruthy();
+  });
+
+  test('doesn\'t end before', () => {
+    expect(CY(2024, H1).endsBefore(CY(2024, Range(Jan, May)))).toBeFalsy();
+  });
+
   test('same month', () => {
     expect(CY(2022, Sep).endsSameMonth(FY(2023, Q1))).toBeTruthy();
   });
@@ -156,6 +185,18 @@ describe('comparing biz periods', () => {
 });
 
 describe('combining and splitting periods', () => {
+  test('CY Quarter to start month', () => {
+    expect(CY(2019, Q4).getStartMonth()).toMatchObject(
+      pObj(K.CY, 201910, 201910)
+    )
+  });
+
+  test('FY Half to end Month', () => {
+    expect(FY(2023, H2).getEndMonth()).toMatchObject(
+      pObj(K.FY, 202306, 202306)
+    );
+  });
+
   test('months from month', () => {
     expect(FY(20, May).toMonths()).toMatchObject([pObj(K.FY, 202005, 202005)]);
   });
