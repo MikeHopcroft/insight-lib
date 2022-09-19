@@ -27,7 +27,7 @@ import {
   Range,
   currentMonth,
 } from '../../src/biz-calendar';
-import {Period} from '../../src/biz-calendar/core';
+import {Half, Period, Year} from '../../src/biz-calendar/core';
 import {K, pObj} from './test-support';
 
 describe('transforming business periods', () => {
@@ -202,6 +202,52 @@ describe('combining and splitting periods', () => {
       pObj(K.CY, 202307, 202412)
     );
   });
+
+  test('combine two quarters into a half', () => {
+    let period = FY(23, Q1).newPeriodCombinedWith(FY(23, Q2));
+    expect(period).toBeInstanceOf(Half);
+    expect(period).toMatchObject(FY(23, H1));
+    expect(period.toString()).toBe('FY2023 H1');
+  });
+
+  test('combine two quarters into a half with to', () => {
+    let period = CY(23, Q3).newPeriodTo(CY(23, Q4));
+    expect(period).toBeInstanceOf(Half);
+    expect(period).toMatchObject(FY(23, H1));
+    expect(period.toString()).toBe('FY2023 H1');
+  });
+
+  test('combine two quarters into a half with from', () => {
+    let period = FY(23, Q2).newPeriodFrom(FY(23, Q1));
+    expect(period).toBeInstanceOf(Half);
+    expect(period).toMatchObject(FY(23, H1));
+    expect(period.toString()).toBe('FY2023 H1');
+  });
+
+  test('combination is normal for quarters from different year kinds', () => {
+    let period = FY(23, Q1).newPeriodTo(CY(22, Q4));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(FY(23, Range(Jul, Dec)));
+    expect(period.toString()).toBe('FY2023 Jul-Dec');
+  });
+
+  test('combination is normal for non-adjacent quarters', () => {
+    let period = FY(23, Q1).newPeriodTo(FY(23, Q3));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(FY(23, Range(Jul, Mar)));
+    expect(period.toString()).toBe('FY2023 Jul-Mar');
+  });
+
+  test('combination is normal for quarter combining with another type', () => {
+    let period = FY(23, Q4).newPeriodTo(FY(24));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(pObj(K.FY, 202304, 202406));
+    expect(period.toString()).toBe('FY2023 Apr - FY2024 Jun');
+  });
+
+  // test('combine two halves into a year', () => {
+    
+  // });
 
   test('CY Quarter to start month', () => {
     expect(CY(2019, Q4).getStartMonth()).toMatchObject(

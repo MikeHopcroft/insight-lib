@@ -261,10 +261,16 @@ export class PeriodConfig {
   static stringMonthPad = ' ';
 
   /**
-   * The space used on either side of the dash in a range when toString is
+   * The space used on either side of the dash in a date range when toString is
    * called on a Period. The default is a single space.
    */
-  static stringRangePad = ' ';
+     static stringDateRangePad = ' ';
+
+  /**
+   * The space used on either side of the dash in a month range when toString
+   * is called on a Period. The default is a single space.
+   */
+  static stringMonthRangePad = '';
 
   /**
    * If true, toString produces strings with two-digit years (FY24), instead of

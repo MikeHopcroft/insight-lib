@@ -348,15 +348,15 @@ export class Period implements IPeriod {
       } else {
         this.cachedString = `${pre}${ifShortYear(startYear)}${
           PeriodConfig.stringMonthPad
-        }${months[startMonth]}${PeriodConfig.stringRangePad}-${
-          PeriodConfig.stringRangePad
+        }${months[startMonth]}${PeriodConfig.stringMonthRangePad}-${
+          PeriodConfig.stringMonthRangePad
         }${months[endMonth]}`;
       }
     } else {
       this.cachedString = `${pre}${ifShortYear(startYear)}${
         PeriodConfig.stringMonthPad
-      }${months[startMonth]}${PeriodConfig.stringRangePad}-${
-        PeriodConfig.stringRangePad
+      }${months[startMonth]}${PeriodConfig.stringDateRangePad}-${
+        PeriodConfig.stringDateRangePad
       }${pre}${ifShortYear(endYear)}${PeriodConfig.stringMonthPad}${
         months[endMonth]
       }`;
