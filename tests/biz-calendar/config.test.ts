@@ -119,7 +119,7 @@ describe('parsing non-default padded strings', () => {
     );
     expect(parsePeriod(CY(2023, Range(Feb, Oct)).toString())).toMatchObject(
       pObj(K.CY, 202302, 202310)
-    )
+    );
     expect(parsePeriod(CY(2023).toFiscal().toString())).toMatchObject(
       pObj(K.FY, 202301, 202312)
     );
@@ -139,7 +139,7 @@ describe('parsing non-default padded strings', () => {
     );
     expect(parsePeriod(CY(2023, Range(Feb, Oct)).toString())).toMatchObject(
       pObj(K.CY, 202302, 202310)
-    )
+    );
     expect(
       parsePeriod(CY(2023, Range(Mar, Jun)).toFiscal().toString())
     ).toMatchObject(pObj(K.FY, 202303, 202306));

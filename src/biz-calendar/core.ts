@@ -426,9 +426,10 @@ export class Quarter extends Period implements IPeriod {
    *          its calendar or fiscal year
    */
   half(): number {
-    let monthOrdinal = this.kind === YearKind.CY ?
-      this.getStartCalendarMonth() :
-      this.getStartFiscalMonth();
+    const monthOrdinal =
+      this.kind === YearKind.CY
+        ? this.getStartCalendarMonth()
+        : this.getStartFiscalMonth();
     if (monthOrdinal === 1 || monthOrdinal === 4) {
       return 1;
     } else {
@@ -462,10 +463,11 @@ export class Quarter extends Period implements IPeriod {
       return super.newPeriodCombinedWith(period);
     }
     if (this.isPartOfSameHalfAs(period as Quarter)) {
-      const startYear = this.kind === YearKind.CY ?
-        period.getStartCalendarYear() :
-        period.getStartFiscalYear();
-      return new Half(this.kind, startYear, this.half());  
+      const startYear =
+        this.kind === YearKind.CY
+          ? period.getStartCalendarYear()
+          : period.getStartFiscalYear();
+      return new Half(this.kind, startYear, this.half());
     } else {
       return super.newPeriodCombinedWith(period);
     }
@@ -480,7 +482,7 @@ export class Quarter extends Period implements IPeriod {
     if (!(from instanceof Quarter)) {
       return super.newPeriodFrom(from);
     }
-    if (this.startsBefore(from) || from.endsAfter(this)) {
+    if (this.startsBefore(from)) {
       throw new Error(
         '`from` must start before `this` and `this` must end after `from`'
       );
@@ -498,7 +500,7 @@ export class Quarter extends Period implements IPeriod {
     if (!(to instanceof Quarter)) {
       return super.newPeriodTo(to);
     }
-    if (to.startsBefore(this) || this.endsAfter(to)) {
+    if (to.startsBefore(this)) {
       throw new Error(
         '`this` must start before `to` and `to` must end after `this`'
       );
@@ -579,6 +581,83 @@ export class Half extends Period implements IPeriod {
         : [year, month];
     const startMonth = endMonth - 5;
     super(kind, calendarYear, startMonth, -1, endMonth);
+  }
+
+  /**
+   * Determine if this and half can be combined into a year
+   *
+   * @param half another Half
+   * @returns true if the halves are adjacent and in the same calendar or
+   *          fiscal year of their
+   */
+  isPartOfSameYearAs(half: Half): boolean {
+    if (
+      this.kind !== half.kind ||
+      this.getStartCalendarMonth() === half.getStartCalendarMonth()
+    ) {
+      return false;
+    }
+    if (this.kind === YearKind.CY) {
+      return this.getStartCalendarYear() === half.getStartCalendarYear();
+    } else {
+      return this.getStartFiscalYear() === half.getStartFiscalYear();
+    }
+  }
+
+  /**
+   * When combining Quarters, they will be combined into a new Half, if possible
+   *
+   * @returns a new Half or Period
+   */
+  newPeriodCombinedWith(period: IPeriod): IPeriod {
+    if (!(period instanceof Half)) {
+      return super.newPeriodCombinedWith(period);
+    }
+    if (this.isPartOfSameYearAs(period as Half)) {
+      const startYear =
+        this.kind === YearKind.CY
+          ? period.getStartCalendarYear()
+          : period.getStartFiscalYear();
+      return new Year(this.kind, startYear);
+    } else {
+      return super.newPeriodCombinedWith(period);
+    }
+  }
+
+  /**
+   * When combining Halves, they will be combined into a new Year, if possible
+   *
+   * @returns a new Year or Period
+   */
+  newPeriodFrom(from: IPeriod): IPeriod {
+    if (!(from instanceof Half)) {
+      return super.newPeriodFrom(from);
+    }
+    if (this.startsBefore(from) || from.endsAfter(this)) {
+      throw new Error(
+        '`from` must start before `this` and `this` must end after `from`'
+      );
+    } else {
+      return this.newPeriodCombinedWith(from);
+    }
+  }
+
+  /**
+   * When combining Halves, they will be combined into a new Year, if possible
+   *
+   * @returns a new Year or Period
+   */
+  newPeriodTo(to: IPeriod): IPeriod {
+    if (!(to instanceof Half)) {
+      return super.newPeriodTo(to);
+    }
+    if (to.startsBefore(this) || this.endsAfter(to)) {
+      throw new Error(
+        '`this` must start before `to` and `to` must end after `this`'
+      );
+    } else {
+      return this.newPeriodCombinedWith(to);
+    }
   }
 
   /**

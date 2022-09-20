@@ -264,7 +264,7 @@ export class PeriodConfig {
    * The space used on either side of the dash in a date range when toString is
    * called on a Period. The default is a single space.
    */
-     static stringDateRangePad = ' ';
+  static stringDateRangePad = ' ';
 
   /**
    * The space used on either side of the dash in a month range when toString

@@ -114,7 +114,7 @@ export function ifShortYear(year: number): number {
 /**
  * Incrementer for YearMonths
  */
- export function tickMonth(yearMonth: number): number {
+export function tickMonth(yearMonth: number): number {
   let nextMonth = yearMonth + 1;
   if (nextMonth % 100 === 13) {
     nextMonth += 88;

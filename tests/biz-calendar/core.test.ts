@@ -204,50 +204,88 @@ describe('combining and splitting periods', () => {
   });
 
   test('combine two quarters into a half', () => {
-    let period = FY(23, Q1).newPeriodCombinedWith(FY(23, Q2));
+    const period = FY(23, Q1).newPeriodCombinedWith(FY(23, Q2));
     expect(period).toBeInstanceOf(Half);
     expect(period).toMatchObject(FY(23, H1));
     expect(period.toString()).toBe('FY2023 H1');
   });
 
   test('combine two quarters into a half with to', () => {
-    let period = CY(23, Q3).newPeriodTo(CY(23, Q4));
+    const period = CY(23, Q3).newPeriodTo(CY(23, Q4));
     expect(period).toBeInstanceOf(Half);
     expect(period).toMatchObject(CY(23, H2));
     expect(period.toString()).toBe('CY2023 H2');
   });
 
   test('combine two quarters into a half with from', () => {
-    let period = FY(23, Q2).newPeriodFrom(FY(23, Q1));
+    const period = FY(23, Q2).newPeriodFrom(FY(23, Q1));
     expect(period).toBeInstanceOf(Half);
     expect(period).toMatchObject(FY(23, H1));
     expect(period.toString()).toBe('FY2023 H1');
   });
 
   test('combination is normal for quarters from different year kinds', () => {
-    let period = FY(23, Q1).newPeriodTo(CY(22, Q4));
+    const period = FY(23, Q1).newPeriodTo(CY(22, Q4));
     expect(period).toBeInstanceOf(Period);
     expect(period).toMatchObject(FY(23, Range(Jul, Dec)));
     expect(period.toString()).toBe('FY2023 Jul-Dec');
   });
 
   test('combination is normal for non-adjacent quarters', () => {
-    let period = FY(23, Q1).newPeriodTo(FY(23, Q3));
+    const period = FY(23, Q1).newPeriodTo(FY(23, Q3));
     expect(period).toBeInstanceOf(Period);
     expect(period).toMatchObject(FY(23, Range(Jul, Mar)));
     expect(period.toString()).toBe('FY2023 Jul-Mar');
   });
 
   test('combination is normal for quarter combining with another type', () => {
-    let period = FY(23, Q4).newPeriodTo(FY(24));
+    const period = FY(23, Q4).newPeriodTo(FY(24));
     expect(period).toBeInstanceOf(Period);
     expect(period).toMatchObject(pObj(K.FY, 202304, 202406));
     expect(period.toString()).toBe('FY2023 Apr - FY2024 Jun');
   });
 
-  // test('combine two halves into a year', () => {
-    
-  // });
+  test('combine two halves into a year', () => {
+    const period = FY(23, H2).newPeriodCombinedWith(FY(23, H1));
+    expect(period).toBeInstanceOf(Year);
+    expect(period).toMatchObject(FY(23));
+    expect(period.toString()).toBe('FY2023');
+  });
+
+  test('combine two halves into a year with to', () => {
+    const period = CY(23, H1).newPeriodTo(CY(23, H2));
+    expect(period).toBeInstanceOf(Year);
+    expect(period).toMatchObject(CY(23));
+    expect(period.toString()).toBe('CY2023');
+  });
+
+  test('combine two havles into a year with from', () => {
+    const period = FY(2056, H2).newPeriodFrom(FY(2056, H1));
+    expect(period).toBeInstanceOf(Year);
+    expect(period).toMatchObject(FY(56));
+    expect(period.toString()).toBe('FY2056');
+  });
+
+  test('combination is normal for halves from different year kinds', () => {
+    const period = FY(23, H1).newPeriodTo(CY(23, H1));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(FY(23, Range(Jul, Jun)));
+    expect(period.toString()).toBe('FY2023 Jul-Jun');
+  });
+
+  test('combination is normal for non-adjacent havles', () => {
+    const period = FY(23, H1).newPeriodTo(FY(24, H2));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(pObj(K.FY, 202207, 202406));
+    expect(period.toString()).toBe('FY2023 Jul - FY2024 Jun');
+  });
+
+  test('combination is normal for halves combining with another type', () => {
+    const period = FY(23, H1).newPeriodTo(FY(23, Q3));
+    expect(period).toBeInstanceOf(Period);
+    expect(period).toMatchObject(pObj(K.FY, 202207, 202303));
+    expect(period.toString()).toBe('FY2023 Jul-Mar');
+  });
 
   test('CY Quarter to start month', () => {
     expect(CY(2019, Q4).getStartMonth()).toMatchObject(

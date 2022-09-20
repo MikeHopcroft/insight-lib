@@ -58,7 +58,7 @@ describe('sorting parsed periods for display', () => {
         });
       } catch (e) {
         console.log(`Could not parse ${node.bizPeriod}`);
-        console.log(`Error: ${(e as Error).message}`)
+        console.log(`Error: ${(e as Error).message}`);
       }
     }
 
