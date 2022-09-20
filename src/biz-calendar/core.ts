@@ -422,6 +422,92 @@ export class Quarter extends Period implements IPeriod {
   }
 
   /**
+   * @returns the half ordinal, in [1..2], that this quarter is in relative to
+   *          its calendar or fiscal year
+   */
+  half(): number {
+    let monthOrdinal = this.kind === YearKind.CY ?
+      this.getStartCalendarMonth() :
+      this.getStartFiscalMonth();
+    if (monthOrdinal === 1 || monthOrdinal === 4) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
+  /**
+   * Determine if this and quarter can be combined into a half
+   *
+   * @param quarter another Quarter
+   * @returns true if the quarters are adjacent and in the same half of their
+   *          calendar or fiscal year
+   */
+  isPartOfSameHalfAs(quarter: Quarter): boolean {
+    return (
+      this.half() === quarter.half() &&
+      this.kind === quarter.kind &&
+      (tickMonth(this.endYearMonth) === quarter.startYearMonth ||
+        tickMonth(quarter.endYearMonth) === this.startYearMonth)
+    );
+  }
+
+  /**
+   * When combining Quarters, they will be combined into a new Half, if possible
+   *
+   * @returns a new Half or Period
+   */
+  newPeriodCombinedWith(period: IPeriod): IPeriod {
+    if (!(period instanceof Quarter)) {
+      return super.newPeriodCombinedWith(period);
+    }
+    if (this.isPartOfSameHalfAs(period as Quarter)) {
+      const startYear = this.kind === YearKind.CY ?
+        period.getStartCalendarYear() :
+        period.getStartFiscalYear();
+      return new Half(this.kind, startYear, this.half());  
+    } else {
+      return super.newPeriodCombinedWith(period);
+    }
+  }
+
+  /**
+   * When combining Quarters, they will be combined into a new Half, if possible
+   *
+   * @returns a new Half or Period
+   */
+  newPeriodFrom(from: IPeriod): IPeriod {
+    if (!(from instanceof Quarter)) {
+      return super.newPeriodFrom(from);
+    }
+    if (this.startsBefore(from) || from.endsAfter(this)) {
+      throw new Error(
+        '`from` must start before `this` and `this` must end after `from`'
+      );
+    } else {
+      return this.newPeriodCombinedWith(from);
+    }
+  }
+
+  /**
+   * When combining Quarters, they will be combined into a new Half, if possible
+   *
+   * @returns a new Half or Period
+   */
+  newPeriodTo(to: IPeriod): IPeriod {
+    if (!(to instanceof Quarter)) {
+      return super.newPeriodTo(to);
+    }
+    if (to.startsBefore(this) || this.endsAfter(to)) {
+      throw new Error(
+        '`this` must start before `to` and `to` must end after `this`'
+      );
+    } else {
+      return this.newPeriodCombinedWith(to);
+    }
+  }
+
+  /**
    * @returns a Period instead of a Quarter if the fiscal year is not quarter-
    *          aligned with the calendar year
    */

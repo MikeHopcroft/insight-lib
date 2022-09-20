@@ -213,8 +213,8 @@ describe('combining and splitting periods', () => {
   test('combine two quarters into a half with to', () => {
     let period = CY(23, Q3).newPeriodTo(CY(23, Q4));
     expect(period).toBeInstanceOf(Half);
-    expect(period).toMatchObject(FY(23, H1));
-    expect(period.toString()).toBe('FY2023 H1');
+    expect(period).toMatchObject(CY(23, H2));
+    expect(period.toString()).toBe('CY2023 H2');
   });
 
   test('combine two quarters into a half with from', () => {
