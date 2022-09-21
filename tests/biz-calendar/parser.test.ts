@@ -27,7 +27,8 @@ import {
   Range,
   parsePeriod,
 } from '../../src/biz-calendar';
-import {K, pObj} from './test-support';
+import {YearKind as K} from '../../src/biz-calendar/core';
+import {pObj} from './test-support';
 
 describe('parsing biz periods', () => {
   test('parse CY', () => {

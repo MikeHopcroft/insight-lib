@@ -35,9 +35,9 @@ import {
   Month,
   Quarter,
   Year,
-  YearKind,
+  YearKind as K,
 } from '../../src/biz-calendar/core';
-import {K, pObj} from './test-support';
+import {pObj} from './test-support';
 
 describe('constructing business periods', () => {
   test('fiscal year', () => {
@@ -99,7 +99,7 @@ describe('constructing current business periods', () => {
   });
 
   test('current fiscal Month', () => {
-    const month = currentMonth(YearKind.FY);
+    const month = currentMonth(K.FY);
     expect(month).toBeInstanceOf(Month);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
@@ -119,7 +119,7 @@ describe('constructing current business periods', () => {
   });
 
   test('current fiscal Quarter', () => {
-    const month = currentQuarter(YearKind.FY);
+    const month = currentQuarter(K.FY);
     expect(month).toBeInstanceOf(Quarter);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
@@ -139,7 +139,7 @@ describe('constructing current business periods', () => {
   });
 
   test('current fiscal Half', () => {
-    const month = currentHalf(YearKind.FY);
+    const month = currentHalf(K.FY);
     expect(month).toBeInstanceOf(Half);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);
@@ -159,7 +159,7 @@ describe('constructing current business periods', () => {
   });
 
   test('current fiscal Year', () => {
-    const month = currentYear(YearKind.FY);
+    const month = currentYear(K.FY);
     expect(month).toBeInstanceOf(Year);
     expect(month.isFiscalPeriod()).toBeTruthy();
     expect(month.getStartYearMonth()).toBeLessThan(210000);

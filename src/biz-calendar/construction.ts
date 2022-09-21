@@ -4,9 +4,9 @@ import {
   Period,
   Quarter,
   Year,
+  YearKind,
   _TBD,
   _Unknown,
-  YearKind,
 } from './core';
 import {IPeriod, PeriodConfig} from './interface';
 import {calendarToFiscal} from './math';
@@ -64,6 +64,69 @@ export function CY(year: number, part: periodFunction = Y): IPeriod {
  */
 export function FY(year: number, func: periodFunction = Y): IPeriod {
   return func(year, YearKind.FY);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Year(kind, year);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Half(kind, year, 1);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Half(kind, year, 2);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Quarter(kind, year, 1);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Quarter(kind, year, 2);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Quarter(kind, year, 3);
+}
+
+/**
+ * Part of a literate interface for constructing new fiscal years
+ *
+ * See CY() and FY() for examples.
+ */
+export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
+  return new Quarter(kind, year, 4);
 }
 
 /**
@@ -179,69 +242,6 @@ export function Dec(year: number, kind: YearKind = YearKind.CY): IPeriod {
  *
  * See CY() and FY() for examples.
  */
-export function Q1(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Quarter(kind, year, 1);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function Q2(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Quarter(kind, year, 2);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function Q3(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Quarter(kind, year, 3);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function Q4(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Quarter(kind, year, 4);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function H1(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Half(kind, year, 1);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function H2(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Half(kind, year, 2);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
-export function Y(year: number, kind: YearKind = YearKind.CY): IPeriod {
-  return new Year(kind, year);
-}
-
-/**
- * Part of a literate interface for constructing new fiscal years
- *
- * See CY() and FY() for examples.
- */
 export function Range(
   start: periodFunction,
   end: periodFunction
@@ -249,12 +249,13 @@ export function Range(
   const startMonth = months[start.name];
   const endMonth = months[end.name];
   return (year: number, kind: YearKind): IPeriod => {
-    const calendarYear =
-      kind === YearKind.FY
-        ? startMonth >= PeriodConfig.fiscalYearStartMonth
-          ? year - 1
-          : year
-        : year;
+    let calendarYear = year;
+    if (
+      kind === YearKind.FY &&
+      startMonth >= PeriodConfig.fiscalYearStartMonth
+    ) {
+      calendarYear = year - 1;
+    }
     return new Period(kind, calendarYear, startMonth, -1, endMonth);
   };
 }

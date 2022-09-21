@@ -1,3 +1,17 @@
+/*
+ * See IPeriod.divideInto() for documentation on how these Symbols and
+ * DivisionGranularity are used and interpreted.
+ */
+export const Years = Symbol();
+export const Halves = Symbol();
+export const Quarters = Symbol();
+export const Months = Symbol();
+export type DivisionGranularity =
+  | typeof Years
+  | typeof Halves
+  | typeof Quarters
+  | typeof Months;
+
 /**
  * Supports common 'FY22 H1'-style date formats
  *
@@ -23,6 +37,33 @@ export interface IPeriod {
    * @returns true if this period includes all of the months in period
    */
   contains(period: IPeriod): boolean;
+
+  /**
+   * Creates the natural sub-periods for this period
+   *
+   * @returns sub-periods of this period
+   */
+  divide(): IPeriod[];
+
+  /**
+   * Creates periods that represent dividing this period into periods of the
+   * specified size
+   *
+   * @param granularity divideInto will continue to divide the period until
+   *        it reaches the specified granularity
+   * @param includeIntermediateLevels divideInto can return only the lowest
+   *        level of granularity or the full tree of intermediate periods
+   *        created under this period
+   * @param fillInRange if true, divideInto() includes any necesary periods,
+   *        of sizes less than that specific by granularity, required to fill
+   *        in the range of this from
+   * @returns sub-periods of this period
+   */
+  divideInto(
+    granularity: DivisionGranularity,
+    includeIntermediateLevels: boolean,
+    fillInRange: boolean
+  ): IPeriod[];
 
   /**
    * The Periods may overlap
@@ -133,6 +174,11 @@ export interface IPeriod {
   isFiscalPeriod(): boolean;
 
   /**
+   * @returns the length of this period in months
+   */
+  lengthInMonths(): number;
+
+  /**
    * Creates a new period spanning the two periods
    *
    * The periods do not need to overlap or be calendar adjacent.
@@ -172,7 +218,7 @@ export interface IPeriod {
    * combinations, like joining consecutive quarters into a half.
    *
    * @param to the period to combine with
-   * @returns the new priod
+   * @returns the new period
    *
    * @throws Error if this starts after to starts or ends after to ends
    */

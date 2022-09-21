@@ -6,11 +6,12 @@ import {
   checkYear,
   ifShortYear,
   fiscalToCalendar,
+  lengthInMonths,
   yearAndMonth,
   yearMonth,
   tickMonth,
 } from '../../src/biz-calendar/math';
-import {K} from './test-support';
+import {YearKind as K} from '../../src/biz-calendar/core';
 
 describe('checking Period inputs', () => {
   test('checking CY', () => {
@@ -216,6 +217,37 @@ describe('years and months and yearMonths', () => {
 
   test('are inverse', () => {
     expect(yearMonth(...yearAndMonth(202407))).toBe(202407);
+  });
+
+  test('length of a year in months', () => {
+    expect(lengthInMonths(202301, 202312)).toBe(12);
+  });
+
+  test('length of one month', () => {
+    expect(lengthInMonths(202402, 202402)).toBe(1);
+  });
+
+  test('period length less than a year', () => {
+    expect(lengthInMonths(202204, 202206)).toBe(3);
+  });
+
+  test('period length less than a year, across a year', () => {
+    expect(lengthInMonths(202209, 202306)).toBe(10);
+  });
+
+  test('period length greater than a year', () => {
+    expect(lengthInMonths(202203, 202502)).toBe(36);
+  });
+
+  test('period length greater than a year, between years', () => {
+    expect(lengthInMonths(202205, 202403)).toBe(23);
+  });
+
+  test('inverted range is an error', () => {
+    const invertedRange = () => {
+      lengthInMonths(202502, 202304);
+    };
+    expect(invertedRange).toThrowError();
   });
 });
 

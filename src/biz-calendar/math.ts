@@ -2,10 +2,11 @@ import {YearKind} from './core';
 import {PeriodConfig} from './interface';
 
 /**
- * Computes the fiscal year and fiscal month from calendar year and month
+ * Computes the fiscal year and fiscal month ordinal from calendar year and
+ * month
  *
  * @param calendarYear the calendar year
- * @param calendarMonth the month ordinal, in [1..12]
+ * @param calendarMonth the month ordinal in [1..12]
  * @param fiscalStart the month ordinal, in [1..12], for the first month of the
  *        fiscal year relative to the calendar year
  * @returns the fiscal year and month
@@ -22,12 +23,16 @@ export function calendarToFiscal(
   if (fiscalMonth < 1) {
     fiscalMonth = 12 + fiscalMonth;
   }
-  const fiscalYear =
-    calendarMonth >= fiscalStart ? calendarYear + 1 : calendarYear;
-  return [fiscalYear, fiscalMonth];
+  if (calendarMonth >= fiscalStart) {
+    return [calendarYear + 1, fiscalMonth];
+  } else {
+    return [calendarYear, fiscalMonth];
+  }
 }
 
 /**
+ * Required due to enum type erasure
+ *
  * @param kind a YearKind
  * @returns kind if it is valid
  *
@@ -60,6 +65,7 @@ export function checkMonth(month: number): number {
  * @throws Error if year is not valid, year + 2000 if year is < 100
  */
 export function checkYear(year: number): number {
+  // -1 is necessary to support FY0
   if (-1 > year || year > 9999) {
     throw new Error(`${year} is not a valid year`);
   }
@@ -112,25 +118,55 @@ export function ifShortYear(year: number): number {
 }
 
 /**
+ * Computes the length of a period range in months
+ *
+ * @param from the yearMonth starting the range
+ * @param to the yearMonth ending the range
+ * @returns the number of months included in the range [from..to]
+ *
+ * @throws Error if to is before from
+ */
+export function lengthInMonths(from: number, to: number): number {
+  if (from > to) {
+    throw new Error(`from ${from} cannot be before ${to}`);
+  }
+  if (from === to) {
+    // single month
+    return 1;
+  }
+  const [fromYear, fromMonth] = yearAndMonth(from);
+  const [toYear, toMonth] = yearAndMonth(to);
+  const years = toYear - fromYear;
+  const months = toMonth - fromMonth; // could be negative
+  return years * 12 + months + 1; // ranges are inclusive
+}
+
+/**
  * Incrementer for YearMonths
  */
 export function tickMonth(yearMonth: number): number {
   let nextMonth = yearMonth + 1;
   if (nextMonth % 100 === 13) {
-    nextMonth += 88;
+    nextMonth += 88; // equivelant to + 100 - 12
   }
   return nextMonth;
 }
 
 /**
- * Inverse of yearMonth
+ * Converts the internal year + month ordinal representation into its separate
+ * comoponents
+ *
+ * yearAndMonth is the inverse of yearMonth.
  */
 export function yearAndMonth(yearMonth: number): [number, number] {
   return [Math.floor(yearMonth / 100), yearMonth % 100];
 }
 
 /**
- * Inverse of yearAndMonth
+ * Converts a separate year and month ordinal into the internal year + month
+ * ordinal representation
+ *
+ * yearMonth is the inverse of yearAndMonth.
  */
 export function yearMonth(year: number, month: number): number {
   return year * 100 + month;

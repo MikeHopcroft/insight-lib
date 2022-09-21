@@ -1,4 +1,12 @@
-import {IPeriod, PeriodConfig} from './interface';
+import {
+  DivisionGranularity,
+  Halves,
+  IPeriod,
+  Months,
+  PeriodConfig,
+  Quarters,
+  Years,
+} from './interface';
 import {
   calendarToFiscal,
   checkKind,
@@ -131,6 +139,18 @@ export class Period implements IPeriod {
     }
   }
 
+  divide(): IPeriod[] {
+    return this.toMonths();
+  }
+
+  divideInto(
+    granularity: DivisionGranularity,
+    includeIntermediateLevels: boolean,
+    fillInRange: boolean
+  ): IPeriod[] {
+    return this.toMonths();
+  }
+
   endsAfter(date: IPeriod): boolean {
     return this.endYearMonth > date.getEndYearMonth();
   }
@@ -231,6 +251,10 @@ export class Period implements IPeriod {
 
   isFiscalPeriod(): boolean {
     return this.kind === YearKind.FY;
+  }
+
+  lengthInMonths(): number {
+    return 1;
   }
 
   newPeriodCombinedWith(period: IPeriod): IPeriod {
@@ -584,6 +608,24 @@ export class Half extends Period implements IPeriod {
   }
 
   /**
+   * Halves always divide into quarters
+   */
+  divide(): Quarter[] {
+    const quarters: Quarter[] = [];
+    const year =
+      this.kind === YearKind.CY
+        ? this.getStartCalendarYear()
+        : this.getStartFiscalYear();
+    const quarter =
+      this.kind === YearKind.CY
+        ? Math.ceil(this.getStartCalendarMonth() / 3)
+        : Math.ceil(this.getStartFiscalMonth() / 3);
+    quarters.push(new Quarter(this.kind, year, quarter));
+    quarters.push(new Quarter(this.kind, year, quarter + 1));
+    return quarters;
+  }
+
+  /**
    * Determine if this and half can be combined into a year
    *
    * @param half another Half
@@ -729,6 +771,20 @@ export class Year extends Period implements IPeriod {
     let endMonth = (startMonth + 11) % 12;
     endMonth = endMonth === 0 ? 12 : endMonth;
     super(kind, calendarYear, startMonth, -1, endMonth);
+  }
+
+  /**
+   * Years always divides into halves
+   */
+  divide(): Half[] {
+    const halves: Half[] = [];
+    const year =
+      this.kind === YearKind.CY
+        ? this.getStartCalendarYear()
+        : this.getStartFiscalYear();
+    halves.push(new Half(this.kind, year, 1));
+    halves.push(new Half(this.kind, year, 2));
+    return halves;
   }
 
   /**

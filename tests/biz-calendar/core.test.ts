@@ -27,8 +27,8 @@ import {
   Range,
   currentMonth,
 } from '../../src/biz-calendar';
-import {Half, Period, Year} from '../../src/biz-calendar/core';
-import {K, pObj} from './test-support';
+import {Half, Period, Year, YearKind as K} from '../../src/biz-calendar/core';
+import {pObj} from './test-support';
 
 describe('transforming business periods', () => {
   test('CY Quarter to FY Quarter', () => {
