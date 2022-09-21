@@ -1,5 +1,6 @@
 import {PeriodConfig} from '../../src/biz-calendar';
 import {
+  addMonths,
   calendarToFiscal,
   checkKind,
   checkMonth,
@@ -7,6 +8,7 @@ import {
   ifShortYear,
   fiscalToCalendar,
   lengthInMonths,
+  subtractMonths,
   yearAndMonth,
   yearMonth,
   tickMonth,
@@ -207,6 +209,60 @@ describe('converting between year kinds', () => {
 });
 
 describe('years and months and yearMonths', () => {
+  test('adding to month in a year', () => {
+    expect(addMonths(4, 3)).toMatchObject([7, 0]);
+  });
+
+  test('adding to a month across a year boundary', () => {
+    expect(addMonths(8, 7)).toMatchObject([3, 1]);
+  });
+
+  test('adding to a month across multiple year boundaries', () => {
+    expect(addMonths(10, 25)).toMatchObject([11, 2]);
+  });
+
+  test('trying to add to an invalid month ordinal throws', () => {
+    const monthZero = () => {
+      addMonths(0, 3);
+    };
+    const monthThirteen = () => {
+      addMonths(13, 5);
+    };
+    expect(monthZero).toThrowError();
+    expect(monthThirteen).toThrowError();
+  });
+
+  test('adding a negative number of months works', () => {
+    expect(addMonths(5, -2)).toMatchObject([3, 0]);
+  });
+
+  test('subtracting from month in a year', () => {
+    expect(subtractMonths(4, 3)).toMatchObject([1, 0]);
+  });
+
+  test('subtracting from a month across a year boundary', () => {
+    expect(subtractMonths(6, 10)).toMatchObject([8, -1]);
+  });
+
+  test('subtracting from a month to year 12', () => {
+    expect(subtractMonths(3, 3)).toMatchObject([12, -1]);
+  });
+
+  test('subtracting from a month across multiple year boundaries', () => {
+    expect(subtractMonths(7, 38)).toMatchObject([5, -3]);
+  });
+
+  test('subtracting from an invalid month ordinal throws', () => {
+    const monthZero = () => {
+      subtractMonths(0, 3);
+    };
+    const monthThirteen = () => {
+      subtractMonths(13, 5);
+    };
+    expect(monthZero).toThrowError();
+    expect(monthThirteen).toThrowError();
+  });
+
   test('combining', () => {
     expect(yearMonth(2022, 1)).toBe(202201);
   });

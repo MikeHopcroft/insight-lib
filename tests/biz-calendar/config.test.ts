@@ -29,27 +29,10 @@ import {
   Y,
 } from '../../src/biz-calendar';
 import {YearKind as K} from '../../src/biz-calendar/core';
-import {pObj} from './test-support';
+import {pObj, setConfig} from './test-support';
 
-function setConfig(
-  fiscal = 7,
-  hqPad = ' ',
-  monthPad = ' ',
-  dateRangePad = ' ',
-  monthRangePad = '',
-  shortYear = false,
-  tbdPad = ''
-) {
-  PeriodConfig.fiscalYearStartMonth = fiscal;
-  PeriodConfig.stringHalfAndQuarterPad = hqPad;
-  PeriodConfig.stringMonthPad = monthPad;
-  PeriodConfig.stringDateRangePad = dateRangePad;
-  PeriodConfig.stringMonthRangePad = monthRangePad;
-  PeriodConfig.stringShortYear = shortYear;
-  PeriodConfig.stringTBDPad = tbdPad;
-}
-
-// math.test.ts tests fiscal year start config with the core calendar math
+// math.test.ts tests fiscal year start config with the core calendar
+// core.test.ts tests Period and its subclasses for different fiscal years
 
 describe('configuring padding', () => {
   test('add one to all padding', () => {

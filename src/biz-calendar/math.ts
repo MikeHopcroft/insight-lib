@@ -2,6 +2,27 @@ import {YearKind} from './core';
 import {PeriodConfig} from './interface';
 
 /**
+ * @param month starting month ordinal
+ * @param add number of months to add
+ * @returns the new month ordinal and any year adjustment implied (e.g. -1)
+ */
+export function addMonths(month: number, add: number): [number, number] {
+  if (month < 1 || month > 12) {
+    throw new Error(`cannot add months to ${month}`);
+  }
+  if (add < 0) {
+    return subtractMonths(month, -add);
+  }
+  let result = month + add;
+  const yearDiff = Math.floor(result / 12);
+  result = result % 12;
+  if (result === 0) {
+    result = 12;
+  }
+  return [result, yearDiff];
+}
+
+/**
  * Computes the fiscal year and fiscal month ordinal from calendar year and
  * month
  *
@@ -139,6 +160,30 @@ export function lengthInMonths(from: number, to: number): number {
   const years = toYear - fromYear;
   const months = toMonth - fromMonth; // could be negative
   return years * 12 + months + 1; // ranges are inclusive
+}
+
+/**
+ * @param month starting month ordinal
+ * @param subtract number of months to subtract
+ * @returns the new month ordinal and any year adjustment implied (e.g. -1)
+ */
+export function subtractMonths(
+  month: number,
+  subtract: number
+): [number, number] {
+  if (month < 1 || month > 12) {
+    throw new Error(`cannot subtract months from ${month}`);
+  }
+  let result = month - subtract;
+  if (result > 0) {
+    return [result, 0];
+  }
+  if (result === 0) {
+    return [12, -1];
+  }
+  const yearDiff = Math.floor(result / 12);
+  result = result % 12;
+  return [12 + result, yearDiff];
 }
 
 /**

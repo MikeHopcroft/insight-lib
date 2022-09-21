@@ -1,11 +1,11 @@
 /*
- * Supports common 'FY23 H1'-style date formats
- *
- * Deliverables and other business concepts in Microsoft are frequently
- * associated with business periods, like 'FY2023 Q2' or 'CY22 Nov'.
- * biz-calendar provides forgiving parsing of common string representations,
- * creates canonical string representations, and uses a common internal
- * representation to allow comparison of any twovPeriods.
+   Supports common 'FY23 H1'-style date formats
+
+   Deliverables and other business concepts in Microsoft are frequently
+   associated with business periods, like 'FY2023 Q2' or 'CY22 Nov'.
+   biz-calendar provides forgiving parsing of common string representations,
+   creates canonical string representations, and uses a common internal
+   representation to allow comparison of any twovPeriods.
  */
 
 /**

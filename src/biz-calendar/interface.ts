@@ -1,6 +1,6 @@
 /*
- * See IPeriod.divideInto() for documentation on how these Symbols and
- * DivisionGranularity are used and interpreted.
+   See IPeriod.divideInto() for documentation on how these Symbols and
+   DivisionGranularity are used and interpreted.
  */
 export const Years = Symbol();
 export const Halves = Symbol();
