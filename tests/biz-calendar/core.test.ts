@@ -44,49 +44,49 @@ describe('transforming business periods with default fiscal year', () => {
   test('CY Half to FY Half', () => {
     const half = CY(2023, H2).toFiscal();
     expect(half).toBeInstanceOf(Half);
-    expect(half).toMatchObject(pObj(K.FY, 202307, 202312));
+    expect(half).toEqual(FY(24, H1));
   });
 
   test('FY Half to CY Half', () => {
     const half = FY(2023, H2).toCalendar();
     expect(half).toBeInstanceOf(Half);
-    expect(half).toMatchObject(pObj(K.CY, 202301, 202306));
+    expect(half).toEqual(CY(23, H1));
   });
 
   test('CY Month to FY Month', () => {
     const month = CY(25, Oct).toFiscal();
     expect(month).toBeInstanceOf(Month);
-    expect(month).toMatchObject(pObj(K.FY, 202510, 202510));
+    expect(month).toEqual(FY(26, Oct));
   });
 
   test('FY Month to CY Month', () => {
     const month = FY(25, Nov).toCalendar();
     expect(month).toBeInstanceOf(Month);
-    expect(month).toMatchObject(pObj(K.CY, 202411, 202411));
+    expect(month).toEqual(CY(24, Nov));
   });
 
   test('CY Quarter to FY Quarter', () => {
     const quarter = CY(2022, Q3).toFiscal();
     expect(quarter).toBeInstanceOf(Quarter);
-    expect(quarter).toMatchObject(pObj(K.FY, 202207, 202209));
+    expect(quarter).toEqual(FY(23, Q1));
   });
 
   test('FY Quarter to CY Quarter', () => {
     const quarter = FY(2022, Q1).toCalendar();
     expect(quarter).toBeInstanceOf(Quarter);
-    expect(quarter).toMatchObject(pObj(K.CY, 202107, 202109));
+    expect(quarter).toEqual(CY(21, Q3));
   });
 
   test('CY to FY Period', () => {
     const year = CY(48).toFiscal();
     expect(year).toBeInstanceOf(Period);
-    expect(year).toMatchObject(pObj(K.FY, 204801, 204812));
+    expect(year).toEqual(FY(48, Jan).newPeriodTo(FY(49, Dec)));
   });
 
   test('FY to CY Period', () => {
     const year = FY(49).toCalendar();
     expect(year).toBeInstanceOf(Period);
-    expect(year).toMatchObject(pObj(K.CY, 204807, 204906));
+    expect(year).toEqual(CY(48, Jul).newPeriodTo(CY(49, Jun)));
   });
 });
 
@@ -256,70 +256,70 @@ describe('combining periods', () => {
   test('combine two quarters into a half', () => {
     const period = FY(23, Q1).newPeriodCombinedWith(FY(23, Q2));
     expect(period).toBeInstanceOf(Half);
-    expect(period).toMatchObject(FY(23, H1));
+    expect(period).toEqual(FY(23, H1));
     expect(period.toString()).toBe('FY2023 H1');
   });
 
   test('combine two quarters into a half with to', () => {
     const period = CY(23, Q3).newPeriodTo(CY(23, Q4));
     expect(period).toBeInstanceOf(Half);
-    expect(period).toMatchObject(CY(23, H2));
+    expect(period).toEqual(CY(23, H2));
     expect(period.toString()).toBe('CY2023 H2');
   });
 
   test('combine two quarters into a half with from', () => {
     const period = FY(23, Q2).newPeriodFrom(FY(23, Q1));
     expect(period).toBeInstanceOf(Half);
-    expect(period).toMatchObject(FY(23, H1));
+    expect(period).toEqual(FY(23, H1));
     expect(period.toString()).toBe('FY2023 H1');
   });
 
   test('combination is normal for quarters from different year kinds', () => {
     const period = FY(23, Q1).newPeriodTo(CY(22, Q4));
     expect(period).toBeInstanceOf(Period);
-    expect(period).toMatchObject(FY(23, Range(Jul, Dec)));
+    expect(period).toEqual(FY(23, Range(Jul, Dec)));
     expect(period.toString()).toBe('FY2023 Jul-Dec');
   });
 
   test('combination is normal for non-adjacent quarters', () => {
     const period = FY(23, Q1).newPeriodTo(FY(23, Q3));
     expect(period).toBeInstanceOf(Period);
-    expect(period).toMatchObject(FY(23, Range(Jul, Mar)));
+    expect(period).toEqual(FY(23, Range(Jul, Mar)));
     expect(period.toString()).toBe('FY2023 Jul-Mar');
   });
 
   test('combination is normal for quarter combining with another type', () => {
     const period = FY(23, Q4).newPeriodTo(FY(24));
     expect(period).toBeInstanceOf(Period);
-    expect(period).toMatchObject(pObj(K.FY, 202304, 202406));
+    expect(period).toEqual(pObj(K.FY, 202304, 202406));
     expect(period.toString()).toBe('FY2023 Apr - FY2024 Jun');
   });
 
   test('combine two halves into a year', () => {
     const period = FY(23, H2).newPeriodCombinedWith(FY(23, H1));
     expect(period).toBeInstanceOf(Year);
-    expect(period).toMatchObject(FY(23));
+    expect(period).toEqual(FY(23));
     expect(period.toString()).toBe('FY2023');
   });
 
   test('combine two halves into a year with to', () => {
     const period = CY(23, H1).newPeriodTo(CY(23, H2));
     expect(period).toBeInstanceOf(Year);
-    expect(period).toMatchObject(CY(23));
+    expect(period).toEqual(CY(23));
     expect(period.toString()).toBe('CY2023');
   });
 
-  test('combine two havles into a year with from', () => {
+  test('combine two halves into a year with from', () => {
     const period = FY(2056, H2).newPeriodFrom(FY(2056, H1));
     expect(period).toBeInstanceOf(Year);
-    expect(period).toMatchObject(FY(56));
+    expect(period).toEqual(FY(56));
     expect(period.toString()).toBe('FY2056');
   });
 
   test('combination is normal for halves from different year kinds', () => {
     const period = FY(23, H1).newPeriodTo(CY(23, H1));
     expect(period).toBeInstanceOf(Period);
-    expect(period).toMatchObject(FY(23, Range(Jul, Jun)));
+    expect(period).toEqual(FY(23, Range(Jul, Jun)));
     expect(period.toString()).toBe('FY2023 Jul-Jun');
   });
 
@@ -342,45 +342,41 @@ describe('dividing periods', () => {
   test('CY to halves', () => {
     const halves = CY(0).divide();
     expect(halves[0]).toBeInstanceOf(Half);
-    expect(halves[0]).toMatchObject(pObj(K.CY, 200001, 200006));
+    expect(halves[0]).toEqual(CY(2000, H1));
     expect(halves[1]).toBeInstanceOf(Half);
-    expect(halves[1]).toMatchObject(pObj(K.CY, 200007, 200012));
+    expect(halves[1]).toEqual(CY(2000, H2));
   });
 
   test('FY to halves', () => {
     const halves = FY(23).divide();
     expect(halves[0]).toBeInstanceOf(Half);
-    expect(halves[0]).toMatchObject(pObj(K.FY, 202207, 202212));
+    expect(halves[0]).toEqual(FY(23, H1));
     expect(halves[1]).toBeInstanceOf(Half);
-    expect(halves[1]).toMatchObject(pObj(K.FY, 202301, 202306));
+    expect(halves[1]).toEqual(FY(23, H2));
   });
 
   test('CY half to quarters', () => {
     const quarters = CY(42, H1).divide();
     expect(quarters[0]).toBeInstanceOf(Quarter);
-    expect(quarters[0]).toMatchObject(pObj(K.CY, 204201, 204203));
+    expect(quarters[0]).toEqual(CY(42, Q1));
     expect(quarters[1]).toBeInstanceOf(Quarter);
-    expect(quarters[1]).toMatchObject(pObj(K.CY, 204204, 204206));
+    expect(quarters[1]).toEqual(CY(42, Q2));
   });
 
   test('FY half to quarters', () => {
     const quarters = FY(0, H1).divide();
     expect(quarters[0]).toBeInstanceOf(Quarter);
-    expect(quarters[0]).toMatchObject(pObj(K.FY, 199907, 199909));
+    expect(quarters[0]).toEqual(FY(2000, Q1));
     expect(quarters[1]).toBeInstanceOf(Quarter);
-    expect(quarters[1]).toMatchObject(pObj(K.FY, 199910, 199912));
+    expect(quarters[1]).toEqual(FY(2000, Q2));
   });
 
   test('CY Quarter to start month', () => {
-    expect(CY(2019, Q4).getStartMonth()).toMatchObject(
-      pObj(K.CY, 201910, 201910)
-    );
+    expect(CY(2019, Q4).getStartMonth()).toEqual(CY(2019, Oct));
   });
 
   test('FY Half to end Month', () => {
-    expect(FY(2023, H2).getEndMonth()).toMatchObject(
-      pObj(K.FY, 202306, 202306)
-    );
+    expect(FY(2023, H2).getEndMonth()).toEqual(FY(23, Jun));
   });
 
   test('months from month', () => {
@@ -388,30 +384,30 @@ describe('dividing periods', () => {
   });
 
   test('months from quarter', () => {
-    expect(CY(2028, Q3).toMonths()).toMatchObject([
-      pObj(K.CY, 202807, 202807),
-      pObj(K.CY, 202808, 202808),
-      pObj(K.CY, 202809, 202809),
+    expect(CY(2028, Q3).toMonths()).toEqual([
+      CY(28, Jul),
+      CY(28, Aug),
+      CY(28, Sep),
     ]);
   });
 
   test('months from half', () => {
-    expect(FY(12, H2).toMonths()).toMatchObject([
-      pObj(K.FY, 201201, 201201),
-      pObj(K.FY, 201202, 201202),
-      pObj(K.FY, 201203, 201203),
-      pObj(K.FY, 201204, 201204),
-      pObj(K.FY, 201205, 201205),
-      pObj(K.FY, 201206, 201206),
+    expect(FY(12, H2).toMonths()).toEqual([
+      FY(12, Jan),
+      FY(12, Feb),
+      FY(12, Mar),
+      FY(12, Apr),
+      FY(12, May),
+      FY(12, Jun),
     ]);
   });
 
   test('months from long arbitrary range', () => {
     const range = CY(2000).newPeriodTo(CY(2020, Nov)).toMonths();
     expect(range.length).toBe(251);
-    expect(range[0]).toMatchObject(pObj(K.CY, 200001, 200001));
-    expect(range[133]).toMatchObject(pObj(K.CY, 201102, 201102));
-    expect(range[250]).toMatchObject(pObj(K.CY, 202011, 202011));
+    expect(range[0]).toEqual(CY(2000, Jan));
+    expect(range[133]).toEqual(CY(2011, Feb));
+    expect(range[250]).toEqual(CY(2020, Nov));
   });
 });
 

@@ -97,105 +97,105 @@ describe('converting between year kinds', () => {
   test('calendar to default fiscal start', () => {
     expect(
       calendarToFiscal(2022, 7, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2023, 1]);
+    ).toStrictEqual([2023, 1]);
   });
 
   test('calendar start to default fiscal', () => {
     expect(
       calendarToFiscal(2022, 1, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2022, 7]);
+    ).toStrictEqual([2022, 7]);
   });
 
   test('calendar to default fiscal', () => {
     expect(
       calendarToFiscal(2019, 2, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2019, 8]);
+    ).toStrictEqual([2019, 8]);
   });
 
   test('calendar to default fiscal end', () => {
     expect(
       calendarToFiscal(2025, 6, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2025, 12]);
+    ).toStrictEqual([2025, 12]);
   });
 
   test('calendar end to default fiscal', () => {
     expect(
       calendarToFiscal(2042, 12, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2043, 6]);
+    ).toStrictEqual([2043, 6]);
   });
 
   test('calendar to configured fiscal start', () => {
-    expect(calendarToFiscal(2022, 4, 4)).toMatchObject([2023, 1]);
+    expect(calendarToFiscal(2022, 4, 4)).toStrictEqual([2023, 1]);
   });
 
   test('calendar start to configured fiscal', () => {
-    expect(calendarToFiscal(2022, 1, 5)).toMatchObject([2022, 9]);
+    expect(calendarToFiscal(2022, 1, 5)).toStrictEqual([2022, 9]);
   });
 
   test('calendar to configured fiscal', () => {
-    expect(calendarToFiscal(2019, 2, 8)).toMatchObject([2019, 7]);
+    expect(calendarToFiscal(2019, 2, 8)).toStrictEqual([2019, 7]);
   });
 
   test('calendar to configured fiscal end', () => {
-    expect(calendarToFiscal(2025, 9, 10)).toMatchObject([2025, 12]);
+    expect(calendarToFiscal(2025, 9, 10)).toStrictEqual([2025, 12]);
   });
 
   test('calendar end to configured fiscal', () => {
-    expect(calendarToFiscal(2042, 12, 11)).toMatchObject([2043, 2]);
+    expect(calendarToFiscal(2042, 12, 11)).toStrictEqual([2043, 2]);
   });
 
   test('calendar and fiscal year match', () => {
-    expect(calendarToFiscal(2025, 6, 1)).toMatchObject([2025, 6]);
+    expect(calendarToFiscal(2025, 6, 1)).toStrictEqual([2025, 6]);
   });
 
   test('default fiscal to calendar start', () => {
     expect(
       fiscalToCalendar(2023, 7, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2023, 1]);
+    ).toStrictEqual([2023, 1]);
   });
 
   test('default fiscal start to calendar', () => {
     expect(
       fiscalToCalendar(2022, 1, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2021, 7]);
+    ).toStrictEqual([2021, 7]);
   });
 
   test('default fiscal to calendar', () => {
     expect(
       fiscalToCalendar(2019, 2, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2018, 8]);
+    ).toStrictEqual([2018, 8]);
   });
 
   test('default fiscal to calendar end', () => {
     expect(
       fiscalToCalendar(2025, 6, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2024, 12]);
+    ).toStrictEqual([2024, 12]);
   });
 
   test('default fiscal end to calendar', () => {
     expect(
       fiscalToCalendar(2042, 12, PeriodConfig.fiscalYearStartMonth)
-    ).toMatchObject([2042, 6]);
+    ).toStrictEqual([2042, 6]);
   });
 
   test('configured fiscal to calendar start', () => {
-    expect(fiscalToCalendar(2023, 10, 4)).toMatchObject([2023, 1]);
+    expect(fiscalToCalendar(2023, 10, 4)).toStrictEqual([2023, 1]);
   });
 
   test('configured fiscal start to calendar', () => {
-    expect(fiscalToCalendar(2022, 1, 5)).toMatchObject([2021, 5]);
+    expect(fiscalToCalendar(2022, 1, 5)).toStrictEqual([2021, 5]);
   });
 
   test('configured fiscal to calendar', () => {
-    expect(fiscalToCalendar(2019, 2, 8)).toMatchObject([2018, 9]);
+    expect(fiscalToCalendar(2019, 2, 8)).toStrictEqual([2018, 9]);
   });
 
   test('configured fiscal to calendar end', () => {
-    expect(fiscalToCalendar(2026, 3, 10)).toMatchObject([2025, 12]);
+    expect(fiscalToCalendar(2026, 3, 10)).toStrictEqual([2025, 12]);
   });
 
   test('configured fiscal end to calendar', () => {
-    expect(fiscalToCalendar(2042, 12, 11)).toMatchObject([2042, 10]);
+    expect(fiscalToCalendar(2042, 12, 11)).toStrictEqual([2042, 10]);
   });
 
   test('fiscalToCalendar and calendarToFiscal are inverse', () => {
@@ -204,21 +204,21 @@ describe('converting between year kinds', () => {
         ...fiscalToCalendar(2023, 3, PeriodConfig.fiscalYearStartMonth),
         PeriodConfig.fiscalYearStartMonth
       )
-    ).toMatchObject([2023, 3]);
+    ).toStrictEqual([2023, 3]);
   });
 });
 
 describe('years and months and yearMonths', () => {
   test('adding to month in a year', () => {
-    expect(addMonths(4, 3)).toMatchObject([7, 0]);
+    expect(addMonths(4, 3)).toStrictEqual([7, 0]);
   });
 
   test('adding to a month across a year boundary', () => {
-    expect(addMonths(8, 7)).toMatchObject([3, 1]);
+    expect(addMonths(8, 7)).toStrictEqual([3, 1]);
   });
 
   test('adding to a month across multiple year boundaries', () => {
-    expect(addMonths(10, 25)).toMatchObject([11, 2]);
+    expect(addMonths(10, 25)).toStrictEqual([11, 2]);
   });
 
   test('trying to add to an invalid month ordinal throws', () => {
@@ -233,23 +233,23 @@ describe('years and months and yearMonths', () => {
   });
 
   test('adding a negative number of months works', () => {
-    expect(addMonths(5, -2)).toMatchObject([3, 0]);
+    expect(addMonths(5, -2)).toStrictEqual([3, 0]);
   });
 
   test('subtracting from month in a year', () => {
-    expect(subtractMonths(4, 3)).toMatchObject([1, 0]);
+    expect(subtractMonths(4, 3)).toStrictEqual([1, 0]);
   });
 
   test('subtracting from a month across a year boundary', () => {
-    expect(subtractMonths(6, 10)).toMatchObject([8, -1]);
+    expect(subtractMonths(6, 10)).toStrictEqual([8, -1]);
   });
 
   test('subtracting from a month to year 12', () => {
-    expect(subtractMonths(3, 3)).toMatchObject([12, -1]);
+    expect(subtractMonths(3, 3)).toStrictEqual([12, -1]);
   });
 
   test('subtracting from a month across multiple year boundaries', () => {
-    expect(subtractMonths(7, 38)).toMatchObject([5, -3]);
+    expect(subtractMonths(7, 38)).toStrictEqual([5, -3]);
   });
 
   test('subtracting from an invalid month ordinal throws', () => {
@@ -268,7 +268,7 @@ describe('years and months and yearMonths', () => {
   });
 
   test('pulling apart', () => {
-    expect(yearAndMonth(201912)).toMatchObject([2019, 12]);
+    expect(yearAndMonth(201912)).toStrictEqual([2019, 12]);
   });
 
   test('are inverse', () => {
