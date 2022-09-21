@@ -1,27 +1,30 @@
-export type NodeType = string;
-export type NodeId = number;
-export type NodeFields = {[key: string]: any};
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Nodes and Edges
 //
 ///////////////////////////////////////////////////////////////////////////////
-export interface Node {
+export type NodeType = string;
+export type NodeId = number;
+export type NodeFields = {[key: string]: any};
+
+export interface NodeTemplate<NODE_REF> {
   type: NodeType;
   id: NodeId;
-  incoming: {[type: string]: Edge[]};
-  outgoing: {[type: string]: Edge[]};
+  incoming: {[type: EdgeType]: EdgeTemplate<NODE_REF>[]};
+  outgoing: {[type: EdgeType]: EdgeTemplate<NODE_REF>[]};
   fields: NodeFields;
 }
 
 export type EdgeType = string;
 
-export interface Edge {
+export interface EdgeTemplate<NODE_REF> {
   type: EdgeType;
-  from: Node;
-  to: Node;
+  from: NODE_REF;
+  to: NODE_REF;
 }
+
+export type Node = NodeTemplate<Node>;
+export type Edge = EdgeTemplate<Edge>;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

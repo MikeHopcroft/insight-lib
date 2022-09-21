@@ -43,6 +43,8 @@ function go() {
   render(store, accountInsightImpactView);
 
   render(store, capabilityFeatureTaskView);
+
+  // console.log(JSON.stringify(store.serialize(), null, 2));
 }
 
 go();
