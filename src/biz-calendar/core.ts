@@ -348,11 +348,21 @@ export class Period implements IPeriod {
   toMonths(): Month[] {
     const months: Month[] = [];
     for (
-      let month = this.startYearMonth;
-      month <= this.endYearMonth;
-      month = tickMonth(month)
+      let yearMonth = this.startYearMonth;
+      yearMonth <= this.endYearMonth;
+      yearMonth = tickMonth(yearMonth)
     ) {
-      months.push(new Month(this.kind, ...yearAndMonth(month)));
+      const [year, month] = yearAndMonth(yearMonth);
+      if (this.isFiscalPeriod()) {
+        const [fiscalYear] = calendarToFiscal(
+          year,
+          month,
+          PeriodConfig.fiscalYearStartMonth
+        );
+        months.push(new Month(this.kind, fiscalYear, month));
+      } else {
+        months.push(new Month(this.kind, year, month));
+      }
     }
     return months;
   }

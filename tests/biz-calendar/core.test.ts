@@ -339,6 +339,38 @@ describe('combining periods', () => {
 });
 
 describe('dividing periods', () => {
+  test('CY to halves', () => {
+    const halves = CY(0).divide();
+    expect(halves[0]).toBeInstanceOf(Half);
+    expect(halves[0]).toMatchObject(pObj(K.CY, 200001, 200006));
+    expect(halves[1]).toBeInstanceOf(Half);
+    expect(halves[1]).toMatchObject(pObj(K.CY, 200007, 200012));
+  });
+
+  test('FY to halves', () => {
+    const halves = FY(23).divide();
+    expect(halves[0]).toBeInstanceOf(Half);
+    expect(halves[0]).toMatchObject(pObj(K.FY, 202207, 202212));
+    expect(halves[1]).toBeInstanceOf(Half);
+    expect(halves[1]).toMatchObject(pObj(K.FY, 202301, 202306));
+  });
+
+  test('CY half to quarters', () => {
+    const quarters = CY(42, H1).divide();
+    expect(quarters[0]).toBeInstanceOf(Quarter);
+    expect(quarters[0]).toMatchObject(pObj(K.CY, 204201, 204203));
+    expect(quarters[1]).toBeInstanceOf(Quarter);
+    expect(quarters[1]).toMatchObject(pObj(K.CY, 204204, 204206));
+  });
+
+  test('FY half to quarters', () => {
+    const quarters = FY(0, H1).divide();
+    expect(quarters[0]).toBeInstanceOf(Quarter);
+    expect(quarters[0]).toMatchObject(pObj(K.FY, 199907, 199909));
+    expect(quarters[1]).toBeInstanceOf(Quarter);
+    expect(quarters[1]).toMatchObject(pObj(K.FY, 199910, 199912));
+  });
+
   test('CY Quarter to start month', () => {
     expect(CY(2019, Q4).getStartMonth()).toMatchObject(
       pObj(K.CY, 201910, 201910)
@@ -454,6 +486,41 @@ describe('working with unaligned fiscal year', () => {
     const year = FY(49).toCalendar();
     expect(year).toBeInstanceOf(Period);
     expect(year).toMatchObject(pObj(K.CY, 204805, 204904));
+  });
+
+  test('FY to halves', () => {
+    const halves = FY(23).divide();
+    expect(halves[0]).toBeInstanceOf(Half);
+    expect(halves[0]).toMatchObject(pObj(K.FY, 202205, 202210));
+    expect(halves[1]).toBeInstanceOf(Half);
+    expect(halves[1]).toMatchObject(pObj(K.FY, 202211, 202304));
+  });
+
+  test('FY half to quarters', () => {
+    const quarters = FY(0, H1).divide();
+    expect(quarters[0]).toBeInstanceOf(Quarter);
+    expect(quarters[0]).toMatchObject(pObj(K.FY, 199905, 199907));
+    expect(quarters[1]).toBeInstanceOf(Quarter);
+    expect(quarters[1]).toMatchObject(pObj(K.FY, 199908, 199910));
+  });
+
+  test('months from quarter', () => {
+    expect(FY(2028, Q3).toMonths()).toMatchObject([
+      pObj(K.FY, 202711, 202711),
+      pObj(K.FY, 202712, 202712),
+      pObj(K.FY, 202801, 202801),
+    ]);
+  });
+
+  test('months from half', () => {
+    expect(FY(12, H2).toMonths()).toMatchObject([
+      pObj(K.FY, 201111, 201111),
+      pObj(K.FY, 201112, 201112),
+      pObj(K.FY, 201201, 201201),
+      pObj(K.FY, 201202, 201202),
+      pObj(K.FY, 201203, 201203),
+      pObj(K.FY, 201204, 201204),
+    ]);
   });
 
   afterAll(() => {
