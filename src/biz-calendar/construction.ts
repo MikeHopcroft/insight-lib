@@ -1,6 +1,6 @@
 import {Half, Month, Period, Quarter, Year, _TBD, _Unknown} from './core';
 import {IPeriod, PeriodConfig, YearKind} from './interface';
-import {addMonths, calendarToFiscal, tickMonth, yearAndMonth} from './math';
+import {addMonths, calendarToFiscal, tickMonth, yearAndMonth, yearMonth} from './math';
 
 export type periodFunction = (year: number, kind: YearKind) => IPeriod;
 type yearFunction = (year: number, part: periodFunction) => IPeriod;
@@ -495,6 +495,10 @@ class CalendarBuilder {
     ) {
       calendar.push(...this.step(yearMonth));
     }
+    const lastPushed = calendar[calendar.length - 1];
+    if (lastPushed.getEndYearMonth() !== this.period.getEndYearMonth()) {
+      calendar.push(...this.coverFrom(tickMonth(lastPushed.getEndYearMonth())));
+    }
     return calendar;
   }
 
@@ -511,7 +515,41 @@ class CalendarBuilder {
     }
     return newPeriods;
   }
+
+  coverFrom(startYearMonth: number): IPeriod[] {
+    const cover: IPeriod[] = [];
+    let quarter: IPeriod = new CoverMarker();
+    let half: IPeriod = new CoverMarker();
+    let year: IPeriod = new CoverMarker();
+    let yearMonth = startYearMonth;
+    for (let i = 0; i < 12; i++) {
+      const candidates = this.step(yearMonth);
+      for (const candidate of candidates) {
+        if (candidate instanceof Quarter && quarter instanceof CoverMarker) {
+          quarter = candidate;
+        }
+        if (candidate instanceof Half && half instanceof CoverMarker) {
+          half = candidate;
+        }
+        if (candidate instanceof Year && year instanceof CoverMarker) {
+          year = candidate;
+        }
+      }
+    }
+    if (quarter instanceof Quarter) {
+      cover.push(quarter);
+    }
+    if (half instanceof Half) {
+      cover.push(half);
+    }
+    if (year instanceof Year) {
+      cover.push(year);
+    }
+    return cover;
+  }
 }
+
+class CoverMarker extends Period implements IPeriod {}
 
 class NextYearMarker extends Period implements IPeriod {}
 

@@ -271,27 +271,23 @@ describe('building calendars from periods', () => {
     ]);
   });
 
-  // test('build fiscal quarters calendar with intermediate levels and fill on both sides', () => {
-  //   expect(
-  //     buildCalendarForPeriod(
-  //       FY(1985, Feb).newPeriodTo(FY(1987, Jul)),
-  //       Quarters,
-  //       true,
-  //       true
-  //     )
-  //   ).toStrictEqual([
-  //     FY(1985, Mar),
-  //     FY(1985, Q4),
-  //     FY(1986),
-  //     FY(1986, H1),
-  //     FY(1986, Q1),
-  //     FY(1986, Q2),
-  //     FY(1986, H2),
-  //     FY(1986, Q3),
-  //     FY(1986, Q4),
-  //     FY(1987, Jul),
-  //   ]);
-  // });
+  test('build fiscal quarters calendar with intermediate levels and cover both sides', () => {
+    expect(
+      buildCalendarForPeriod(
+        FY(1985, Feb).newPeriodTo(FY(1987, Jul)),
+        Quarters,
+        false
+      )
+    ).toStrictEqual([
+      FY(1985, Q3),
+      FY(1985, Q4),
+      FY(1986, Q1),
+      FY(1986, Q2),
+      FY(1986, Q3),
+      FY(1986, Q4),
+      FY(1987, Q1),
+    ]);
+  });
 
   test('build full calendar tree', () => {
     expect(buildCalendarForPeriod(CY(2023), Months, true)).toStrictEqual([
