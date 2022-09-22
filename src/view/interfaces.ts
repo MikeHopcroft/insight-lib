@@ -26,6 +26,12 @@ export interface EdgeTemplate<NODE_REF> {
 export type Node = NodeTemplate<Node>;
 export type Edge = EdgeTemplate<Edge>;
 
+export interface SerializableNode {
+  id: string;
+  outgoing: EdgeTemplate<string>[];
+  fields: NodeFields;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // RowDefinition

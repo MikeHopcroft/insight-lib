@@ -1,10 +1,11 @@
 import {
+  EdgeTemplate,
   EdgeType,
   Node,
-  NodeTemplate,
   NodeFields,
   NodeId,
   NodeType,
+  SerializableNode,
 } from './interfaces';
 
 export class NodeStore {
@@ -50,14 +51,14 @@ export class NodeStore {
     toNodes.push({type, to: from, from: to});
   }
 
-  serialize(): NodeTemplate<string>[] {
-    const nodes: NodeTemplate<string>[] = [];
+  serialize(): SerializableNode[] {
+    const nodes: SerializableNode[] = [];
     for (const type of this.nodes.values()) {
       for (const node of type.values()) {
         nodes.push({
-          ...node,
-          incoming: serializeEdges(node.incoming),
+          id: getNodeRef(node),
           outgoing: serializeEdges(node.outgoing),
+          fields: node.fields,
         });
       }
     }
@@ -84,15 +85,18 @@ export class NodeStore {
 // Serialization and Deserialization
 //
 ///////////////////////////////////////////////////////////////////////////////
-function serializeEdges(edges: Node['incoming']): NodeTemplate<string>['incoming'] {
-  return Object.keys(edges).reduce((acc, type) => {
-    acc[type] = edges[type].map(edge => ({
-      ...edge,
-      from: getNodeRef(edge.from),
-      to: getNodeRef(edge.to),
-    }));
-    return acc;
-  }, {} as NodeTemplate<string>['incoming']);
+function serializeEdges(edges: Node['incoming']): EdgeTemplate<string>[] {
+  const result: EdgeTemplate<string>[] = [];
+  for (const type in edges) {
+    for (const edge of edges[type]) {
+      result.push({
+        ...edge,
+        from: getNodeRef(edge.from),
+        to: getNodeRef(edge.to),
+      });
+    }
+  }
+  return result;
 }
 
 // DESIGN NOTE: chose ':' because it doesn't appear in the text encoding of the
