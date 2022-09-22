@@ -317,34 +317,27 @@ describe('building calendars from periods', () => {
     ]);
   });
 
-  // test('build full fiscal tree', () => {
-  //   expect(buildCalendarForPeriod(FY(2023), Months, true, true)).toStrictEqual([
-  //     FY(2023),
-  //     FY(2023, H1),
-  //     FY(2023, Q1),
-  //     FY(2023, Jul),
-  //     FY(2023, Aug),
-  //     FY(2023, Sep),
-  //     FY(2023, Q2),
-  //     FY(2023, Oct),
-  //     FY(2023, Nov),
-  //     FY(2023, Dec),
-  //     FY(2023, H2),
-  //     FY(2023, Q3),
-  //     FY(2023, Jan),
-  //     FY(2023, Feb),
-  //     FY(2023, Mar),
-  //     FY(2023, Q4),
-  //     FY(2023, Apr),
-  //     FY(2023, May),
-  //     FY(2023, Jun),
-  //   ]);
-  // });
-
-  // test('cannot build a calendar with a granularity that is longer than the period', () => {
-  //   const rangeTooSmall = () => {
-  //     buildCalendarForPeriod(CY(2052, Q2), Halves);
-  //   };
-  //   expect(rangeTooSmall).toThrowError();
-  // });
+  test('build full fiscal tree', () => {
+    expect(buildCalendarForPeriod(FY(2023), Months, true)).toStrictEqual([
+      FY(2023),
+      FY(2023, H1),
+      FY(2023, Q1),
+      FY(2023, Jul),
+      FY(2023, Aug),
+      FY(2023, Sep),
+      FY(2023, Q2),
+      FY(2023, Oct),
+      FY(2023, Nov),
+      FY(2023, Dec),
+      FY(2023, H2),
+      FY(2023, Q3),
+      FY(2023, Jan),
+      FY(2023, Feb),
+      FY(2023, Mar),
+      FY(2023, Q4),
+      FY(2023, Apr),
+      FY(2023, May),
+      FY(2023, Jun),
+    ]);
+  });
 });
