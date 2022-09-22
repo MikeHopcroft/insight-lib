@@ -212,24 +212,18 @@ describe('building calendars from periods', () => {
     ).toStrictEqual([FY(2020), FY(2021), FY(2022), FY(2023), FY(2024)]);
   });
 
-  // test('build calendar halves calendar and fill at beginning', () => {
-  //   expect(
-  //     buildCalendarForPeriod(
-  //       CY(2028, Mar).newPeriodTo(CY(2030, Dec)),
-  //       Halves,
-  //       false,
-  //       true
-  //     )
-  //   ).toStrictEqual([
-  //     CY(2028, Mar),
-  //     CY(2028, Q2),
-  //     CY(2028, H2),
-  //     CY(2029, H1),
-  //     CY(2029, H2),
-  //     CY(2030, H1),
-  //     CY(2030, H2),
-  //   ]);
-  // });
+  test('build calendar halves calendar and cover beginning', () => {
+    expect(
+      buildCalendarForPeriod(CY(2028, Mar).newPeriodTo(CY(2030, Dec)), Halves)
+    ).toStrictEqual([
+      CY(2028, H1),
+      CY(2028, H2),
+      CY(2029, H1),
+      CY(2029, H2),
+      CY(2030, H1),
+      CY(2030, H2),
+    ]);
+  });
 
   // test('build fiscal halves calendar and fill at end', () => {
   //   expect(
@@ -250,30 +244,32 @@ describe('building calendars from periods', () => {
   //   ]);
   // });
 
-  // test('build calendar quarters calendar with intermediate levels', () => {
-  //   expect(
-  //     buildCalendarForPeriod(
-  //       CY(1985, Mar).newPeriodTo(CY(1987, Jul)),
-  //       Quarters,
-  //       true
-  //     )
-  //   ).toStrictEqual([
-  //     CY(1985, Q2),
-  //     CY(1985, H2),
-  //     CY(1985, Q3),
-  //     CY(1985, Q4),
-  //     CY(1986),
-  //     CY(1986, H1),
-  //     CY(1986, Q1),
-  //     CY(1986, Q2),
-  //     CY(1986, H2),
-  //     CY(1986, Q3),
-  //     CY(1986, Q4),
-  //     CY(1987, H1),
-  //     CY(1987, Q1),
-  //     CY(1987, Q2),
-  //   ]);
-  // });
+  test('build calendar quarters calendar with intermediate levels', () => {
+    expect(
+      buildCalendarForPeriod(
+        CY(1985, May).newPeriodTo(CY(1987, Jun)),
+        Quarters,
+        true
+      )
+    ).toStrictEqual([
+      CY(1985),
+      CY(1985, H1),
+      CY(1985, Q2),
+      CY(1985, H2),
+      CY(1985, Q3),
+      CY(1985, Q4),
+      CY(1986),
+      CY(1986, H1),
+      CY(1986, Q1),
+      CY(1986, Q2),
+      CY(1986, H2),
+      CY(1986, Q3),
+      CY(1986, Q4),
+      CY(1987, H1),
+      CY(1987, Q1),
+      CY(1987, Q2),
+    ]);
+  });
 
   // test('build fiscal quarters calendar with intermediate levels and fill on both sides', () => {
   //   expect(

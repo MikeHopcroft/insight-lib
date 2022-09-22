@@ -286,23 +286,23 @@ export function Unknown(): IPeriod {
 
 /**
  * Creates periods that represent dividing this period into periods of the
- * specified size
+ * specified granularity
  *
- * @param granularity divideInto will continue to divide the period until
- *        it reaches the specified granularity
- * @param includeIntermediateLevels divideInto can return only the lowest
- *        level of granularity or the full tree of intermediate periods
+ * buildCalendarForPeriod will build the calendar required to at least cover
+ * the months in Period along with any intermediate levels that would be needed
+ * for consistent calendar levels.
+ *
+ * @param granularity buildCalendarForPeriod will divide the period to the
+ *        specified granularity
+ * @param includeIntermediateLevels buildCalendarForPeriod can return only the
+ *        lowest level of granularity or the full tree of intermediate periods
  *        created under this period
- * @param fillInRange if true, divideInto() includes any necesary periods,
- *        of sizes less than that specific by granularity, required to fill
- *        in the range of this from
  * @returns sub-periods of this period
  */
 export function buildCalendarForPeriod(
   period: IPeriod,
   granularity: CalendarGranularity,
-  includeIntermediateLevels = false,
-  fillInRange = false
+  includeIntermediateLevels = false
 ): IPeriod[] {
   if (granularity === Months && !includeIntermediateLevels) {
     return period.toMonths();
