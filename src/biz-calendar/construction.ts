@@ -321,7 +321,7 @@ export function buildCalendarForPeriod(
     +granularity.toString().substring(7, granularity.toString().length - 1);
 
 
-  return period.toMonths();
+  return new CalendarBuilder().build();
 }
 
 /**
@@ -401,4 +401,18 @@ export function currentYear(kind = YearKind.CY): Year {
     );
   }
   return new Year(kind, year);
+}
+
+class CalendarBuilder{
+  constructor() {
+
+  }
+
+  build(): IPeriod[] {
+    return [];
+  }
+
+  step(): IPeriod[] {
+    return [];
+  }
 }
