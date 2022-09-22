@@ -35,7 +35,7 @@ import {
 } from '../../src/biz-calendar';
 import {Half, Month, Quarter, Year} from '../../src/biz-calendar/core';
 import {YearKind as K} from '../../src/biz-calendar/interface';
-import {pObj} from './test-support';
+import {pObj, setConfig} from './test-support';
 
 describe('constructing business periods', () => {
   test('fiscal year', () => {
@@ -225,24 +225,36 @@ describe('building calendars from periods', () => {
     ]);
   });
 
-  // test('build fiscal halves calendar and fill at end', () => {
-  //   expect(
-  //     buildCalendarForPeriod(
-  //       FY(2028, Jul).newPeriodTo(FY(2030, Nov)),
-  //       Halves,
-  //       false,
-  //       true
-  //     )
-  //   ).toStrictEqual([
-  //     FY(2028, H1),
-  //     FY(2028, H2),
-  //     FY(2029, H1),
-  //     FY(2029, H2),
-  //     FY(2030, Q1),
-  //     FY(2030, Oct),
-  //     FY(2030, Nov),
-  //   ]);
-  // });
+  test('build fiscal halves calendar and fill at end', () => {
+    expect(
+      buildCalendarForPeriod(FY(2028, Jul).newPeriodTo(FY(2030, Nov)), Halves)
+    ).toStrictEqual([
+      FY(2028, H1),
+      FY(2028, H2),
+      FY(2029, H1),
+      FY(2029, H2),
+      FY(2030, H1),
+    ]);
+  });
+
+  test('build fiscal halves calendar with years and fill at end', () => {
+    expect(
+      buildCalendarForPeriod(
+        FY(2028, Jul).newPeriodTo(FY(2030, Nov)),
+        Halves,
+        true
+      )
+    ).toStrictEqual([
+      FY(2028),
+      FY(2028, H1),
+      FY(2028, H2),
+      FY(2029),
+      FY(2029, H1),
+      FY(2029, H2),
+      FY(2030),
+      FY(2030, H1),
+    ]);
+  });
 
   test('build calendar quarters calendar with intermediate levels', () => {
     expect(
@@ -335,5 +347,94 @@ describe('building calendars from periods', () => {
       FY(2023, May),
       FY(2023, Jun),
     ]);
+  });
+});
+
+describe('building calendars from periods with unaligned fiscal year', () => {
+  beforeAll(() => {
+    setConfig(5);
+  });
+
+  test('build fiscal year calendar', () => {
+    expect(
+      buildCalendarForPeriod(FY(2020).newPeriodTo(FY(2024)), Years)
+    ).toStrictEqual([FY(2020), FY(2021), FY(2022), FY(2023), FY(2024)]);
+  });
+
+  test('build fiscal halves calendar and fill at end', () => {
+    expect(
+      buildCalendarForPeriod(FY(2028, Jul).newPeriodTo(FY(2030, Sep)), Halves)
+    ).toStrictEqual([
+      FY(2028, H1),
+      FY(2028, H2),
+      FY(2029, H1),
+      FY(2029, H2),
+      FY(2030, H1),
+    ]);
+  });
+
+  test('build fiscal halves calendar with years and fill at end', () => {
+    expect(
+      buildCalendarForPeriod(
+        FY(2028, Jul).newPeriodTo(FY(2030, Aug)),
+        Halves,
+        true
+      )
+    ).toStrictEqual([
+      FY(2028),
+      FY(2028, H1),
+      FY(2028, H2),
+      FY(2029),
+      FY(2029, H1),
+      FY(2029, H2),
+      FY(2030),
+      FY(2030, H1),
+    ]);
+  });
+
+  test('build fiscal quarters calendar with intermediate levels and cover both sides', () => {
+    expect(
+      buildCalendarForPeriod(
+        FY(1985, Feb).newPeriodTo(FY(1987, Aug)),
+        Quarters,
+        false
+      )
+    ).toStrictEqual([
+      FY(1985, Q4),
+      FY(1986, Q1),
+      FY(1986, Q2),
+      FY(1986, Q3),
+      FY(1986, Q4),
+      FY(1987, Q1),
+      FY(1987, Q2),
+    ]);
+  });
+
+  test('build full fiscal tree', () => {
+    expect(buildCalendarForPeriod(FY(2023), Months, true)).toStrictEqual([
+      FY(2023),
+      FY(2023, H1),
+      FY(2023, Q1),
+      FY(2023, May),
+      FY(2023, Jun),
+      FY(2023, Jul),
+      FY(2023, Q2),
+      FY(2023, Aug),
+      FY(2023, Sep),
+      FY(2023, Oct),
+      FY(2023, H2),
+      FY(2023, Q3),
+      FY(2023, Nov),
+      FY(2023, Dec),
+      FY(2023, Jan),
+      FY(2023, Q4),
+      FY(2023, Feb),
+      FY(2023, Mar),
+      FY(2023, Apr),
+    ]);
+  });
+
+  afterAll(() => {
+    setConfig();
   });
 });

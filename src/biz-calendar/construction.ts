@@ -1,6 +1,6 @@
 import {Half, Month, Period, Quarter, Year, _TBD, _Unknown} from './core';
 import {IPeriod, PeriodConfig, YearKind} from './interface';
-import {addMonths, calendarToFiscal, tickMonth, yearAndMonth, yearMonth} from './math';
+import {addMonths, calendarToFiscal, tickMonth, yearAndMonth} from './math';
 
 export type periodFunction = (year: number, kind: YearKind) => IPeriod;
 type yearFunction = (year: number, part: periodFunction) => IPeriod;
@@ -535,6 +535,7 @@ class CalendarBuilder {
           year = candidate;
         }
       }
+      yearMonth = tickMonth(yearMonth);
     }
     if (quarter instanceof Quarter) {
       cover.push(quarter);
