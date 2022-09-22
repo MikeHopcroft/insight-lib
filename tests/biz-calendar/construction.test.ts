@@ -206,11 +206,11 @@ describe('building calendars from periods', () => {
     ).toStrictEqual([CY(2020), CY(2021), CY(2022), CY(2023), CY(2024)]);
   });
 
-  // test('build fiscal year calendar', () => {
-  //   expect(
-  //     buildCalendarForPeriod(FY(2020).newPeriodTo(FY(2024)), Years)
-  //   ).toStrictEqual([FY(2020), FY(2021), FY(2022), FY(2023), FY(2024)]);
-  // });
+  test('build fiscal year calendar', () => {
+    expect(
+      buildCalendarForPeriod(FY(2020).newPeriodTo(FY(2024)), Years)
+    ).toStrictEqual([FY(2020), FY(2021), FY(2022), FY(2023), FY(2024)]);
+  });
 
   // test('build calendar halves calendar and fill at beginning', () => {
   //   expect(

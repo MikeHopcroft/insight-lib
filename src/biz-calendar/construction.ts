@@ -426,11 +426,6 @@ class CalendarBuilder {
     this.granularity = granularity;
 
     // Functions
-    if (period.isFiscalPeriod()) {
-      this.yearFunction = FY;
-    } else {
-      this.yearFunction = CY;
-    }
     if (granularity === Months) {
       this.buildFunctions[1].push(Jan);
       this.buildFunctions[2].push(Feb);
@@ -464,6 +459,12 @@ class CalendarBuilder {
     if (granularity === Years || buildIntermediate) {
       this.buildFunctions[12].push(Y);
     }
+    if (period.isFiscalPeriod()) {
+      this.yearFunction = FY;
+      this.mapFunctions(PeriodConfig.fiscalYearStartMonth);
+    } else {
+      this.yearFunction = CY;
+    }
   }
 
   build(): IPeriod[] {
@@ -476,6 +477,20 @@ class CalendarBuilder {
       calendar.push(...this.step(yearMonth));
     }
     return calendar;
+  }
+
+  mapFunctions(start: number) {
+    if (start === 1) {
+      return;
+    }
+    const mappedFunctions: periodFunction[][] = [[]];
+    for (let i = start; i < 13; i++) {
+      mappedFunctions.push(this.buildFunctions[i]);
+    }
+    for (let i = 1; i < start; i++) {
+      mappedFunctions.push(this.buildFunctions[i]);
+    }
+    this.buildFunctions = mappedFunctions;
   }
 
   step(yearMonth: number): IPeriod[] {
