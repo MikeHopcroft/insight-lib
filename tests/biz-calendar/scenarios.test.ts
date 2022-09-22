@@ -12,7 +12,7 @@ type Wrapper = {
 };
 
 describe('sorting parsed periods for display', () => {
-  test('display sort with stable order', () => {
+  test('sort for display with stable order', () => {
     // Node set from somewhere (e.g. database)
     const nodes: Node[] = [
       {id: 11, name: 'April Fool', bizPeriod: 'FY2022 Apr'},

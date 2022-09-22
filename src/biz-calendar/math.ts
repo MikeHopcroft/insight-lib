@@ -1,5 +1,4 @@
-import {YearKind} from './core';
-import {PeriodConfig} from './interface';
+import {PeriodConfig, YearKind} from './interface';
 
 /**
  * @param month starting month ordinal

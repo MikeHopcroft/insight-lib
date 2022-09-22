@@ -255,9 +255,9 @@ YEAR.setPattern(
 
 /*
 PART
-  = Half [1..2]
-  = Quarter [1..4]
-  = [Month] (- [Month])?
+  = H[1..2]
+  = Q[1..4]
+  = [MONTH] (- [MONTH])?
 */
 PART.setPattern(
   alt(

@@ -1,5 +1,5 @@
 import {PeriodConfig} from '../../src/biz-calendar';
-import {YearKind as K} from '../../src/biz-calendar/core';
+import {YearKind as K} from '../../src/biz-calendar/interface';
 
 export function pObj(kind: K, start: number, end: number): object {
   return {

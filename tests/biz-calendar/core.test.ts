@@ -31,8 +31,8 @@ import {
   Period,
   Quarter,
   Year,
-  YearKind as K,
 } from '../../src/biz-calendar/core';
+import {YearKind as K} from '../../src/biz-calendar/interface';
 import {pObj, setConfig} from './test-support';
 
 // core.test.ts uses the construction types for literate construction, but the

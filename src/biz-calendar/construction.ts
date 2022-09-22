@@ -4,14 +4,27 @@ import {
   Period,
   Quarter,
   Year,
-  YearKind,
   _TBD,
   _Unknown,
 } from './core';
-import {IPeriod, PeriodConfig} from './interface';
+import {IPeriod, PeriodConfig, YearKind} from './interface';
 import {calendarToFiscal} from './math';
 
 export type periodFunction = (year: number, kind: YearKind) => IPeriod;
+
+/*
+   See buildCalendarForPeriod() for documentation on how these Symbols and
+   DivisionGranularity are used and interpreted.
+ */
+export const Years = Symbol('12');
+export const Halves = Symbol('6');
+export const Quarters = Symbol('3');
+export const Months = Symbol('1');
+export type DivisionGranularity =
+  | typeof Years
+  | typeof Halves
+  | typeof Quarters
+  | typeof Months;
 
 const months: {[key: string]: number} = {
   Jan: 1,
@@ -276,6 +289,39 @@ export function TBD(): IPeriod {
  */
 export function Unknown(): IPeriod {
   return new _Unknown();
+}
+
+/**
+ * Creates periods that represent dividing this period into periods of the
+ * specified size
+ *
+ * @param granularity divideInto will continue to divide the period until
+ *        it reaches the specified granularity
+ * @param includeIntermediateLevels divideInto can return only the lowest
+ *        level of granularity or the full tree of intermediate periods
+ *        created under this period
+ * @param fillInRange if true, divideInto() includes any necesary periods,
+ *        of sizes less than that specific by granularity, required to fill
+ *        in the range of this from
+ * @returns sub-periods of this period
+ */
+export function buildCalendarForPeriod(
+  period: IPeriod,
+  granularity: DivisionGranularity,
+  fillInRange?: boolean,
+  includeIntermediateLevels?: boolean
+): IPeriod[] {
+  if (granularity === Months && !includeIntermediateLevels) {
+    return period.toMonths();
+  }
+  const rangeLength = period.lengthInMonths();
+
+  // 'Symbol(12)' -> 12
+  const resolution =
+    +granularity.toString().substring(7, granularity.toString().length - 1);
+
+
+  return period.toMonths();
 }
 
 /**

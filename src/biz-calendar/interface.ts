@@ -1,17 +1,3 @@
-/*
-   See IPeriod.divideInto() for documentation on how these Symbols and
-   DivisionGranularity are used and interpreted.
- */
-export const Years = Symbol();
-export const Halves = Symbol();
-export const Quarters = Symbol();
-export const Months = Symbol();
-export type DivisionGranularity =
-  | typeof Years
-  | typeof Halves
-  | typeof Quarters
-  | typeof Months;
-
 /**
  * Supports common 'FY22 H1'-style date formats
  *
@@ -44,26 +30,6 @@ export interface IPeriod {
    * @returns sub-periods of this period
    */
   divide(): IPeriod[];
-
-  /**
-   * Creates periods that represent dividing this period into periods of the
-   * specified size
-   *
-   * @param granularity divideInto will continue to divide the period until
-   *        it reaches the specified granularity
-   * @param includeIntermediateLevels divideInto can return only the lowest
-   *        level of granularity or the full tree of intermediate periods
-   *        created under this period
-   * @param fillInRange if true, divideInto() includes any necesary periods,
-   *        of sizes less than that specific by granularity, required to fill
-   *        in the range of this from
-   * @returns sub-periods of this period
-   */
-  divideInto(
-    granularity: DivisionGranularity,
-    includeIntermediateLevels: boolean,
-    fillInRange: boolean
-  ): IPeriod[];
 
   /**
    * The Periods may overlap
@@ -329,4 +295,12 @@ export class PeriodConfig {
    * The default is now whitespace.
    */
   static stringTBDPad = '';
+}
+
+export enum YearKind {
+  /** Calendar Year */
+  CY,
+
+  /** Microsoft Fiscal Year */
+  FY,
 }

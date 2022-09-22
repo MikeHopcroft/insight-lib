@@ -25,7 +25,7 @@ import {
   H2,
   Y,
 } from '../../src/biz-calendar';
-import {YearKind as K} from '../../src/biz-calendar/core';
+import {YearKind as K} from '../../src/biz-calendar/interface';
 import {pObj, setConfig} from './test-support';
 
 // math.test.ts tests fiscal year start config with the core calendar

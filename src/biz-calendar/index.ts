@@ -22,11 +22,6 @@ export {parsePeriod} from './parser';
 export {
   IPeriod,
   PeriodConfig,
-  DivisionGranularity,
-  Halves,
-  Months,
-  Quarters,
-  Years,
 } from './interface';
 export {
   CY,
@@ -57,4 +52,10 @@ export {
   currentMonth,
   currentQuarter,
   currentYear,
+  DivisionGranularity,
+  Halves,
+  Months,
+  Quarters,
+  Years,
+  buildCalendarForPeriod,
 } from './construction';

@@ -1,11 +1,7 @@
 import {
-  DivisionGranularity,
-  Halves,
   IPeriod,
-  Months,
   PeriodConfig,
-  Quarters,
-  Years,
+  YearKind,
 } from './interface';
 import {
   calendarToFiscal,
@@ -19,14 +15,6 @@ import {
   yearAndMonth,
   yearMonth,
 } from './math';
-
-export enum YearKind {
-  /** Calendar Year */
-  CY,
-
-  /** Microsoft Fiscal Year */
-  FY,
-}
 
 /**
  * en-US display strings for calendar months
@@ -49,6 +37,8 @@ const months = [
 
 /**
  * Core implementation of IPeriod
+ *
+ * See IPeriod for method documentation.
  */
 export class Period implements IPeriod {
   protected kind: YearKind;
@@ -146,14 +136,6 @@ export class Period implements IPeriod {
   }
 
   divide(): IPeriod[] {
-    return this.toMonths();
-  }
-
-  divideInto(
-    granularity: DivisionGranularity,
-    includeIntermediateLevels: boolean,
-    fillInRange: boolean
-  ): IPeriod[] {
     return this.toMonths();
   }
 

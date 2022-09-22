@@ -1,8 +1,6 @@
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 
 import {
-  TBD,
-  Unknown,
   CY,
   FY,
   Jan,
@@ -23,11 +21,10 @@ import {
   Q4,
   H1,
   H2,
-  Y,
   Range,
   parsePeriod,
 } from '../../src/biz-calendar';
-import {YearKind as K} from '../../src/biz-calendar/core';
+import {YearKind as K} from '../../src/biz-calendar/interface';
 import {pObj} from './test-support';
 
 describe('parsing biz periods', () => {

@@ -13,7 +13,7 @@ import {
   yearMonth,
   tickMonth,
 } from '../../src/biz-calendar/math';
-import {YearKind as K} from '../../src/biz-calendar/core';
+import {YearKind as K} from '../../src/biz-calendar/interface';
 
 describe('checking Period inputs', () => {
   test('checking CY', () => {
