@@ -25,13 +25,7 @@ import {
   Range,
   currentMonth,
 } from '../../src/biz-calendar';
-import {
-  Half,
-  Month,
-  Period,
-  Quarter,
-  Year,
-} from '../../src/biz-calendar/core';
+import {Half, Month, Period, Quarter, Year} from '../../src/biz-calendar/core';
 import {YearKind as K} from '../../src/biz-calendar/interface';
 import {pObj, setConfig} from './test-support';
 

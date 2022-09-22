@@ -19,10 +19,7 @@ export const regex =
 
 // Exported explicitly and in rough order of conceptual importance
 export {parsePeriod} from './parser';
-export {
-  IPeriod,
-  PeriodConfig,
-} from './interface';
+export {IPeriod, PeriodConfig} from './interface';
 export {
   CY,
   FY,

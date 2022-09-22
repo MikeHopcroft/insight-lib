@@ -1,8 +1,4 @@
-import {
-  IPeriod,
-  PeriodConfig,
-  YearKind,
-} from './interface';
+import {IPeriod, PeriodConfig, YearKind} from './interface';
 import {
   calendarToFiscal,
   checkKind,
