@@ -402,6 +402,8 @@ export function currentYear(kind = YearKind.CY): Year {
  * granularity
  */
 class CalendarBuilder {
+  // CalendarBuilder configures a table of period functions to enable building
+  // the calendar via a single pass over the dates in the range
   buildFunctions: periodFunction[][] = [
     [],
     [],
@@ -483,9 +485,21 @@ class CalendarBuilder {
     if (granularity === Years || buildIntermediate) {
       this.buildFunctions[addMonths(12, yearStart)[0]].push(Y);
     }
+
+    // catch year transitions
     this.buildFunctions[addMonths(12, yearStart)[0]].push(nextYear);
   }
 
+  /**
+   * For each month in the period range, generates the periods required for
+   * the calendar, if any
+   *
+   * build() also takes care of providing closing periods to fully cover
+   * the range.  
+   *
+   * @returns the periods for the calendar described by this CalendarBuilder's
+   *          properties
+   */
   build(): IPeriod[] {
     const calendar: IPeriod[] = [];
     for (
@@ -495,6 +509,7 @@ class CalendarBuilder {
     ) {
       calendar.push(...this.step(yearMonth));
     }
+
     const lastPushed = calendar[calendar.length - 1];
     if (lastPushed.getEndYearMonth() !== this.period.getEndYearMonth()) {
       calendar.push(...this.coverFrom(tickMonth(lastPushed.getEndYearMonth())));
@@ -516,6 +531,13 @@ class CalendarBuilder {
     return newPeriods;
   }
 
+  /**
+   * Adds any additional periods required to cover the range at
+   * the specified granularity
+   *
+   * @param startYearMonth the month from which to start covering
+   * @returns the final periods for the calendar, if required
+   */
   coverFrom(startYearMonth: number): IPeriod[] {
     const cover: IPeriod[] = [];
     let quarter: IPeriod = new CoverMarker();
@@ -549,6 +571,8 @@ class CalendarBuilder {
     return cover;
   }
 }
+
+// The below types and function are used by CalendarBuilder
 
 class CoverMarker extends Period implements IPeriod {}
 
