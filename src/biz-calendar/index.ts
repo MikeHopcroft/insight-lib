@@ -52,7 +52,7 @@ export {
   currentMonth,
   currentQuarter,
   currentYear,
-  DivisionGranularity,
+  CalendarGranularity,
   Halves,
   Months,
   Quarters,

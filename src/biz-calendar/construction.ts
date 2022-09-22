@@ -8,9 +8,10 @@ import {
   _Unknown,
 } from './core';
 import {IPeriod, PeriodConfig, YearKind} from './interface';
-import {calendarToFiscal} from './math';
+import {calendarToFiscal, tickMonth, yearAndMonth} from './math';
 
 export type periodFunction = (year: number, kind: YearKind) => IPeriod;
+type yearFunction = (year: number, part: periodFunction) =>  IPeriod
 
 /*
    See buildCalendarForPeriod() for documentation on how these Symbols and
@@ -20,7 +21,7 @@ export const Years = Symbol('12');
 export const Halves = Symbol('6');
 export const Quarters = Symbol('3');
 export const Months = Symbol('1');
-export type DivisionGranularity =
+export type CalendarGranularity =
   | typeof Years
   | typeof Halves
   | typeof Quarters
@@ -307,7 +308,7 @@ export function Unknown(): IPeriod {
  */
 export function buildCalendarForPeriod(
   period: IPeriod,
-  granularity: DivisionGranularity,
+  granularity: CalendarGranularity,
   fillInRange?: boolean,
   includeIntermediateLevels?: boolean
 ): IPeriod[] {
@@ -320,8 +321,8 @@ export function buildCalendarForPeriod(
   const resolution =
     +granularity.toString().substring(7, granularity.toString().length - 1);
 
-
-  return new CalendarBuilder().build();
+  const calendar = new CalendarBuilder(period, granularity).build();
+  return calendar.sort((p1, p2) => {return p1.compare(p2)});
 }
 
 /**
@@ -404,15 +405,57 @@ export function currentYear(kind = YearKind.CY): Year {
 }
 
 class CalendarBuilder{
-  constructor() {
+  period: IPeriod;
+  granularity: CalendarGranularity;
+  yearFunction: yearFunction;
+  buildFunctions: periodFunction[][] =
+  [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [Y],
+  ];
 
+  constructor(
+    period: IPeriod,
+    granularity: CalendarGranularity
+  ) {
+    this.period = period;
+    this.granularity = granularity;
+    if (period.isFiscalPeriod()) {
+      this.yearFunction = FY;
+    } else {
+      this.yearFunction = CY;
+    }
   }
 
   build(): IPeriod[] {
-    return [];
+    const calendar: IPeriod[] = [];
+    for (
+      let yearMonth = this.period.getStartYearMonth();
+      yearMonth = tickMonth(yearMonth);
+      yearMonth <= this.period.getEndYearMonth()
+    ) {
+      calendar.push(...this.step(yearMonth));
+    }
+    return calendar;
   }
 
-  step(): IPeriod[] {
-    return [];
+  step(yearMonth: number): IPeriod[] {
+    const newPeriods: IPeriod[] = [];
+    const [year, month] = yearAndMonth(yearMonth);
+    for (const f of this.buildFunctions[month]) {
+      newPeriods.push(this.yearFunction(year, f));
+    }
+    return newPeriods;
   }
 }
