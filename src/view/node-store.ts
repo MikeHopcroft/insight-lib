@@ -1,10 +1,14 @@
+// Temporary import for create plausible fake NodeIds.
+// TODO: uninstall node-murmurhash and delete node-murmurhash.d.ts
+import * as murmurhash from 'node-murmurhash';
+
 import {
-  EdgeTemplate,
   EdgeType,
   Node,
   NodeFields,
   NodeId,
   NodeType,
+  SerializableEdge,
   SerializableNode,
 } from './interfaces';
 
@@ -85,40 +89,20 @@ export class NodeStore {
 // Serialization and Deserialization
 //
 ///////////////////////////////////////////////////////////////////////////////
-function serializeEdges(edges: Node['incoming']): EdgeTemplate<string>[] {
-  const result: EdgeTemplate<string>[] = [];
+function serializeEdges(edges: Node['outgoing']): SerializableEdge[] {
+  const result: SerializableEdge[] = [];
   for (const type in edges) {
     for (const edge of edges[type]) {
       result.push({
-        ...edge,
-        from: getNodeRef(edge.from),
-        to: getNodeRef(edge.to),
+        [edge.type]: getNodeRef(edge.to),
       });
     }
   }
   return result;
 }
 
-// DESIGN NOTE: chose ':' because it doesn't appear in the text encoding of the
-// numeric `id` value. This allows us to safely extract the `id` field by
-// looking for the lastIndexOf(nodeRefDelimeter). The `type` field can be any
-// string value, including those containing the delimeter character.
-const nodeRefDelimeter = ':';
-
 function getNodeRef(node: Node): string {
-  return node.type + nodeRefDelimeter + node.id;
-}
-
-function parseNodeRef(ref: string): {id: number; type: string} {
-  const x = ref.lastIndexOf(nodeRefDelimeter);
-  if (x === -1) {
-    throw new Error(`Error parsing NodeRef "${ref}". Expected id field.`);
-  }
-  const type = ref.slice(0, x);
-  const id = Number(ref.slice(x + 1));
-  if (isNaN(id)) {
-    throw new Error(`Error parsing NodeRef "${ref}". Id must be a number.`);
-  }
-
-  return {id, type};
+  // Create plausible fake NodeIds
+  const hash = murmurhash(node.type+node.id, 123456);
+  return `urn:is:${node.type}:${hash}`;
 }
