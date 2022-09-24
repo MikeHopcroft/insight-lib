@@ -1,16 +1,16 @@
 import {NodeFields} from '../store';
 import {
+  CompiledTreeDefinition,
   count,
   fieldEq,
   fieldGt,
   otherwise,
   outgoing,
-  RowDefinition,
   select,
   sum,
 } from '../tree';
 
-export const taskView: RowDefinition = {
+export const taskView: CompiledTreeDefinition = {
   type: 'tasks',
   columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}],
   // filter: fieldEq('status', 'active'),
@@ -21,7 +21,7 @@ export const taskView: RowDefinition = {
   ]),
 };
 
-export const featureTaskView: RowDefinition = {
+export const featureTaskView: CompiledTreeDefinition = {
   type: 'features',
   relation: outgoing('features=>tasks', taskView),
   expressions: [
@@ -51,7 +51,7 @@ export const featureTaskView: RowDefinition = {
   ],
 };
 
-export const capabilityFeatureTaskView: RowDefinition = {
+export const capabilityFeatureTaskView: CompiledTreeDefinition = {
   type: 'capabilities',
   relation: outgoing('capabilities=>features', featureTaskView),
   expressions: [
@@ -63,20 +63,20 @@ export const capabilityFeatureTaskView: RowDefinition = {
   columns: [{field: 'title'}, {}, {field: 'count'}],
 };
 
-export const impactView: RowDefinition = {
+export const impactView: CompiledTreeDefinition = {
   type: 'impacts',
   columns: [{field: 'title'}],
   sort: (a: NodeFields, b: NodeFields) => a.title.localeCompare(b.title),
 };
 
-export const insightImpactView: RowDefinition = {
+export const insightImpactView: CompiledTreeDefinition = {
   type: 'insights',
   relation: outgoing('insights=>impacts', impactView),
   columns: [{field: 'title'}],
   sort: (a: NodeFields, b: NodeFields) => a.title.localeCompare(b.title),
 };
 
-export const accountInsightImpactView: RowDefinition = {
+export const accountInsightImpactView: CompiledTreeDefinition = {
   type: 'accounts',
   relation: outgoing('accounts=>insights', insightImpactView),
   columns: [{field: 'name'}],

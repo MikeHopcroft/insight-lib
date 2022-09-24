@@ -2,10 +2,10 @@ import {Node, NodeFields, NodeType} from '../store/interfaces';
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// RowDefinition
+// CompiledTreeDefinition
 //
 ///////////////////////////////////////////////////////////////////////////////
-export interface RowDefinition {
+export interface CompiledTreeDefinition {
   // Data source, hierarchical structure, and computed fields.
   type: NodeType;
   relation?: Relation;
@@ -19,7 +19,7 @@ export interface RowDefinition {
 }
 
 export type Relation = (context: Node[]) => {
-  childRowDefinition: RowDefinition;
+  childRowDefinition: CompiledTreeDefinition;
   children: Node[];
 };
 
@@ -40,21 +40,21 @@ export interface ColumnDefinition {
 type Formatter = (value: any) => string | {[key: string]: any};
 export type Filter = (row: NodeFields) => boolean;
 type Sorter = (a: NodeFields, b: NodeFields) => number;
-type Styler = (row: NodeFields) => Style | undefined;
+type Styler = (row: NodeFields) => PresentationStyle | undefined;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Hierarchy/Outline/Structural Tree
+// DataTree
 //
 ///////////////////////////////////////////////////////////////////////////////
-export interface HierarchyRow {
+export interface DataTree {
   fields: NodeFields;
 
   // Used by render pass.
-  definition: RowDefinition;
+  definition: CompiledTreeDefinition;
 
   // TODO: DESIGN: store in data._children?
-  children?: HierarchyRow[];
+  children?: DataTree[];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,18 +62,18 @@ export interface HierarchyRow {
 // Render Tree
 //
 ///////////////////////////////////////////////////////////////////////////////
-export interface Style {
+export interface PresentationStyle {
   backgroundColor?: string;
   color?: string;
 }
 
-export interface RenderCell {
+export interface PresentationCell {
   text: string | {[key: string]: any};
-  style?: Style;
+  style?: PresentationStyle;
 }
 
-export interface RenderRow {
-  cells: RenderCell[];
-  children?: RenderRow[];
-  style?: Style;
+export interface PresentationTree {
+  cells: PresentationCell[];
+  children?: PresentationTree[];
+  style?: PresentationStyle;
 }

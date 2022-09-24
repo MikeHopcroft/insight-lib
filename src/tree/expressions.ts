@@ -4,9 +4,9 @@ import {
   NodeFields,
 } from '../store';
 import {
+  CompiledTreeDefinition,
   Expression,
   Filter,
-  RowDefinition,
   Relation,
 } from '../tree';
 
@@ -89,7 +89,7 @@ export function ByField(fieldName: string) {
 ///////////////////////////////////////////////////////////////////////////////
 export function outgoing(
   type: EdgeType,
-  childRowDefinition: RowDefinition
+  childRowDefinition: CompiledTreeDefinition
 ): Relation {
   return (context: Node[]) => {
     const node = context[context.length - 1];
@@ -104,7 +104,7 @@ export function outgoing(
 
 export function outgoingInContext(
   type: EdgeType,
-  childRowDefinition: RowDefinition,
+  childRowDefinition: CompiledTreeDefinition,
   direct: EdgeType
 ): Relation {
   return (context: Node[]) => {

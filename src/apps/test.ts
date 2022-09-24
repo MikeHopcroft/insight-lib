@@ -7,23 +7,23 @@ import {
 } from '../sample-data';
 import {NodeStore} from '../store';
 import {
+  buildDataTree,
+  buildPresentationTree,
+  CompiledTreeDefinition,
   outgoingInContext,
-  Renderer,
-  renderRowsToString,
-  RowDefinition,
+  presentationTreeToString,
 } from '../tree';
 
-function render(store: NodeStore, view: RowDefinition) {
-  const renderer = new Renderer(store);
-  const viewRows = renderer.buildHierarchy(view);
-  // console.log(JSON.stringify(viewRows, null, 2));
+function render(store: NodeStore, view: CompiledTreeDefinition) {
+  const dataTree = buildDataTree(store, view);
+  // console.log(JSON.stringify(dataTree, null, 2));
   // console.log('=============================');
 
-  const renderRows = renderer.renderHierarchy(viewRows);
+  const presentationTree = buildPresentationTree(dataTree);
   // console.log(JSON.stringify(renderRows, null, 2));
   // console.log('=============================');
 
-  console.log(renderRowsToString(renderRows));
+  console.log(presentationTreeToString(presentationTree));
 }
 
 function go() {

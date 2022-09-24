@@ -4,26 +4,27 @@
 * Document current render pipeline.
 * x Break src/view folder into src/store and src/tree
 * x Split interfaces.ts between src/store and src/tree
-* Choose better names for
-  * RowDefinition => CompiledTreeDefinition, TreeDefinition
-  * HierarchyRow => DataTree
-  * RenderRow => PresentationTree
-  * class Renderer builds DataTree.
-* Should Renderer even be a class?
+* x Choose better names for
+  * x RowDefinition => CompiledTreeDefinition, TreeDefinition
+  * x HierarchyRow => DataTree
+  * x RenderRow => PresentationTree
+  * x class Renderer builds DataTree.
+* x Should Renderer even be a class?
+* Change sample-view.ts to use TreeDefinition instead of CompiledTreeDefinition
+* RowDefinition.filter might become an array
 * Introduce an editable RowSpec
   * A RowDefinition is a compiled RowSpec
-* RowDefinition.filter might become an array
 
 # Stages
 
-* RowSpec
+* TreeDefinition
   * Editable data structure
   * Can traverse entire hierarchy (e.g. across relations)
   * Probably should be serializable for saving to local storage
-* RowDefinition
+* CompiledTreeDefinition
   * Compiled data structure, suitable for direct hierarchy construction
-* HierarchyRow[]
+* DataTree[]
   * The data tree
-* RenderRow[]
+* PresentationTree[]
   * The logical presentation tree
 * React component tree

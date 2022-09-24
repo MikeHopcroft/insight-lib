@@ -1,8 +1,8 @@
 import * as chalk from 'chalk';
 
-import {RenderRow, Style} from '../tree';
+import {PresentationTree, PresentationStyle} from '../tree';
 
-export function renderRowsToString(roots: RenderRow[]): string {
+export function presentationTreeToString(roots: PresentationTree[]): string {
   const widths: number[] = [];
   for (const root of roots) {
     computeColumnWidths(0, root, widths);
@@ -16,7 +16,11 @@ export function renderRowsToString(roots: RenderRow[]): string {
 
 const indent = 2;
 
-function computeColumnWidths(level: number, root: RenderRow, widths: number[]) {
+function computeColumnWidths(
+  level: number,
+  root: PresentationTree,
+  widths: number[]
+) {
   for (const [i, cell] of root.cells.entries()) {
     const w = String(cell.text).length + (i === 0 ? indent : 0);
     if (!widths[i] || w > widths[i]) {
@@ -32,7 +36,7 @@ function computeColumnWidths(level: number, root: RenderRow, widths: number[]) {
 
 function formatRow(
   level: number,
-  root: RenderRow,
+  root: PresentationTree,
   widths: number[],
   lines: string[]
 ) {
@@ -63,7 +67,7 @@ function formatRow(
   }
 }
 
-function applyStyle(style: Style) {
+function applyStyle(style: PresentationStyle) {
   if (style.backgroundColor) {
     switch (style.backgroundColor) {
       case 'red':
