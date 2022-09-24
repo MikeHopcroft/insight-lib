@@ -1,6 +1,3 @@
-import {Node} from '../view/interfaces';
-import {NodeStore} from '../view/node-store';
-
 import {
   accounts,
   capabilities,
@@ -12,6 +9,7 @@ import {
   tasks,
   TypedSourceTable,
 } from './sample-data';
+import {Node, NodeStore} from '../store';
 
 export function loadTablesAndEdges(store: NodeStore) {
   createTable(store, tasks);

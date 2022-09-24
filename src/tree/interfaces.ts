@@ -1,46 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
-//
-// Nodes and Edges
-//
-///////////////////////////////////////////////////////////////////////////////
-export type NodeType = string;
-export type NodeId = number;
-export type NodeFields = {[key: string]: any};
-
-export interface Node {
-  type: NodeType;
-  id: NodeId;
-  incoming: {[type: EdgeType]: Edge[]};
-  outgoing: {[type: EdgeType]: Edge[]};
-  fields: NodeFields;
-}
-
-export type EdgeType = string;
-
-export interface Edge {
-  type: EdgeType;
-  from: Node;
-  to: Node;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Working proposal for serialization format.
-//
-// DESIGN NOTE: SerilaizableId will likely have a structure like
-//   `urn:is:${node.type}:${node.id}`
-// where node.id, will likely be a string encoding of the service's id for
-// the node.
-//
-///////////////////////////////////////////////////////////////////////////////
-export type SerializableNodeId = string;
-export type SerializableEdge = {[edgeType: string]: SerializableNodeId};
-
-export interface SerializableNode {
-  id: SerializableNodeId;
-  outgoing: SerializableEdge[];
-  fields: NodeFields;
-}
+import {Node, NodeFields, NodeType} from '../store/interfaces';
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -79,7 +37,7 @@ export interface ColumnDefinition {
   style?: Styler;
 }
 
-type Formatter = (value: any) => string | {[key:string]:any};;
+type Formatter = (value: any) => string | {[key: string]: any};
 export type Filter = (row: NodeFields) => boolean;
 type Sorter = (a: NodeFields, b: NodeFields) => number;
 type Styler = (row: NodeFields) => Style | undefined;
@@ -110,7 +68,7 @@ export interface Style {
 }
 
 export interface RenderCell {
-  text: string | {[key:string]:any};
+  text: string | {[key: string]: any};
   style?: Style;
 }
 

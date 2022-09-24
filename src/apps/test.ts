@@ -1,15 +1,17 @@
-import {outgoingInContext} from '../view/expressions';
-import {Renderer} from '../view/hierarchy';
-import {RowDefinition} from '../view/interfaces';
-import {NodeStore} from '../view/node-store';
-import {renderRowsToString} from '../view/row-to-string';
-import {loadTablesAndEdges} from '../sample-data/sample-loader';
 import {
   accountInsightImpactView,
   capabilityFeatureTaskView,
   impactView,
   insightImpactView,
-} from '../sample-data/sample-views';
+  loadTablesAndEdges,
+} from '../sample-data';
+import {NodeStore} from '../store';
+import {
+  outgoingInContext,
+  Renderer,
+  renderRowsToString,
+  RowDefinition,
+} from '../tree';
 
 function render(store: NodeStore, view: RowDefinition) {
   const renderer = new Renderer(store);

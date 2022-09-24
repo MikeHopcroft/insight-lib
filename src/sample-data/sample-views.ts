@@ -1,13 +1,14 @@
+import {NodeFields} from '../store';
 import {
   count,
   fieldEq,
   fieldGt,
   otherwise,
   outgoing,
+  RowDefinition,
   select,
   sum,
-} from '../view/expressions';
-import {NodeFields, RowDefinition} from '../view/interfaces';
+} from '../tree';
 
 export const taskView: RowDefinition = {
   type: 'tasks',

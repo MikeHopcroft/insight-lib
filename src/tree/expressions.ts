@@ -1,12 +1,14 @@
 import {
   EdgeType,
-  Expression,
-  Filter,
   Node,
   NodeFields,
+} from '../store';
+import {
+  Expression,
+  Filter,
   RowDefinition,
   Relation,
-} from './interfaces';
+} from '../tree';
 
 ///////////////////////////////////////////////////////////////////////////////
 //

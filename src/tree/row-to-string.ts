@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 
-import {RenderRow, Style} from './interfaces';
+import {RenderRow, Style} from '../tree';
 
 export function renderRowsToString(roots: RenderRow[]): string {
   const widths: number[] = [];

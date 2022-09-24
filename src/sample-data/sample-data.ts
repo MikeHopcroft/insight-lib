@@ -1,4 +1,4 @@
-import {NodeType} from '../view/interfaces';
+import {NodeType} from '../store';
 
 export interface TypedSourceTable<T extends any[]> {
   id: string;

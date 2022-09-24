@@ -1,13 +1,16 @@
-import {
-  HierarchyRow,
-  Node,
-  RenderCell,
-  RenderRow,
-  RowDefinition,
-} from './interfaces';
+import {Node, NodeStore} from '../store';
+import {HierarchyRow, RowDefinition, RenderCell, RenderRow} from '../tree';
 
-import {NodeStore} from './node-store';
-
+///////////////////////////////////////////////////////////////////////////////
+//
+// Renderer.buildHierarchy() uses a RowDefinition to convert Nodes in the
+// NodeStore to a HierarchyRow[].
+//
+// Conversion does the following:
+//   1. Builds out complete tree based on RowDefinition.Relation.
+//   2. Adds computed fields.
+//
+///////////////////////////////////////////////////////////////////////////////
 export class Renderer {
   store: NodeStore;
 
@@ -74,9 +77,24 @@ export class Renderer {
     return hierarchy;
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  //
+  // renderHierarchy converts HierarchyRow[] to RenderRow[]
+  //
+  // Conversion does the following
+  //   1. Filters each level of the hierarchy, according its
+  //      RowDefinition.filter
+  //   2. Sorts each level of the hierarchy, according to its
+  //      RowDefinition.Sort.
+  //   3. Formats and styles each cell according to its ColumnDefintion's
+  //      style and format.
+  //
+  /////////////////////////////////////////////////////////////////////////////
+
   // TODO: return header row information as well.
   // Or make a separate renderer for the headers.
   renderHierarchy(rows: HierarchyRow[]): RenderRow[] {
+    console.log('renderHierarchy ==================================');
     // Makes tree that includes only specified columns.
     // Filters and sorts children
     // Applies formatting
