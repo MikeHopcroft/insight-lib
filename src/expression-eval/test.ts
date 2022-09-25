@@ -29,7 +29,6 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-import { stringify } from 'querystring';
 import * as expr from './expression-eval';
 
 type Fixture = {expr: string, expected: any};

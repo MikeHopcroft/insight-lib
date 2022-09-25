@@ -1,19 +1,27 @@
 # TreeView
 
 * . Bring in expression-eval and jsep
-* Modify expression-eval for aggregate expressions
-* x Add MIT license
+  * SECURITY: Consider disabling member variable access entirely or for functions
 * Bring in jest and jest test explorer recommendation
 * Migrate expression-eval tests to jest
+* Modify expression-eval for aggregate expressions
+* x Add MIT license
 * . TreeDefinition compiler
   * . Structure: columns and relations
   * Expressions
+    * x Parent context only
+    * Add child context for aggregates
+    * Rename expressions.ts to built-ins.ts.
+    * Consider combining columns and expressions
     * Catch and handle parse errors
     * Catch and handle eval errors
+    * Enforce expression topological ordering so expressions can reference each other.
+  * x Filters => child context only
   * Formatters
-  * Sorters
+  * Relations
+  * Sorters => child context only
+    * General sort functions for things like status where sort is not lexographic
   * Stylers
-  * Filters
 * Publish npm package
 * . Integrate npm package into insight-demo
 * Relation expressions should be able to filter on edge type and node type

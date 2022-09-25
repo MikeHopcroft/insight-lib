@@ -1,9 +1,14 @@
+import * as expr from '../expression-eval';
+import {NodeFields} from '../store';
+
 import {outgoing} from './expressions';
 import {
   ColumnDefinition,
   CompiledTreeDefinition,
   Expression,
   ExpressionDefinition,
+  Filter,
+  FilterDefinition,
   Relation,
   RelationDefinition,
   TreeDefinition,
@@ -12,7 +17,7 @@ import {
 export function compile(tree: TreeDefinition): CompiledTreeDefinition {
   const relations = compileRelations(tree.relations);
   const expressions = compileExpressions(tree.expressions);
-  const filter = undefined;
+  const filter = compileFilter(tree.filter);
   const sort = undefined;
   const style = undefined;
   const a = tree.columns;
@@ -30,6 +35,19 @@ export function compile(tree: TreeDefinition): CompiledTreeDefinition {
     style,
   };
   return compiled;
+}
+
+function compileFilter(filter: FilterDefinition | undefined): Filter | undefined {
+  if (!filter) {
+    return undefined;
+  }
+
+  const f = expr.compile(filter.predicate);
+  const result = (context: NodeFields): any => {
+    return f(context);
+  };
+
+  return result;
 }
 
 function compileRelations(
@@ -51,12 +69,18 @@ function compileExpressions(
     return [];
   }
 
-  return expressions.map(e => ({
-    field: e.field,
-    // For now all expressions return 0.
-    // TODO: wire up expression parser/evaluator here.
-    value: () => 0,
-  }));
+  return expressions.map(e => {
+    const f = expr.compile(e.value);
+    const value = (parent: NodeFields, children: NodeFields): any => {
+      return f(parent);
+    };
+    return {
+      field: e.field,
+      // For now all expressions return 0.
+      // TODO: wire up expression parser/evaluator here.
+      value: f,
+    };
+  });
 }
 
 function compileColumns(

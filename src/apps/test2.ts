@@ -28,7 +28,9 @@ function render(store: NodeStore, view: TreeDefinition) {
 
 export const taskView: TreeDefinition = {
   type: 'tasks',
-  columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}],
+  columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
+  expressions: [{field: 'exp', value: 'id + 1'}],
+  filter: {predicate: 'status!=="active"'},
   // filter: fieldEq('status', 'active'),
   // sort: (a: NodeFields, b: NodeFields) => a.id - b.id,
   // style: select([

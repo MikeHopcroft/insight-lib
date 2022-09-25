@@ -21,7 +21,7 @@ export const tasks: TypedSourceTable<
     [18843, 'Gremlin integration', 'hsiaoy', 'active', 2, 'Interactive graphs'],
     [10648, 'Update Rancher config', 'danm', 'complete', 2, 'Cloud deployment'],
     [11333, 'Shortest path alg', 'lisat', 'active', 2, 'Interactive graphs'],
-    [14127, 'Task comppiler/scheduler', 'robind', 'complete', 2, 'Data driven'],
+    [14127, 'Task compiler/scheduler', 'robind', 'complete', 2, 'Data driven'],
   ],
 };
 
