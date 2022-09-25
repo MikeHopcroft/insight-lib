@@ -37,11 +37,9 @@ function go() {
 
   // Change relation to only show impacts if their account
   // is somewhere in the context (ancestor chain)
-  insightImpactView.relation = outgoingInContext(
-    'insights=>impacts',
-    impactView,
-    'accounts=>impacts'
-  );
+  insightImpactView.relations = [
+    outgoingInContext('insights=>impacts', impactView, 'accounts=>impacts'),
+  ];
   render(store, accountInsightImpactView);
 
   render(store, capabilityFeatureTaskView);

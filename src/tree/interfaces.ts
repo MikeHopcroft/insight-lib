@@ -2,43 +2,101 @@ import {Node, NodeFields, NodeType} from '../store/interfaces';
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// GenericTreeDefinition
+//
+///////////////////////////////////////////////////////////////////////////////
+export interface GenericTreeDefinition<
+  EXPRESSION,
+  FILTER,
+  FORMATTER,
+  RELATION,
+  SORTER,
+  STYLER
+> {
+  // Data source, hierarchical structure, and computed fields.
+  type: NodeType;
+  relations?: RELATION[];
+  expressions?: EXPRESSION[];
+
+  // Presentation
+  filter?: FILTER;
+  sort?: SORTER;
+  style?: STYLER;
+  columns: ColumnDefinition<FORMATTER, STYLER>[];
+}
+
+export interface ColumnDefinition<FORMATTER, STYLER> {
+  // Use field: undefined for a padding cell
+  field?: string;
+
+  // Presentation
+  format?: FORMATTER;
+  style?: STYLER;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// TreeDefinition
+//
+///////////////////////////////////////////////////////////////////////////////
+export type TreeDefinition = GenericTreeDefinition<
+  ExpressionDefinition,
+  FilterDefinition,
+  FormatterDefinition,
+  RelationDefinition,
+  SorterDefinition,
+  StylerDefinition
+>;
+
+export interface ExpressionDefinition {
+  field: string;
+  value: string;
+};
+
+export interface FilterDefinition {
+  predicate: string;
+}
+
+export interface FormatterDefinition {
+  format: string;
+}
+
+export type RelationDefinition = {
+  childRowDefinition: TreeDefinition;
+  predicate: string;
+};
+
+export type SorterDefinition = {fieldName: string; increasing: boolean}[];
+
+export type StylerDefinition = { predicate: string, style: PresentationStyle }[];
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // CompiledTreeDefinition
 //
 ///////////////////////////////////////////////////////////////////////////////
-export interface CompiledTreeDefinition {
-  // Data source, hierarchical structure, and computed fields.
-  type: NodeType;
-  relation?: Relation;
-  expressions?: Expression[];
-
-  // Presentation
-  filter?: Filter;
-  sort?: Sorter;
-  style?: Styler;
-  columns: ColumnDefinition[];
-}
-
-export type Relation = (context: Node[]) => {
-  childRowDefinition: CompiledTreeDefinition;
-  children: Node[];
-};
+export type CompiledTreeDefinition = GenericTreeDefinition<
+  Expression,
+  Filter,
+  Formatter,
+  Relation,
+  Sorter,
+  Styler
+>;
 
 export interface Expression {
   field: string;
   value: (parent: NodeFields, children: NodeFields[]) => any;
 }
 
-export interface ColumnDefinition {
-  // Use field: undefined for a padding cell
-  field?: string;
-
-  // Presentation
-  format?: Formatter;
-  style?: Styler;
-}
-
-type Formatter = (value: any) => string | {[key: string]: any};
 export type Filter = (row: NodeFields) => boolean;
+type Formatter = (value: any) => string | {[key: string]: any};
+
+export type Relation = (context: Node[]) => {
+  childRowDefinition: CompiledTreeDefinition;
+  children: Node[];
+};
+
 type Sorter = (a: NodeFields, b: NodeFields) => number;
 type Styler = (row: NodeFields) => PresentationStyle | undefined;
 
@@ -59,7 +117,7 @@ export interface DataTree {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Render Tree
+// PresentationTree
 //
 ///////////////////////////////////////////////////////////////////////////////
 export interface PresentationStyle {

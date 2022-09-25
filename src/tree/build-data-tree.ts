@@ -39,7 +39,7 @@ function buildDataTreeRecursion(
     // Initialize new DataTree node with data fields and RowDefinition.
     //
     const fields = node.fields;
-    const x: DataTree = {
+    const dataTree: DataTree = {
       fields,
       definition,
     };
@@ -47,16 +47,21 @@ function buildDataTreeRecursion(
     //
     // Add descendant nodes returned by the relation.
     //
-    const relation = definition.relation;
-    if (relation) {
-      const {childRowDefinition, children} = relation(context);
-      if (children.length > 0) {
-        x.children = buildDataTreeRecursion(
-          level + 1,
-          childRowDefinition,
-          children,
-          context
-        );
+    const relations = definition.relations;
+    if (relations) {
+      dataTree.children = [];
+      for (const relation of relations) {
+        const {childRowDefinition, children} = relation(context);
+        if (children.length > 0) {
+          dataTree.children.push(
+            ...buildDataTreeRecursion(
+              level + 1,
+              childRowDefinition,
+              children,
+              context
+            )
+          );
+        }
       }
     }
 
@@ -66,12 +71,12 @@ function buildDataTreeRecursion(
     const expressions = definition.expressions;
     if (expressions) {
       for (const expression of expressions) {
-        const children = x.children ? x.children.map(c => c.fields) : [];
-        x.fields[expression.field] = expression.value(x.fields, children);
+        const children = dataTree.children ? dataTree.children.map(c => c.fields) : [];
+        dataTree.fields[expression.field] = expression.value(dataTree.fields, children);
       }
     }
 
-    dataTrees.push(x);
+    dataTrees.push(dataTree);
     context.pop();
   }
 

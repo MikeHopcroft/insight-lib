@@ -23,7 +23,7 @@ export const taskView: CompiledTreeDefinition = {
 
 export const featureTaskView: CompiledTreeDefinition = {
   type: 'features',
-  relation: outgoing('features=>tasks', taskView),
+  relations: [outgoing('features=>tasks', taskView)],
   expressions: [
     {
       field: 'total',
@@ -53,7 +53,7 @@ export const featureTaskView: CompiledTreeDefinition = {
 
 export const capabilityFeatureTaskView: CompiledTreeDefinition = {
   type: 'capabilities',
-  relation: outgoing('capabilities=>features', featureTaskView),
+  relations: [outgoing('capabilities=>features', featureTaskView)],
   expressions: [
     {
       field: 'count',
@@ -71,14 +71,14 @@ export const impactView: CompiledTreeDefinition = {
 
 export const insightImpactView: CompiledTreeDefinition = {
   type: 'insights',
-  relation: outgoing('insights=>impacts', impactView),
+  relations: [outgoing('insights=>impacts', impactView)],
   columns: [{field: 'title'}],
   sort: (a: NodeFields, b: NodeFields) => a.title.localeCompare(b.title),
 };
 
 export const accountInsightImpactView: CompiledTreeDefinition = {
   type: 'accounts',
-  relation: outgoing('accounts=>insights', insightImpactView),
+  relations: [outgoing('accounts=>insights', insightImpactView)],
   columns: [{field: 'name'}],
   sort: (a: NodeFields, b: NodeFields) => a.name.localeCompare(b.name),
 };
