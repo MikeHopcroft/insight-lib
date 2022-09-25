@@ -1,17 +1,25 @@
+///////////////////////////////////////////////////////////////////////////////
+// This is a fork of test.ts from the expression-eval npm package.
+// https://github.com/donmccurdy/expression-eval/commit/698342fabcee7a1a0f6f031ec3a014a28e1613b5
+// After the fork, the code was modified to support aggregate functions where
+// parameters are evaluated in a child context.
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
 // The MIT License (MIT)
-
+//
 // Copyright (c) 2017 Don McCurdy
-
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,21 +27,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 ///////////////////////////////////////////////////////////////////////////////
-// This is a fork of index.ts from the expression-eval npm package.
-// https://github.com/donmccurdy/expression-eval/commit/698342fabcee7a1a0f6f031ec3a014a28e1613b5
-// After the fork, the code was modified to support aggregate functions where
-// parameters are evaluated in a child context.
 
-// require('source-map-support').install();
-
-// const expr = require('./dist/expression-eval.js');
-// const tape = require('tape');
-
+import { stringify } from 'querystring';
 import * as expr from './expression-eval';
 
-const fixtures = [
+type Fixture = {expr: string, expected: any};
+
+const fixtures: Fixture[] = [
 
   // array expression
   {expr: '([1,2,3])[0]',               expected: 1     },
@@ -117,11 +118,6 @@ const fixtures = [
   // 'this' context
   {expr: 'this.three', expected: 3 },
 
-  // // custom operators
-  // {expr: '@2', expected: 'two' },
-  // {expr: '3#4', expected: 3.4  },
-  // {expr: '(1 # 2 # 3)', expected: 1.5 }, // Fails with undefined precedence, see issue #45
-  // {expr: '1 + 2 ~ 3', expected: 9 }, // ~ is * but with low precedence
 ];
 
 const context = {
@@ -139,17 +135,6 @@ const context = {
   throw: () => { throw new Error('Should not be called.'); }
 };
 
-// expr.addUnaryOp('@', (a) => {
-//   if (a === 2) {
-//     return 'two';
-//   }
-//   throw new Error('Unexpected value: ' + a);
-// });
-
-// expr.addBinaryOp('#', (a, b) => a + b / 10);
-
-// expr.addBinaryOp('~', 1, (a, b) => a * b);
-
 for (const fixture of fixtures) {
   const val = expr.compile(fixture.expr)(context);
   if (val !== fixture.expected) {
@@ -159,52 +144,28 @@ for (const fixture of fixtures) {
   }
 }
 
-// tape('sync', (t: any) => {
-//   fixtures.forEach((o) => {
-//     const val = expr.compile(o.expr)(context);
-//     t.equal(val, o.expected, `${o.expr} (${val}) === ${o.expected}`);
-//   });
+function expectThrows(expression: string, context: any, error: string) {
+  try {
+    const val = expr.compile(expression)(context);
+    console.log(`Error: expected throw evaluating "${expression}"`);
+  } catch (e: any) {
+    const re = /Access to member "(\w+)" disallowed/;
+    const matches = String(e.message).match(re);
+    if (!matches) {
+      console.log(matches);
+      console.log(`Error: incorrect error evaluating "${expression}".`);
+    } else {
+      console.log(`OK: expected throw evaluating "${expression}", message="${e.message}"`);
+    }
+  }
+}
 
-//   t.end();
-// });
-
-// tape('async', async (t) => {
-//   const asyncContext = context;
-//   asyncContext.asyncFunc = async function(a, b) {
-//     return await a + b;
-//   };
-//   asyncContext.promiseFunc = function(a, b) {
-//     return new Promise((resolve, reject) => {
-//       setTimeout(() => resolve(a + b), 1000);
-//     })
-//   }
-//   const asyncFixtures = fixtures;
-//   asyncFixtures.push({
-//     expr: 'asyncFunc(one, two)',
-//     expected: 3,
-//   }, {
-//     expr: 'promiseFunc(one, two)',
-//     expected: 3,
-//   });
-
-//   for (let o of asyncFixtures) {
-//     const val = await expr.compileAsync(o.expr)(asyncContext);
-//     t.equal(val, o.expected, `${o.expr} (${val}) === ${o.expected}`);
-//   }
-//   t.end();
-// });
-
-// TODO: reintroduce the error test cases
-// tape('errors', async (t: any) => {
-//   const expectedMsg = /Access to member "\w+" disallowed/;
-//   t.throws(() => expr.compile(`o.__proto__`)({o: {}}), expectedMsg, '.__proto__');
-//   t.throws(() => expr.compile(`o.prototype`)({o: {}}), expectedMsg, '.prototype');
-//   t.throws(() => expr.compile(`o.constructor`)({o: {}}), expectedMsg, '.constructor');
-//   t.throws(() => expr.compile(`o['__proto__']`)({o: {}}), expectedMsg, '["__proto__"]');
-//   t.throws(() => expr.compile(`o['prototype']`)({o: {}}), expectedMsg, '["prototype"]');
-//   t.throws(() => expr.compile(`o['constructor']`)({o: {}}), expectedMsg, '["constructor"]');
-//   t.throws(() => expr.compile(`o[p]`)({o: {}, p: '__proto__'}), expectedMsg, '[~__proto__]');
-//   t.throws(() => expr.compile(`o[p]`)({o: {}, p: 'prototype'}), expectedMsg, '[~prototype]');
-//   t.throws(() => expr.compile(`o[p]`)({o: {}, p: 'constructor'}), expectedMsg, '[~constructor]');
-//   t.end();
-// });
+expectThrows(`o.__proto__`, {o: {}}, '.__proto__');
+expectThrows(`o.prototype`, {o: {}}, 'prototype');
+expectThrows(`o.constructor`, {o: {}}, '.constructor');
+expectThrows(`o['__proto__']`, {o: {}}, '["__proto__"]');
+expectThrows(`o['prototype']`, {o: {}}, '["prototype"]');
+expectThrows(`o['constructor']`, {o: {}}, '["constructor"]');
+expectThrows(`o[p]`, {o: {}, p: '__proto__'}, '[~__proto__]');
+expectThrows(`o[p]`, {o: {}, p: 'prototype'}, '[~prototype]');
+expectThrows(`o[p]`, {o: {}, p: 'constructor'}, '[~constructor]');
