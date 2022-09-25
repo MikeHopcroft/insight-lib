@@ -1,8 +1,10 @@
 # TreeView
 
-* Bring in expression-eval and jsep
-* Add MIT license
+* . Bring in expression-eval and jsep
+* Modify expression-eval for aggregate expressions
+* x Add MIT license
 * Bring in jest and jest test explorer recommendation
+* Migrate expression-eval tests to jest
 * . TreeDefinition compiler
   * . Structure: columns and relations
   * Expressions
@@ -15,6 +17,7 @@
 * Publish npm package
 * . Integrate npm package into insight-demo
 * Relation expressions should be able to filter on edge type and node type
+* Schema inference
 * What is EdgeDescriptor?
 * Document current render pipeline.
 * x Break src/view folder into src/store and src/tree
