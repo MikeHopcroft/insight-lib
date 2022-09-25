@@ -260,7 +260,7 @@ function evaluate(_node: jsep.Expression, context: Context): any {
       return evaluateMember(node, context)[1];
 
     case 'ThisExpression':
-      return context;
+      return context.context.fields;
 
     case 'UnaryExpression':
       return unops[node.operator](evaluate(node.argument, context));

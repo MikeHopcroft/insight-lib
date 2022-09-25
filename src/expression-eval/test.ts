@@ -157,14 +157,16 @@ for (const fixture of fixtures) {
 
 function expectThrows(expression: string, context: any, error: string): void {
   try {
-    const val = expr.compile(expression)(context);
+    const val = expr.compile(expression)({context: {fields: context}});
     console.log(`Error: expected throw evaluating "${expression}"`);
   } catch (e: any) {
     const re = /Access to member "(\w+)" disallowed/;
     const matches = String(e.message).match(re);
     if (!matches) {
       console.log(matches);
-      console.log(`Error: incorrect error evaluating "${expression}". Found "${e.message}".`);
+      console.log(
+        `Error: incorrect error evaluating "${expression}". Found "${e.message}".`
+      );
     } else {
       console.log(
         `OK: expected throw evaluating "${expression}", message="${e.message}"`
