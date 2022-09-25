@@ -7,15 +7,29 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "expression-eval/test.js",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/build/src/apps/test.js",
+      "program": "${workspaceFolder}/build/src/expression-eval/test.js",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "apps/test2.ts",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/build/src/apps/test2.js",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"
       ]
     }
+
   ]
 }

@@ -1,24 +1,29 @@
 # TreeView
 
+* Fix unit tests
 * . Bring in expression-eval and jsep
   * SECURITY: Consider disabling member variable access entirely or for functions
 * Bring in jest and jest test explorer recommendation
 * Migrate expression-eval tests to jest
-* Modify expression-eval for aggregate expressions
+* . Modify expression-eval for aggregate expressions
+* Move expression-eval into tree folder
+  * Check dependency web
 * x Add MIT license
 * . TreeDefinition compiler
   * . Structure: columns and relations
   * Expressions
     * x Parent context only
-    * Add child context for aggregates
+    * . Add child context for aggregates
     * Rename expressions.ts to built-ins.ts.
     * Consider combining columns and expressions
+    * Consider list of reserved field names (id, type, parent, child, sum, count, max, min)
+      * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
     * Catch and handle parse errors
     * Catch and handle eval errors
     * Enforce expression topological ordering so expressions can reference each other.
   * x Filters => child context only
-  * Formatters
-  * Relations
+  * Formatters - these are structural formatters (e.g. hyperlinks, number format)
+  * . Relations
   * Sorters => child context only
     * General sort functions for things like status where sort is not lexographic
   * Stylers

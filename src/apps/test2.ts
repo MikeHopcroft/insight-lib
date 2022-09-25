@@ -5,13 +5,13 @@ import {NodeStore} from '../store';
 import {
   buildDataTree,
   buildPresentationTree,
-  compile,
+  compileTree,
   presentationTreeToString,
   TreeDefinition,
 } from '../tree';
 
 function render(store: NodeStore, view: TreeDefinition) {
-  const compiledTree = compile(view);
+  const compiledTree = compileTree(view);
   console.log(JSON.stringify(compiledTree, null, 2));
   console.log('=============================');
 
@@ -42,6 +42,17 @@ export const taskView: TreeDefinition = {
 export const featureTaskView: TreeDefinition = {
   type: 'features',
   relations: [{childRowDefinition: taskView, predicate: 'features=>tasks'}],
+  expressions: [
+    {
+      field: 'total',
+      value: 'sum(days)',
+    },
+    {
+      field: 'remaining',
+      value: "sum(days, status !== 'active')",
+    },
+],
+
   // expressions: [
   //   {
   //     field: 'total',
@@ -62,6 +73,8 @@ export const featureTaskView: TreeDefinition = {
   // ],
   columns: [
     {field: 'title'},
+    {field: 'total'},
+    {field: 'remaining'},
     // {
     //   field: 'total',
     //   style: select([[fieldGt('total', 6), {backgroundColor: 'red'}]]),

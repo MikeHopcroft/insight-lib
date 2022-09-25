@@ -71,8 +71,7 @@ function buildDataTreeRecursion(
     const expressions = definition.expressions;
     if (expressions) {
       for (const expression of expressions) {
-        const children = dataTree.children ? dataTree.children.map(c => c.fields) : [];
-        dataTree.fields[expression.field] = expression.value(dataTree.fields, children);
+        dataTree.fields[expression.field] = expression.value(dataTree);
       }
     }
 

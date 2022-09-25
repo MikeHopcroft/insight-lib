@@ -86,7 +86,7 @@ export type CompiledTreeDefinition = GenericTreeDefinition<
 
 export interface Expression {
   field: string;
-  value: (parent: NodeFields, children: NodeFields[]) => any;
+  value: (node: DataTree) => any;
 }
 
 export type Filter = (row: NodeFields) => boolean;

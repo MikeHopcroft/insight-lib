@@ -5,6 +5,7 @@ import {
 } from '../store';
 import {
   CompiledTreeDefinition,
+  DataTree,
   Expression,
   Filter,
   Relation,
@@ -16,11 +17,13 @@ import {
 //
 ///////////////////////////////////////////////////////////////////////////////
 export function sum(field: string, filter?: Filter): Expression['value'] {
-  return (_ignore: NodeFields, children: NodeFields[]) => {
+  return (node: DataTree) => {
     let x = 0;
-    for (const row of children) {
-      if (!filter || filter(row)) {
-        x += row[field];
+    if (node.children) {
+      for (const row of node.children) {
+        if (!filter || filter(row)) {
+          x += row.fields[field];
+        }
       }
     }
     return x;
@@ -28,11 +31,13 @@ export function sum(field: string, filter?: Filter): Expression['value'] {
 }
 
 export function count(field: string, filter?: Filter): Expression['value'] {
-  return (_ignore: NodeFields, children: NodeFields[]) => {
+  return (node: DataTree) => {
     let x = 0;
-    for (const row of children) {
-      if (!filter || filter(row)) {
-        x++;
+    if (node.children) {
+      for (const row of node.children) {
+        if (!filter || filter(row)) {
+          x++;
+        }
       }
     }
     return x;

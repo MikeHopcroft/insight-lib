@@ -30,6 +30,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import * as jsep from 'jsep';
+import {NodeFields} from '../store';
+
+export interface ISymbols {
+  get(name: string): any;
+  isChildContextFunction(f: Function): boolean;
+}
+
+export interface ContextData {
+  fields: NodeFields;
+  children?: ContextData[];
+}
+
+export interface Context {
+  globals?: ISymbols;
+  context: ContextData;
+}
 
 /**
  * Evaluation code from JSEP project, under MIT License.
@@ -58,45 +74,96 @@ const DEFAULT_PRECEDENCE = {
   '-': 9,
   '*': 10,
   '/': 10,
-  '%': 10
+  '%': 10,
 };
 
-const binops: {[key: string]: (a:any, b: any) => any} = {
-  '||': function (a: any, b: any) { return a || b; },
-  '&&': function (a: any, b: any) { return a && b; },
-  '|': function (a: any, b: any) { return a | b; },
-  '^': function (a: any, b: any) { return a ^ b; },
-  '&': function (a: any, b: any) { return a & b; },
-  '==': function (a: any, b: any) { return a == b; }, // jshint ignore:line
-  '!=': function (a: any, b: any) { return a != b; }, // jshint ignore:line
-  '===': function (a: any, b: any) { return a === b; },
-  '!==': function (a: any, b: any) { return a !== b; },
-  '<': function (a: any, b: any) { return a < b; },
-  '>': function (a: any, b: any) { return a > b; },
-  '<=': function (a: any, b: any) { return a <= b; },
-  '>=': function (a: any, b: any) { return a >= b; },
-  '<<': function (a: any, b: any) { return a << b; },
-  '>>': function (a: any, b: any) { return a >> b; },
-  '>>>': function (a: any, b: any) { return a >>> b; },
-  '+': function (a: any, b: any) { return a + b; },
-  '-': function (a: any, b: any) { return a - b; },
-  '*': function (a: any, b: any) { return a * b; },
-  '/': function (a: any, b: any) { return a / b; },
-  '%': function (a: any, b: any) { return a % b; }
+const binops: {[key: string]: (a: any, b: any) => any} = {
+  '||': function (a: any, b: any) {
+    return a || b;
+  },
+  '&&': function (a: any, b: any) {
+    return a && b;
+  },
+  '|': function (a: any, b: any) {
+    return a | b;
+  },
+  '^': function (a: any, b: any) {
+    return a ^ b;
+  },
+  '&': function (a: any, b: any) {
+    return a & b;
+  },
+  '==': function (a: any, b: any) {
+    return a == b;
+  }, // jshint ignore:line
+  '!=': function (a: any, b: any) {
+    return a != b;
+  }, // jshint ignore:line
+  '===': function (a: any, b: any) {
+    return a === b;
+  },
+  '!==': function (a: any, b: any) {
+    return a !== b;
+  },
+  '<': function (a: any, b: any) {
+    return a < b;
+  },
+  '>': function (a: any, b: any) {
+    return a > b;
+  },
+  '<=': function (a: any, b: any) {
+    return a <= b;
+  },
+  '>=': function (a: any, b: any) {
+    return a >= b;
+  },
+  '<<': function (a: any, b: any) {
+    return a << b;
+  },
+  '>>': function (a: any, b: any) {
+    return a >> b;
+  },
+  '>>>': function (a: any, b: any) {
+    return a >>> b;
+  },
+  '+': function (a: any, b: any) {
+    return a + b;
+  },
+  '-': function (a: any, b: any) {
+    return a - b;
+  },
+  '*': function (a: any, b: any) {
+    return a * b;
+  },
+  '/': function (a: any, b: any) {
+    return a / b;
+  },
+  '%': function (a: any, b: any) {
+    return a % b;
+  },
 };
 
-const unops: {[key: string]: (a:any) => any} = {
-  '-': function (a: any) { return -a as any; },
-  '+': function (a: any) { return +a as any; },
-  '~': function (a: any) { return ~a as any; },
-  '!': function (a: any) { return !a as any; },
+const unops: {[key: string]: (a: any) => any} = {
+  '-': function (a: any) {
+    return -a as any;
+  },
+  '+': function (a: any) {
+    return +a as any;
+  },
+  '~': function (a: any) {
+    return ~a as any;
+  },
+  '!': function (a: any) {
+    return !a as any;
+  },
 };
 
 declare type operand = number | string;
-declare type unaryCallback = (a: operand) => operand;
-declare type binaryCallback = (a: operand, b: operand) => operand;
+// declare type unaryCallback = (a: operand) => operand;
+// declare type binaryCallback = (a: operand, b: operand) => operand;
 
-type AnyExpression = jsep.ArrayExpression
+type AnyExpression =
+  | jsep.ArrayExpression
   | jsep.BinaryExpression
   | jsep.CallExpression
   | jsep.ConditionalExpression
@@ -107,11 +174,13 @@ type AnyExpression = jsep.ArrayExpression
   | jsep.ThisExpression
   | jsep.UnaryExpression;
 
-function evaluateArray(list: any, context: any) {
-  return list.map(function (v: any) { return evaluate(v, context); });
+function evaluateArray(list: any, context: Context) {
+  return list.map(function (v: any) {
+    return evaluate(v, context);
+  });
 }
 
-function evaluateMember(node: jsep.MemberExpression, context: object) {
+function evaluateMember(node: jsep.MemberExpression, context: Context) {
   const object: any = evaluate(node.object, context);
   let key: string;
   if (node.computed) {
@@ -125,11 +194,10 @@ function evaluateMember(node: jsep.MemberExpression, context: object) {
   return [object, object[key]];
 }
 
-function evaluate(_node: jsep.Expression, context: {[key: string]: any}): any {
+function evaluate(_node: jsep.Expression, context: Context): any {
   const node = _node as AnyExpression;
 
   switch (node.type) {
-
     case 'ArrayExpression':
       return evaluateArray(node.elements, context);
 
@@ -140,7 +208,10 @@ function evaluate(_node: jsep.Expression, context: {[key: string]: any}): any {
       } else if (node.operator === '&&') {
         return evaluate(node.left, context) && evaluate(node.right, context);
       }
-      return binops[node.operator](evaluate(node.left, context), evaluate(node.right, context));
+      return binops[node.operator](
+        evaluate(node.left, context),
+        evaluate(node.right, context)
+      );
 
     case 'CallExpression':
       let caller, fn, assign;
@@ -151,8 +222,16 @@ function evaluate(_node: jsep.Expression, context: {[key: string]: any}): any {
       } else {
         fn = evaluate(node.callee, context);
       }
-      if (typeof fn !== 'function') { return undefined; }
-      return fn.apply(caller, evaluateArray(node.arguments, context));
+      if (typeof fn !== 'function') {
+        return undefined;
+      }
+      if (context.globals && context.globals.isChildContextFunction(fn)) {
+        return fn.apply(caller, [context, (context: Context) => {
+          return evaluateArray(node.arguments, context);
+        }]);
+      } else {
+        return fn.apply(caller, evaluateArray(node.arguments, context));
+      }
 
     case 'ConditionalExpression':
       return evaluate(node.test, context)
@@ -160,7 +239,10 @@ function evaluate(_node: jsep.Expression, context: {[key: string]: any}): any {
         : evaluate(node.alternate, context);
 
     case 'Identifier':
-      return context[node.name];
+      return (
+        (context.globals && context.globals.get(node.name)) ||
+        context.context.fields[node.name]
+      );
 
     case 'Literal':
       return node.value;
@@ -186,15 +268,12 @@ function evaluate(_node: jsep.Expression, context: {[key: string]: any}): any {
     default:
       return undefined;
   }
-
 }
 
-function compile(expression: string | jsep.Expression): (context: object) => any {
+function compile(
+  expression: string | jsep.Expression
+): (context: Context) => any {
   return evaluate.bind(null, jsep(expression));
 }
 
-export {
-  jsep as parse,
-  evaluate as eval,
-  compile,
-};
+export {jsep as parse, evaluate as eval, compile};

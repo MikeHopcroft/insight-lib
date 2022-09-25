@@ -1,10 +1,11 @@
-import * as expr from '../expression-eval';
+import {ISymbols, compile, Context} from '../expression-eval';
 import {NodeFields} from '../store';
 
 import {outgoing} from './expressions';
 import {
   ColumnDefinition,
   CompiledTreeDefinition,
+  DataTree,
   Expression,
   ExpressionDefinition,
   Filter,
@@ -14,7 +15,49 @@ import {
   TreeDefinition,
 } from './interfaces';
 
-export function compile(tree: TreeDefinition): CompiledTreeDefinition {
+class GlobalSymbols implements ISymbols {
+  symbols = new Map<string, any>();
+  childContextFunctions = new Set<Function>();
+
+  get(name: string): any {
+    return this.symbols.get(name);
+  }
+
+  add(name: string, f: Function, isChildContext = false) {
+    if (this.symbols.has(name)) {
+      throw new Error(`Registering duplicate symbol "${name}"`);
+    }
+    this.symbols.set(name, f);
+    if (isChildContext) {
+      this.childContextFunctions.add(f);
+    }
+  }
+
+  isChildContextFunction(f: Function): boolean {
+    return this.childContextFunctions.has(f);
+  }
+}
+
+const globalSymbols = new GlobalSymbols();
+globalSymbols.add('sum', sumAggregator, true);
+
+function sumAggregator(context: Context, args: (c: Context) => any[]): number {
+  let total = 0;
+  if (context.context.children) {
+    for (const child of context.context.children) {
+      const x = args({
+        globals: context.globals,
+        context: child,
+      });
+      if (x.length === 1 || x[1] === true) {
+        total += x[0];
+      }
+    }
+  }
+  return total;
+}
+
+export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   const relations = compileRelations(tree.relations);
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
@@ -37,14 +80,16 @@ export function compile(tree: TreeDefinition): CompiledTreeDefinition {
   return compiled;
 }
 
-function compileFilter(filter: FilterDefinition | undefined): Filter | undefined {
+function compileFilter(
+  filter: FilterDefinition | undefined
+): Filter | undefined {
   if (!filter) {
     return undefined;
   }
 
-  const f = expr.compile(filter.predicate);
+  const f = compile(filter.predicate);
   const result = (context: NodeFields): any => {
-    return f(context);
+    return f({context: {fields: context}});
   };
 
   return result;
@@ -58,7 +103,7 @@ function compileRelations(
   }
 
   return relations.map(r => {
-    return outgoing(r.predicate, compile(r.childRowDefinition));
+    return outgoing(r.predicate, compileTree(r.childRowDefinition));
   });
 }
 
@@ -69,18 +114,22 @@ function compileExpressions(
     return [];
   }
 
-  return expressions.map(e => {
-    const f = expr.compile(e.value);
-    const value = (parent: NodeFields, children: NodeFields): any => {
-      return f(parent);
+  const y = expressions.map(e => {
+    const f = compile(e.value);
+    const value = (context: DataTree): any => {
+      return f({
+        globals: globalSymbols,
+        context,
+      });
     };
-    return {
+    const x = {
       field: e.field,
-      // For now all expressions return 0.
-      // TODO: wire up expression parser/evaluator here.
-      value: f,
+      value: value,
     };
+    return x;
   });
+
+  return y;
 }
 
 function compileColumns(
