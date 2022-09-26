@@ -69,7 +69,7 @@ export type RelationDefinition = {
   predicate?: string; // Default behavior allows all edges
 }
 
-export type SorterDefinition = {field: string; increasing: boolean};
+export type SorterDefinition = {field: string; increasing?: boolean};
 export type SorterDefinitionList = SorterDefinition[];
 
 export type StylerDefinition = {predicate: string; style: string};

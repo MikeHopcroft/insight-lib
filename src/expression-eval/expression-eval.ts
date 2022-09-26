@@ -30,8 +30,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import * as jsep from 'jsep';
-import * as jsepObject from '@jsep-plugin/object';
-import {ObjectExpression} from '@jsep-plugin/object';
+
+import {jsepObject, ObjectExpression} from './jsep-object';
 jsep.plugins.register(jsepObject);
 
 import {NodeFields} from '../store';

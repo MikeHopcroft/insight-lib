@@ -265,7 +265,7 @@ function compareFields({field: fieldName, increasing}: SorterDefinition) {
     } else {
       sign = x.toString().localeCompare(y);
     }
-    if (increasing) {
+    if (increasing === undefined || increasing) {
       return sign;
     } else {
       return -sign;

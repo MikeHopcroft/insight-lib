@@ -87,3 +87,51 @@
   * The logical presentation tree
 * React component tree
 
+
+https://www.google.com/search?q=javascript+import+returns+type+module+__esmodule&rlz=1C1GCEU_enUS825US825&sxsrf=ALiCzsbPHZkz60bhegQZ4OlWbwuNj1tHWA%3A1664224225443&ei=4QsyY5vcGqSG0PEPxNuYkAg&oq=javascript+import+returns+type+module+__esmodu&gs_lcp=Cgdnd3Mtd2l6EAMYADIFCCEQoAEyBQghEKABMgUIIRCgAToKCAAQRxDWBBCwAzoFCCEQqwI6CAghEB4QFhAdOgcIIRCgARAKSgQIQRgASgQIRhgAULQEWI8tYO07aAJwAXgAgAFniAH2BpIBAzguMpgBAKABAcgBCLgBA8ABAQ&sclient=gws-wiz
+
+https://stackoverflow.com/questions/69041454/error-require-of-es-modules-is-not-supported-when-importing-node-fetch
+https://stackoverflow.com/questions/69200697/why-does-typescript-allow-me-to-import-dependencies-it-cant-use-at-runtime
+https://stackoverflow.com/questions/41219542/how-to-import-js-modules-into-typescript-file
+
+
+## Problem importing jsepObject
+
+Works fine in insight-lib console apps.
+Imports as an ES module in insight-demo. This leads to an invalid jsep plugin error.
+
+// const jsepObject = require("@jsep-plugin/object");
+// const jsepObject = require('./jsep-object');
+// import * as jsepObject from './jsep-object';
+// import * as jsepObject from module('./jsep-object');
+// const fetch = (...args) =>
+//   import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+// https://stackoverflow.com/questions/69041454/error-require-of-es-modules-is-not-supported-when-importing-node-fetch
+// const jsepObject = (...args: any[]) =>
+//   import('@jsep-plugin/object').then(({default: jsepObject}) =>
+//     jsepObject(...args);
+//   );
+
+
+tsconfig.json
+~~~
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "allowJs": true,
+    "checkJs": false
+  },
+  // "esModuleInterop": true,
+  // "module": "esnext",
+  // "moduleResolution": "node",
+  // "isolatedModules": true,
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "test/**/*.ts"
+  ]
+}
+~~~
