@@ -1,10 +1,8 @@
 import {compile} from '../expression-eval';
-import {NodeFields} from '../store';
+import {EdgeCollection, Node, NodeFields} from '../store';
 
-import {outgoing} from './expressions';
 import {globalSymbols} from './global-symbols';
 import {
-  ColumnDefinition,
   CompiledTreeDefinition,
   DataTree,
   Expression,
@@ -13,6 +11,7 @@ import {
   FilterDefinition,
   Relation,
   RelationDefinition,
+  RelationDefinition2,
   Sorter,
   SorterDefinition,
   SorterDefinitionList,
@@ -22,8 +21,13 @@ import {
   TreeDefinition,
 } from './interfaces';
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileTree
+//
+///////////////////////////////////////////////////////////////////////////////
 export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
-  const relations = compileRelations(tree.relations);
+  const relations = compileRelations2(tree.relations);
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
   const sort = compileSorters(tree.sort);
@@ -42,6 +46,11 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   return compiled;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileColumns
+//
+///////////////////////////////////////////////////////////////////////////////
 function compileColumns(
   columns: TreeDefinition['columns']
 ): CompiledTreeDefinition['columns'] {
@@ -53,6 +62,11 @@ function compileColumns(
   }));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileExpressions 
+//
+///////////////////////////////////////////////////////////////////////////////
 function compileExpressions(
   expressions: ExpressionDefinition[] | undefined
 ): Expression[] {
@@ -78,6 +92,11 @@ function compileExpressions(
   return y;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileFilter
+//
+///////////////////////////////////////////////////////////////////////////////
 function compileFilter(
   filter: FilterDefinition | undefined
 ): Filter | undefined {
@@ -93,18 +112,111 @@ function compileFilter(
   return result;
 }
 
-function compileRelations(
-  relations: RelationDefinition[] | undefined
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileRelations
+//
+///////////////////////////////////////////////////////////////////////////////
+// function compileRelations(
+//   relations: RelationDefinition[] | undefined
+// ): Relation[] {
+//   if (!relations) {
+//     return [];
+//   }
+
+//   return relations.map(r => {
+//     return outgoing(r.predicate, compileTree(r.childRowDefinition));
+//   });
+// }
+
+function compileRelations2(
+  relations: RelationDefinition2[] | undefined
 ): Relation[] {
   if (!relations) {
     return [];
   }
 
   return relations.map(r => {
-    return outgoing(r.predicate, compileTree(r.childRowDefinition));
+    return traverseEdges(r);
   });
 }
 
+function traverseEdges(relation: RelationDefinition2): Relation {
+  const childRowDefinition = compileTree(relation.childRowDefinition);
+  const predicate = relation.predicate
+    ? compile(relation.predicate)
+    : undefined;
+  return (ancestors: Node[]) => {
+    const children = getNodes(
+      ancestors,
+      relation.direction,
+      relation.edgeType,
+      relation.nodeType,
+      // predicate
+    );
+    return {
+      childRowDefinition,
+      children,
+    };
+  };
+}
+
+function getNodes(
+  ancestors: Node[],
+  direction: string | undefined,
+  edgeType: string | undefined,
+  nodeType: string | undefined,
+  // predicate: ((ancestors: Node[], node: Node) => boolean) | undefined
+): Node[] {
+  if (ancestors.length === 0) {
+    throw new Error('Internal error: ancestors must contain at least one node');
+  }
+  const node = ancestors[ancestors.length - 1];
+  const collection =
+    direction === undefined || direction === 'outgoing'
+      ? node.outgoing
+      : direction === 'incoming'
+      ? node.incoming
+      : undefined;
+
+  if (collection === undefined) {
+    throw new Error(`Unsupported edge collection ${collection}`);
+  }
+
+  return [
+    ...getNodesGenerator(ancestors, collection, edgeType, nodeType),
+    // ...getNodesGenerator(ancestors, collection, edgeType, nodeType, predicate),
+  ];
+}
+
+function* getNodesGenerator(
+  ancestors: Node[],
+  collection: EdgeCollection,
+  edgeType: string | undefined,
+  nodeType: string | undefined,
+  // predicate: ((ancestors: Node[], node: Node) => boolean) | undefined
+): Generator<Node> {
+  for (const type in collection) {
+    for (const edge of collection[type]) {
+      if (edgeType && edge.type !== edgeType) {
+        continue;
+      }
+      if (nodeType && edge.to.type !== nodeType) {
+        continue;
+      }
+      // if (predicate && !predicate(ancestors, edge.to)) {
+      //   continue;
+      // }
+      yield edge.to;
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileSorters
+//
+///////////////////////////////////////////////////////////////////////////////
 function compileSorters(
   sorters: SorterDefinitionList | undefined
 ): Sorter | undefined {
@@ -142,6 +254,11 @@ function compareFields({field: fieldName, increasing}: SorterDefinition) {
   };
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileStylers
+//
+///////////////////////////////////////////////////////////////////////////////
 function compileStylers(
   stylers: StylerDefinitionList | undefined
 ): Styler | undefined {
@@ -159,7 +276,7 @@ function compileStylers(
     const context = {locals: {fields}};
     for (const c of cases) {
       if (c.predicate(context)) {
-        return c.style(context)
+        return c.style(context);
       }
     }
     return {};

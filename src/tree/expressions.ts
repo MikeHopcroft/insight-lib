@@ -2,7 +2,9 @@ import {
   EdgeType,
   Node,
   NodeFields,
+  NodeType,
 } from '../store';
+
 import {
   CompiledTreeDefinition,
   DataTree,
@@ -92,6 +94,8 @@ export function ByField(fieldName: string) {
 // Relations
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+// All outgoing edges
 export function outgoing(
   type: EdgeType,
   childRowDefinition: CompiledTreeDefinition
@@ -107,6 +111,8 @@ export function outgoing(
   };
 }
 
+// Outgoing edges to nodes who's first incoming edge of type direct
+// connects to a node on the traversal context.
 export function outgoingInContext(
   type: EdgeType,
   childRowDefinition: CompiledTreeDefinition,
@@ -127,6 +133,26 @@ export function outgoingInContext(
           return false;
         });
       return {childRowDefinition, children};
+    } else {
+      return {childRowDefinition, children: []};
+    }
+  };
+}
+
+// Outgoing edges leading to nodes with specified type.
+function outgoingWithNodeFilter(
+  type: EdgeType,
+  childRowDefinition: CompiledTreeDefinition,
+  nodeType: NodeType
+): Relation {
+  return (context: Node[]) => {
+    const node = context[context.length - 1];
+    const edges = node.outgoing[type];
+    if (edges) {
+      return {
+        childRowDefinition,
+        children: edges.map(c => c.to).filter(n => n.type === nodeType),
+      };
     } else {
       return {childRowDefinition, children: []};
     }

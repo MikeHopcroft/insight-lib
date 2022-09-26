@@ -6,12 +6,13 @@
 export type NodeType = string;
 export type NodeId = number;
 export type NodeFields = {[key: string]: any};
+export type EdgeCollection = {[type: EdgeType]: Edge[]};
 
 export interface Node {
   type: NodeType;
   id: NodeId;
-  incoming: {[type: EdgeType]: Edge[]};
-  outgoing: {[type: EdgeType]: Edge[]};
+  incoming: EdgeCollection;
+  outgoing: EdgeCollection;
   fields: NodeFields;
 }
 

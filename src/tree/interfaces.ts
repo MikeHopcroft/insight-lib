@@ -43,7 +43,7 @@ export type TreeDefinition = GenericTreeDefinition<
   ExpressionDefinition,
   FilterDefinition,
   FormatterDefinition,
-  RelationDefinition,
+  RelationDefinition2,
   SorterDefinitionList,
   StylerDefinitionList
 >;
@@ -65,6 +65,37 @@ export type RelationDefinition = {
   childRowDefinition: TreeDefinition;
   predicate: string;
 };
+
+export type RelationDefinition2 = {
+  childRowDefinition: TreeDefinition;
+  direction?: string; // Defaults to 'outgoing'
+  edgeType?: string;
+  nodeType?: string;
+  predicate?: string; // Defautls to true
+};
+
+const x: TreeDefinition = undefined as unknown as TreeDefinition;
+
+// outgoing()
+const a: RelationDefinition2 = {
+  childRowDefinition: x,
+  direction: 'outgoing',
+  predicate: 'true'
+}
+
+// outgoingInContext()
+const b: RelationDefinition2 = {
+  childRowDefinition: x,
+  direction: 'outgoing',
+  predicate: 'ancestor("some edge type")',
+}
+
+// outgoingWithNodeFilter()
+const c: RelationDefinition2 = {
+  childRowDefinition: x,
+  direction: 'outgoing',
+  predicate: 'edge.to.type === "some type"',
+}
 
 export type SorterDefinition = {field: string; increasing: boolean};
 export type SorterDefinitionList = SorterDefinition[];

@@ -10,23 +10,6 @@ import {
   TreeDefinition,
 } from '../tree';
 
-function render(store: NodeStore, view: TreeDefinition) {
-  const compiledTree = compileTree(view);
-  console.log(JSON.stringify(compiledTree, null, 2));
-  console.log('=============================');
-
-  const dataTree = buildDataTree(store, compiledTree);
-  // console.log(JSON.stringify(dataTree, null, 2));
-  // console.log('=============================');
-
-  const presentationTree = buildPresentationTree(dataTree);
-  // console.log(JSON.stringify(renderRows, null, 2));
-  // console.log('=============================');
-
-  console.log(presentationTreeToString(presentationTree));
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Capability => Feature => Task
@@ -46,7 +29,7 @@ const taskView: TreeDefinition = {
 
 const featureTaskView: TreeDefinition = {
   type: 'features',
-  relations: [{childRowDefinition: taskView, predicate: 'features=>tasks'}],
+  relations: [{childRowDefinition: taskView, edgeType: 'features=>tasks'}],
   expressions: [
     {
       field: 'total',
@@ -68,7 +51,10 @@ const featureTaskView: TreeDefinition = {
 
   columns: [
     {field: 'title'},
-    {field: 'total', style: [{predicate: 'total > 6', style: '{backgroundColor: "red"}'}]},
+    {
+      field: 'total',
+      style: [{predicate: 'total > 6', style: '{backgroundColor: "red"}'}],
+    },
     {field: 'remaining'},
     {field: 'percent'},
     {field: 'count'},
@@ -77,7 +63,9 @@ const featureTaskView: TreeDefinition = {
 
 const capabilityFeatureTaskView: TreeDefinition = {
   type: 'capabilities',
-  relations: [{childRowDefinition: featureTaskView, predicate: 'capabilities=>features'}],
+  relations: [
+    {childRowDefinition: featureTaskView, edgeType: 'capabilities=>features'},
+  ],
   expressions: [
     {
       field: 'count',
@@ -100,18 +88,40 @@ const impactView: TreeDefinition = {
 
 const insightImpactView: TreeDefinition = {
   type: 'insights',
-  relations: [{childRowDefinition: impactView, predicate: 'insights=>impacts'}],
+  relations: [{childRowDefinition: impactView, edgeType: 'insights=>impacts'}],
   columns: [{field: 'title'}],
   sort: [{field: 'title', increasing: false}],
 };
 
 const accountInsightImpactView: TreeDefinition = {
   type: 'accounts',
-  relations: [{childRowDefinition: insightImpactView, predicate: 'accounts=>insights'}],
+  relations: [
+    {childRowDefinition: insightImpactView, edgeType: 'accounts=>insights'},
+  ],
   columns: [{field: 'name'}],
   sort: [{field: 'name', increasing: false}],
 };
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Demo code
+//
+////////////////////////////////////////////////////////////////////////////////
+function render(store: NodeStore, view: TreeDefinition) {
+  const compiledTree = compileTree(view);
+  // console.log(JSON.stringify(compiledTree, null, 2));
+  // console.log('=============================');
+
+  const dataTree = buildDataTree(store, compiledTree);
+  // console.log(JSON.stringify(dataTree, null, 2));
+  // console.log('=============================');
+
+  const presentationTree = buildPresentationTree(dataTree);
+  // console.log(JSON.stringify(renderRows, null, 2));
+  // console.log('=============================');
+
+  console.log(presentationTreeToString(presentationTree));
+}
 
 function go() {
   const store = new NodeStore();
@@ -120,9 +130,8 @@ function go() {
   // Render plain hierarchical view
   // render(store, taskView);
   // render(store, featureTaskView);
-  // render(store, capabilityFeatureTaskView);
+  render(store, capabilityFeatureTaskView);
   render(store, accountInsightImpactView);
-
 
   console.log('======================');
 
