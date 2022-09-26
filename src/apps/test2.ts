@@ -31,6 +31,7 @@ export const taskView: TreeDefinition = {
   columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
   expressions: [{field: 'exp', value: 'id + 1'}],
   filter: {predicate: 'status!=="active"'},
+  sort: [{field: 'id', increasing: false}],
   // filter: fieldEq('status', 'active'),
   // sort: (a: NodeFields, b: NodeFields) => a.id - b.id,
   // style: select([

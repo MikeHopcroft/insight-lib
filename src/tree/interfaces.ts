@@ -44,7 +44,7 @@ export type TreeDefinition = GenericTreeDefinition<
   FilterDefinition,
   FormatterDefinition,
   RelationDefinition,
-  SorterDefinition,
+  SorterDefinitionList,
   StylerDefinition
 >;
 
@@ -66,7 +66,8 @@ export type RelationDefinition = {
   predicate: string;
 };
 
-export type SorterDefinition = {fieldName: string; increasing: boolean}[];
+export type SorterDefinition = {field: string; increasing: boolean};
+export type SorterDefinitionList = SorterDefinition[];
 
 export type StylerDefinition = { predicate: string, style: PresentationStyle }[];
 
@@ -97,8 +98,8 @@ export type Relation = (context: Node[]) => {
   children: Node[];
 };
 
-type Sorter = (a: NodeFields, b: NodeFields) => number;
-type Styler = (row: NodeFields) => PresentationStyle | undefined;
+export type Sorter = (a: NodeFields, b: NodeFields) => number;
+export type Styler = (row: NodeFields) => PresentationStyle | undefined;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

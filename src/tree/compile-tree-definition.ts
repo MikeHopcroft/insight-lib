@@ -13,6 +13,9 @@ import {
   FilterDefinition,
   Relation,
   RelationDefinition,
+  Sorter,
+  SorterDefinition,
+  SorterDefinitionList,
   TreeDefinition,
 } from './interfaces';
 
@@ -20,9 +23,8 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   const relations = compileRelations(tree.relations);
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
-  const sort = undefined;
+  const sort = compileSorters(tree.sort);
   const style = undefined;
-  const a = tree.columns;
   const columns = compileColumns(tree.columns);
 
   const compiled: CompiledTreeDefinition = {
@@ -35,6 +37,42 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
     style,
   };
   return compiled;
+}
+
+function compileColumns(
+  columns: TreeDefinition['columns']
+): CompiledTreeDefinition['columns'] {
+  return columns.map(c => ({
+    field: c.field,
+    // For now, drop formatter and styler
+    // TODO: compile formatter and styler
+  }));
+}
+
+
+function compileExpressions(
+  expressions: ExpressionDefinition[] | undefined
+): Expression[] {
+  if (!expressions) {
+    return [];
+  }
+
+  const y = expressions.map(e => {
+    const f = compile(e.value);
+    const value = (context: DataTree): any => {
+      return f({
+        globals: globalSymbols,
+        locals: context,
+      });
+    };
+    const x = {
+      field: e.field,
+      value: value,
+    };
+    return x;
+  });
+
+  return y;
 }
 
 function compileFilter(
@@ -64,37 +102,40 @@ function compileRelations(
   });
 }
 
-function compileExpressions(
-  expressions: ExpressionDefinition[] | undefined
-): Expression[] {
-  if (!expressions) {
-    return [];
+function compileSorters(
+  sorters: SorterDefinitionList | undefined
+): Sorter | undefined {
+  if (!sorters) {
+    return undefined;
   }
+  const comparers = sorters.map(x => compareFields(x));
 
-  const y = expressions.map(e => {
-    const f = compile(e.value);
-    const value = (context: DataTree): any => {
-      return f({
-        globals: globalSymbols,
-        locals: context,
-      });
-    };
-    const x = {
-      field: e.field,
-      value: value,
-    };
-    return x;
-  });
-
-  return y;
+  return (a: NodeFields, b: NodeFields) => {
+    for (const comparer of comparers) {
+      const sign = comparer(a, b);
+      if (sign) {
+        return sign;
+      }
+    }
+    return 0;
+  }
 }
 
-function compileColumns(
-  columns: TreeDefinition['columns']
-): CompiledTreeDefinition['columns'] {
-  return columns.map(c => ({
-    field: c.field,
-    // For now, drop formatter and styler
-    // TODO: compile formatter and styler
-  }));
+function compareFields({field: fieldName, increasing}: SorterDefinition) {
+  return (a: NodeFields, b: NodeFields) => {
+    const x = a[fieldName];
+    const y = b[fieldName];
+    let sign: number;
+    if (typeof x === 'number' && typeof y === 'number') {
+      sign = x -y;
+    } else {
+      sign = x.toString().localeCompare(y);
+    }
+    if (increasing) {
+      return sign;
+    } else {
+      return -sign;
+    }
+  }
 }
+
