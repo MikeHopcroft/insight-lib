@@ -13,7 +13,8 @@
   * . Structure: columns and relations
   * Expressions
     * x Parent context only
-    * . Add child context for aggregates
+    * x Add child context for aggregates
+    * Cleanup evaluateObjectLiteral()
     * Make sure evaluateMember() doesn't return global symbols as members.
     * Rename expressions.ts to built-ins.ts.
     * Consider combining columns and expressions
@@ -21,13 +22,16 @@
       * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
     * Catch and handle parse errors
     * Catch and handle eval errors
+    * Consider throwing at the default case of evaluate()
+    * Reenable Object Literal tests
     * Enforce expression topological ordering so expressions can reference each other.
   * x Filters => child context only
   * Formatters - these are structural formatters (e.g. hyperlinks, number format)
   * . Relations
-  * Sorters => child context only
+    * Figure out work-around for outgoingInContext()
+  * x Sorters => child context only
     * General sort functions for things like status where sort is not lexographic
-  * Stylers
+  * x Stylers
 * Publish npm package
 * . Integrate npm package into insight-demo
 * Relation expressions should be able to filter on edge type and node type

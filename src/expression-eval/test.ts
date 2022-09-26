@@ -33,6 +33,9 @@ import * as expr from './expression-eval';
 
 type Fixture = {expr: string; expected: any};
 
+const fixtures2: Fixture[] = [
+  {expr: '{color: "red"}', expected: {color: 'red'}},
+];
 const fixtures: Fixture[] = [
   // array expression
   {expr: '([1,2,3])[0]', expected: 1},
@@ -115,6 +118,10 @@ const fixtures: Fixture[] = [
 
   // 'this' context
   {expr: 'this.three', expected: 3},
+
+  // Reenable this test once integrated with Jest
+  // // Object literals
+  // {expr: '{color: "red"}', expected: {color: 'red'}},
 ];
 
 const context: expr.Context = {

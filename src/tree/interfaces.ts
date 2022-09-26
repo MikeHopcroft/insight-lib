@@ -45,13 +45,13 @@ export type TreeDefinition = GenericTreeDefinition<
   FormatterDefinition,
   RelationDefinition,
   SorterDefinitionList,
-  StylerDefinition
+  StylerDefinitionList
 >;
 
 export interface ExpressionDefinition {
   field: string;
   value: string;
-};
+}
 
 export interface FilterDefinition {
   predicate: string;
@@ -69,7 +69,8 @@ export type RelationDefinition = {
 export type SorterDefinition = {field: string; increasing: boolean};
 export type SorterDefinitionList = SorterDefinition[];
 
-export type StylerDefinition = { predicate: string, style: PresentationStyle }[];
+export type StylerDefinition = {predicate: string; style: string};
+export type StylerDefinitionList = StylerDefinition[];
 
 ///////////////////////////////////////////////////////////////////////////////
 //

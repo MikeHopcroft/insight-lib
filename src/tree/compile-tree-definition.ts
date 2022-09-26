@@ -2,7 +2,7 @@ import {compile} from '../expression-eval';
 import {NodeFields} from '../store';
 
 import {outgoing} from './expressions';
-import { globalSymbols } from './global-symbols';
+import {globalSymbols} from './global-symbols';
 import {
   ColumnDefinition,
   CompiledTreeDefinition,
@@ -16,6 +16,9 @@ import {
   Sorter,
   SorterDefinition,
   SorterDefinitionList,
+  Styler,
+  StylerDefinition,
+  StylerDefinitionList,
   TreeDefinition,
 } from './interfaces';
 
@@ -24,7 +27,7 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
   const sort = compileSorters(tree.sort);
-  const style = undefined;
+  const style = compileStylers(tree.style);
   const columns = compileColumns(tree.columns);
 
   const compiled: CompiledTreeDefinition = {
@@ -48,7 +51,6 @@ function compileColumns(
     // TODO: compile formatter and styler
   }));
 }
-
 
 function compileExpressions(
   expressions: ExpressionDefinition[] | undefined
@@ -118,7 +120,7 @@ function compileSorters(
       }
     }
     return 0;
-  }
+  };
 }
 
 function compareFields({field: fieldName, increasing}: SorterDefinition) {
@@ -127,7 +129,7 @@ function compareFields({field: fieldName, increasing}: SorterDefinition) {
     const y = b[fieldName];
     let sign: number;
     if (typeof x === 'number' && typeof y === 'number') {
-      sign = x -y;
+      sign = x - y;
     } else {
       sign = x.toString().localeCompare(y);
     }
@@ -136,6 +138,31 @@ function compareFields({field: fieldName, increasing}: SorterDefinition) {
     } else {
       return -sign;
     }
-  }
+  };
 }
 
+function compileStylers(
+  stylers: StylerDefinitionList | undefined
+): Styler | undefined {
+  if (!stylers) {
+    return undefined;
+  }
+
+  const cases = stylers.map(styler => {
+    const predicate = compile(styler.predicate);
+    const style = compile(styler.style);
+    return {predicate, style};
+  });
+
+  const result = (fields: NodeFields): any => {
+    const context = {locals: {fields}};
+    for (const c of cases) {
+      if (c.predicate(context)) {
+        return c.style(context)
+      }
+    }
+    return {};
+  };
+
+  return result;
+}

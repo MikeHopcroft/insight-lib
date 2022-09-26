@@ -30,6 +30,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import * as jsep from 'jsep';
+import * as jsepObject from '@jsep-plugin/object';
+import {ObjectExpression} from '@jsep-plugin/object';
+jsep.plugins.register(jsepObject);
+
 import {NodeFields} from '../store';
 
 export interface ISymbols {
@@ -172,7 +176,8 @@ type AnyExpression =
   // | jsep.LogicalExpression (was in jsep@0.0.3. Not in jsep@1.3.7.)
   | jsep.MemberExpression
   | jsep.ThisExpression
-  | jsep.UnaryExpression;
+  | jsep.UnaryExpression
+  | ObjectExpression;
 
 function evaluateArray(list: any, context: Context) {
   return list.map(function (v: any) {
@@ -192,6 +197,26 @@ function evaluateMember(node: jsep.MemberExpression, context: Context) {
     throw Error(`Access to member "${key}" disallowed.`);
   }
   return [object, object[key]];
+}
+
+function evaluateObjectLiteral(node: ObjectExpression, context: Context) {
+  const result = {} as any;
+  for (const property of node.properties) {
+    if (property.computed) {
+      throw new Error('Objects must be made up of literals');
+    }
+    if (property.key.type !== 'Identifier') {
+      throw new Error('123');
+    }
+    const key = property.key.name as string;
+    if (/^__proto__|prototype|constructor$/.test(key)) {
+      throw new Error(`Defining member "${key}" disallowed.`);
+    }
+    const value = evaluate(property.value as jsep.Expression, context);
+    result[key] = value;
+  }
+
+  return result;
 }
 
 function evaluate(_node: jsep.Expression, context: Context): any {
@@ -226,9 +251,12 @@ function evaluate(_node: jsep.Expression, context: Context): any {
         return undefined;
       }
       if (context.globals && context.globals.isChildContextFunction(fn)) {
-        return fn.apply(caller, [context, (context: Context) => {
-          return evaluateArray(node.arguments, context);
-        }]);
+        return fn.apply(caller, [
+          context,
+          (context: Context) => {
+            return evaluateArray(node.arguments, context);
+          },
+        ]);
       } else {
         return fn.apply(caller, evaluateArray(node.arguments, context));
       }
@@ -265,7 +293,11 @@ function evaluate(_node: jsep.Expression, context: Context): any {
     case 'UnaryExpression':
       return unops[node.operator](evaluate(node.argument, context));
 
+    case 'ObjectExpression':
+      return evaluateObjectLiteral(node, context);
+
     default:
+      // TODO: consider throwing here.
       return undefined;
   }
 }
