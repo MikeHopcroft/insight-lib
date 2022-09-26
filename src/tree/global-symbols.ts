@@ -1,4 +1,5 @@
 import {ISymbols, Context} from '../expression-eval';
+import {Edge, Node} from '../store';
 
 export class GlobalSymbols implements ISymbols {
   symbols = new Map<string, any>();
@@ -26,7 +27,22 @@ export class GlobalSymbols implements ISymbols {
 export const globalSymbols = new GlobalSymbols();
 globalSymbols.add('sum', sumAggregator, true);
 globalSymbols.add('count', countAggregator, true);
+globalSymbols.add('ancestor', hasAncestor, false);
+
+// TODO: SECURITY: security review
 globalSymbols.add('Math', Math, false);
+
+// Predicate that returns true when a Node's parent along the `parent`
+// incoming edge is one of its tree traversal ancestors.
+function hasAncestor(ancestors: Node[], edge: Edge, parent: string) {
+  const node = edge.to;
+  const edges2 = node.incoming[parent];
+  if (edges2) {
+    const ancestor = edges2[0].to;
+    return ancestors.includes(ancestor);
+  }
+  return false;
+}
 
 function sumAggregator(context: Context, args: (c: Context) => any[]): number {
   let total = 0;

@@ -51,6 +51,8 @@ export interface Context {
   locals: LocalContext;
 }
 
+export type CompiledExpression = (context: Context) => any;
+
 /**
  * Evaluation code from JSEP project, under MIT License.
  * Copyright (c) 2013 Stephen Oney, http://jsep.from.so/

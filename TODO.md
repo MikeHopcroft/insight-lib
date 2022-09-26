@@ -2,7 +2,7 @@
 
 * RELATIONS: Figure out work-around for outgoingInContext(), outgoingWithNodeFilter()
   * x First without predicate
-  * Then with predicate
+  * x Then with predicate
   * Rename RelationDefinition2
 * Mock up insight-demo view as TreeDefinition
 * RELATIONS: Reference childRowDefinition by id

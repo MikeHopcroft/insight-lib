@@ -135,14 +135,16 @@ function go() {
 
   console.log('======================');
 
-  // // Change relation to only show impacts if their account
-  // // is somewhere in the context (ancestor chain)
-  // insightImpactView.relation = outgoingInContext(
-  //   'insights=>impacts',
-  //   impactView,
-  //   'accounts=>impacts'
-  // );
-  // render(store, accountInsightImpactView);
+  // Change relation to only show impacts if their account
+  // is somewhere in the context (ancestor chain)
+  insightImpactView.relations = [
+    {
+      childRowDefinition: impactView,
+      edgeType: 'insights=>impacts',
+      predicate: 'ancestor(ancestors, edge, "accounts=>impacts")',
+    },
+  ];
+  render(store, accountInsightImpactView);
 
   // render(store, capabilityFeatureTaskView);
 

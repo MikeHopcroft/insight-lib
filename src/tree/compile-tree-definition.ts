@@ -1,4 +1,4 @@
-import {compile} from '../expression-eval';
+import {compile, CompiledExpression, Context} from '../expression-eval';
 import {EdgeCollection, Node, NodeFields} from '../store';
 
 import {globalSymbols} from './global-symbols';
@@ -27,7 +27,7 @@ import {
 //
 ///////////////////////////////////////////////////////////////////////////////
 export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
-  const relations = compileRelations2(tree.relations);
+  const relations = compileRelationsList(tree.relations);
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
   const sort = compileSorters(tree.sort);
@@ -64,7 +64,7 @@ function compileColumns(
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// compileExpressions 
+// compileExpressions
 //
 ///////////////////////////////////////////////////////////////////////////////
 function compileExpressions(
@@ -129,7 +129,7 @@ function compileFilter(
 //   });
 // }
 
-function compileRelations2(
+function compileRelationsList(
   relations: RelationDefinition2[] | undefined
 ): Relation[] {
   if (!relations) {
@@ -137,11 +137,11 @@ function compileRelations2(
   }
 
   return relations.map(r => {
-    return traverseEdges(r);
+    return compileRelation(r);
   });
 }
 
-function traverseEdges(relation: RelationDefinition2): Relation {
+function compileRelation(relation: RelationDefinition2): Relation {
   const childRowDefinition = compileTree(relation.childRowDefinition);
   const predicate = relation.predicate
     ? compile(relation.predicate)
@@ -152,7 +152,7 @@ function traverseEdges(relation: RelationDefinition2): Relation {
       relation.direction,
       relation.edgeType,
       relation.nodeType,
-      // predicate
+      predicate
     );
     return {
       childRowDefinition,
@@ -166,7 +166,7 @@ function getNodes(
   direction: string | undefined,
   edgeType: string | undefined,
   nodeType: string | undefined,
-  // predicate: ((ancestors: Node[], node: Node) => boolean) | undefined
+  predicate: CompiledExpression | undefined
 ): Node[] {
   if (ancestors.length === 0) {
     throw new Error('Internal error: ancestors must contain at least one node');
@@ -184,8 +184,8 @@ function getNodes(
   }
 
   return [
-    ...getNodesGenerator(ancestors, collection, edgeType, nodeType),
-    // ...getNodesGenerator(ancestors, collection, edgeType, nodeType, predicate),
+    // ...getNodesGenerator(ancestors, collection, edgeType, nodeType),
+    ...getNodesGenerator(ancestors, collection, edgeType, nodeType, predicate),
   ];
 }
 
@@ -194,7 +194,7 @@ function* getNodesGenerator(
   collection: EdgeCollection,
   edgeType: string | undefined,
   nodeType: string | undefined,
-  // predicate: ((ancestors: Node[], node: Node) => boolean) | undefined
+  predicate: CompiledExpression | undefined
 ): Generator<Node> {
   for (const type in collection) {
     for (const edge of collection[type]) {
@@ -204,9 +204,20 @@ function* getNodesGenerator(
       if (nodeType && edge.to.type !== nodeType) {
         continue;
       }
-      // if (predicate && !predicate(ancestors, edge.to)) {
-      //   continue;
-      // }
+
+      const context: Context = {
+        globals: globalSymbols,
+        locals: {
+          fields: {
+            ancestors,
+            edge,
+          },
+        },
+      };
+      if (predicate && !predicate(context)) {
+        continue;
+      }
+
       yield edge.to;
     }
   }
