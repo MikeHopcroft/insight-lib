@@ -8,7 +8,7 @@ export class GlobalSymbols implements ISymbols {
     return this.symbols.get(name);
   }
 
-  add(name: string, f: Function, isChildContext = false) {
+  add(name: string, f: any, isChildContext = false) {
     if (this.symbols.has(name)) {
       throw new Error(`Registering duplicate symbol "${name}"`);
     }
@@ -26,6 +26,7 @@ export class GlobalSymbols implements ISymbols {
 export const globalSymbols = new GlobalSymbols();
 globalSymbols.add('sum', sumAggregator, true);
 globalSymbols.add('count', countAggregator, true);
+globalSymbols.add('Math', Math, false);
 
 function sumAggregator(context: Context, args: (c: Context) => any[]): number {
   let total = 0;

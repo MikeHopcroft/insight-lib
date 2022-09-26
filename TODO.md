@@ -1,39 +1,44 @@
 # TreeView
 
-* x Fix unit tests
-* . Bring in expression-eval and jsep
-  * SECURITY: Consider disabling member variable access entirely or for functions
+* Mock up insight-demo view as TreeDefinition
+* Relations: Figure out work-around for outgoingInContext(), outgoingWithNodeFilter()
+* Publish npm package
+* . Integrate npm package into insight-demo
 * Bring in jest and jest test explorer recommendation
-* Migrate expression-eval tests to jest
-* . Modify expression-eval for aggregate expressions
+    * Reenable Object Literal tests
+  * Migrate expression-eval tests to jest
 * Move expression-eval into tree folder
   * Check dependency web
+* Consider list of reserved field names (id, type, parent, child, sum, count, max, min)
+    * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
+* SECURITY: Consider disabling member variable access entirely or for functions
+* SECURITY: determine whether Math is a safe global. Might need to replace it with a mock.
+* x Modify expression-eval for aggregate expressions
 * x Add MIT license
+* x Fix unit tests
+* x Bring in expression-eval and jsep
 * . TreeDefinition compiler
-  * . Structure: columns and relations
-  * Expressions
+  * x Column styling
+  * x Structure: columns and relations
+  * x Expressions
     * x Parent context only
     * x Add child context for aggregates
     * Cleanup evaluateObjectLiteral()
     * Make sure evaluateMember() doesn't return global symbols as members.
     * Rename expressions.ts to built-ins.ts.
+      * Or remove after compileTree() migration
     * Consider combining columns and expressions
-    * Consider list of reserved field names (id, type, parent, child, sum, count, max, min)
-      * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
+      * One downside is the expression order can be used to allow expressions to reference each other. If expressions and columns were the same, we'd want the order to be screen order. Also, do we want a 1:1 correspondance? What about expressions with intermediate results?
     * Catch and handle parse errors
     * Catch and handle eval errors
     * Consider throwing at the default case of evaluate()
-    * Reenable Object Literal tests
     * Enforce expression topological ordering so expressions can reference each other.
   * x Filters => child context only
   * Formatters - these are structural formatters (e.g. hyperlinks, number format)
-  * . Relations
-    * Figure out work-around for outgoingInContext()
+  * x Relations
   * x Sorters => child context only
-    * General sort functions for things like status where sort is not lexographic
+  * General sort functions for things like status where sort is not lexographic
   * x Stylers
-* Publish npm package
-* . Integrate npm package into insight-demo
 * Relation expressions should be able to filter on edge type and node type
 * Schema inference
 * What is EdgeDescriptor?
@@ -49,13 +54,13 @@
   * x class Renderer builds DataTree.
 * x Should Renderer even be a class?
 * Change sample-view.ts to use TreeDefinition instead of CompiledTreeDefinition
-* RowDefinition.filter might become an array
-* Introduce an editable RowSpec
-  * A RowDefinition is a compiled RowSpec
+* x .filter might become an array
+* x Introduce an editable RowSpec
+  * x A RowDefinition is a compiled RowSpec
 * Stop exporting compiled tree subtypes (e.g. Filter)
 * Figure out original intent for formatter signature
 * Look into vm2 (https://www.npmjs.com/package/vm2)
-* Look into expression-eval (https://www.npmjs.com/package/expression-eval)
+* x Look into expression-eval (https://www.npmjs.com/package/expression-eval)
 
 # Stages
 

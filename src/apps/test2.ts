@@ -1,7 +1,7 @@
-import {
-  loadTablesAndEdges,
-} from '../sample-data';
+import {loadTablesAndEdges} from '../sample-data';
+
 import {NodeStore} from '../store';
+
 import {
   buildDataTree,
   buildPresentationTree,
@@ -26,19 +26,25 @@ function render(store: NodeStore, view: TreeDefinition) {
   console.log(presentationTreeToString(presentationTree));
 }
 
-export const taskView: TreeDefinition = {
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Capability => Feature => Task
+//
+////////////////////////////////////////////////////////////////////////////////
+const taskView: TreeDefinition = {
   type: 'tasks',
   columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
   expressions: [{field: 'exp', value: 'id + 1'}],
-  // filter: {predicate: 'status!=="active"'},
+  // filter: {predicate: 'status==="active"'},
   sort: [{field: 'id', increasing: false}],
   style: [
     {predicate: 'status === "active"', style: "{backgroundColor: 'red'}"},
-    {predicate: 'true', style: "{backgroundColor: 'green'}"}
+    {predicate: 'true', style: "{backgroundColor: 'green'}"},
   ],
 };
 
-export const featureTaskView: TreeDefinition = {
+const featureTaskView: TreeDefinition = {
   type: 'features',
   relations: [{childRowDefinition: taskView, predicate: 'features=>tasks'}],
   expressions: [
@@ -50,35 +56,60 @@ export const featureTaskView: TreeDefinition = {
       field: 'remaining',
       value: "sum(days, status !== 'active')",
     },
-],
+    {
+      field: 'percent',
+      value: 'Math.round((remaining / total) * 100) + "%"',
+    },
+    {
+      field: 'count',
+      value: 'count()',
+    },
+  ],
 
-  // expressions: [
-  //   {
-  //     field: 'total',
-  //     value: sum('days'),
-  //   },
-  //   {
-  //     field: 'remaining',
-  //     value: sum('days', fieldEq('status', 'active')),
-  //   },
-  //   {
-  //     field: 'percent',
-  //     value: (r: NodeFields) => Math.round((r.remaining / r.total) * 100) + '%',
-  //   },
-  //   {
-  //     field: 'count',
-  //     value: count('id'),
-  //   },
-  // ],
   columns: [
     {field: 'title'},
-    {field: 'total'},
+    {field: 'total', style: [{predicate: 'total > 6', style: '{backgroundColor: "red"}'}]},
     {field: 'remaining'},
-    // {
-    //   field: 'total',
-    //   style: select([[fieldGt('total', 6), {backgroundColor: 'red'}]]),
-    // },
+    {field: 'percent'},
+    {field: 'count'},
   ],
+};
+
+const capabilityFeatureTaskView: TreeDefinition = {
+  type: 'capabilities',
+  relations: [{childRowDefinition: featureTaskView, predicate: 'capabilities=>features'}],
+  expressions: [
+    {
+      field: 'count',
+      value: 'count()',
+    },
+  ],
+  columns: [{field: 'title'}, {}, {field: 'count'}],
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Account => Insight => Impact
+//
+////////////////////////////////////////////////////////////////////////////////
+const impactView: TreeDefinition = {
+  type: 'impacts',
+  columns: [{field: 'title'}],
+  sort: [{field: 'title', increasing: false}],
+};
+
+const insightImpactView: TreeDefinition = {
+  type: 'insights',
+  relations: [{childRowDefinition: impactView, predicate: 'insights=>impacts'}],
+  columns: [{field: 'title'}],
+  sort: [{field: 'title', increasing: false}],
+};
+
+const accountInsightImpactView: TreeDefinition = {
+  type: 'accounts',
+  relations: [{childRowDefinition: insightImpactView, predicate: 'accounts=>insights'}],
+  columns: [{field: 'name'}],
+  sort: [{field: 'name', increasing: false}],
 };
 
 
@@ -88,7 +119,10 @@ function go() {
 
   // Render plain hierarchical view
   // render(store, taskView);
-  render(store, featureTaskView);
+  // render(store, featureTaskView);
+  // render(store, capabilityFeatureTaskView);
+  render(store, accountInsightImpactView);
+
 
   console.log('======================');
 

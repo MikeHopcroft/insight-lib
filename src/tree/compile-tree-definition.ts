@@ -47,8 +47,9 @@ function compileColumns(
 ): CompiledTreeDefinition['columns'] {
   return columns.map(c => ({
     field: c.field,
-    // For now, drop formatter and styler
-    // TODO: compile formatter and styler
+    style: compileStylers(c.style),
+    // For now, drop formatter
+    // TODO: compile formatter
   }));
 }
 
