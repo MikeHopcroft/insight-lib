@@ -37,14 +37,14 @@ export interface ISymbols {
   isChildContextFunction(f: Function): boolean;
 }
 
-export interface ContextData {
+export interface LocalContext {
   fields: NodeFields;
-  children?: ContextData[];
+  children?: LocalContext[];
 }
 
 export interface Context {
   globals?: ISymbols;
-  context: ContextData;
+  locals: LocalContext;
 }
 
 /**
@@ -241,7 +241,7 @@ function evaluate(_node: jsep.Expression, context: Context): any {
     case 'Identifier':
       return (
         (context.globals && context.globals.get(node.name)) ||
-        context.context.fields[node.name]
+        context.locals.fields[node.name]
       );
 
     case 'Literal':
@@ -260,7 +260,7 @@ function evaluate(_node: jsep.Expression, context: Context): any {
       return evaluateMember(node, context)[1];
 
     case 'ThisExpression':
-      return context.context.fields;
+      return context.locals.fields;
 
     case 'UnaryExpression':
       return unops[node.operator](evaluate(node.argument, context));

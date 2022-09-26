@@ -14,6 +14,7 @@
   * Expressions
     * x Parent context only
     * . Add child context for aggregates
+    * Make sure evaluateMember() doesn't return global symbols as members.
     * Rename expressions.ts to built-ins.ts.
     * Consider combining columns and expressions
     * Consider list of reserved field names (id, type, parent, child, sum, count, max, min)

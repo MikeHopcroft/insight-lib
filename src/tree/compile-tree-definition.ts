@@ -1,7 +1,8 @@
-import {ISymbols, compile, Context} from '../expression-eval';
+import {compile} from '../expression-eval';
 import {NodeFields} from '../store';
 
 import {outgoing} from './expressions';
+import { globalSymbols } from './global-symbols';
 import {
   ColumnDefinition,
   CompiledTreeDefinition,
@@ -14,48 +15,6 @@ import {
   RelationDefinition,
   TreeDefinition,
 } from './interfaces';
-
-class GlobalSymbols implements ISymbols {
-  symbols = new Map<string, any>();
-  childContextFunctions = new Set<Function>();
-
-  get(name: string): any {
-    return this.symbols.get(name);
-  }
-
-  add(name: string, f: Function, isChildContext = false) {
-    if (this.symbols.has(name)) {
-      throw new Error(`Registering duplicate symbol "${name}"`);
-    }
-    this.symbols.set(name, f);
-    if (isChildContext) {
-      this.childContextFunctions.add(f);
-    }
-  }
-
-  isChildContextFunction(f: Function): boolean {
-    return this.childContextFunctions.has(f);
-  }
-}
-
-const globalSymbols = new GlobalSymbols();
-globalSymbols.add('sum', sumAggregator, true);
-
-function sumAggregator(context: Context, args: (c: Context) => any[]): number {
-  let total = 0;
-  if (context.context.children) {
-    for (const child of context.context.children) {
-      const x = args({
-        globals: context.globals,
-        context: child,
-      });
-      if (x.length === 1 || x[1] === true) {
-        total += x[0];
-      }
-    }
-  }
-  return total;
-}
 
 export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   const relations = compileRelations(tree.relations);
@@ -71,8 +30,6 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
     columns,
     expressions,
     filter,
-    // For now, use the first relation.
-    // TODO: use all relations
     relations,
     sort,
     style,
@@ -89,7 +46,7 @@ function compileFilter(
 
   const f = compile(filter.predicate);
   const result = (context: NodeFields): any => {
-    return f({context: {fields: context}});
+    return f({locals: {fields: context}});
   };
 
   return result;
@@ -119,7 +76,7 @@ function compileExpressions(
     const value = (context: DataTree): any => {
       return f({
         globals: globalSymbols,
-        context,
+        locals: context,
       });
     };
     const x = {

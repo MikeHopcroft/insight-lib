@@ -118,7 +118,7 @@ const fixtures: Fixture[] = [
 ];
 
 const context: expr.Context = {
-  context: {
+  locals: {
     fields: {
       string: 'string',
       number: 123,
@@ -157,7 +157,7 @@ for (const fixture of fixtures) {
 
 function expectThrows(expression: string, context: any, error: string): void {
   try {
-    const val = expr.compile(expression)({context: {fields: context}});
+    const val = expr.compile(expression)({locals: {fields: context}});
     console.log(`Error: expected throw evaluating "${expression}"`);
   } catch (e: any) {
     const re = /Access to member "(\w+)" disallowed/;
