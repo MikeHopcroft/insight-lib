@@ -11,12 +11,10 @@ import {
   FilterDefinition,
   Relation,
   RelationDefinition,
-  RelationDefinition2,
   Sorter,
   SorterDefinition,
   SorterDefinitionList,
   Styler,
-  StylerDefinition,
   StylerDefinitionList,
   TreeDefinition,
 } from './interfaces';
@@ -114,23 +112,11 @@ function compileFilter(
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// compileRelations
+// compileRelationsList
 //
 ///////////////////////////////////////////////////////////////////////////////
-// function compileRelations(
-//   relations: RelationDefinition[] | undefined
-// ): Relation[] {
-//   if (!relations) {
-//     return [];
-//   }
-
-//   return relations.map(r => {
-//     return outgoing(r.predicate, compileTree(r.childRowDefinition));
-//   });
-// }
-
 function compileRelationsList(
-  relations: RelationDefinition2[] | undefined
+  relations: RelationDefinition[] | undefined
 ): Relation[] {
   if (!relations) {
     return [];
@@ -141,7 +127,7 @@ function compileRelationsList(
   });
 }
 
-function compileRelation(relation: RelationDefinition2): Relation {
+function compileRelation(relation: RelationDefinition): Relation {
   const childRowDefinition = compileTree(relation.childRowDefinition);
   const predicate = relation.predicate
     ? compile(relation.predicate)
@@ -184,7 +170,6 @@ function getNodes(
   }
 
   return [
-    // ...getNodesGenerator(ancestors, collection, edgeType, nodeType),
     ...getNodesGenerator(ancestors, collection, edgeType, nodeType, predicate),
   ];
 }
