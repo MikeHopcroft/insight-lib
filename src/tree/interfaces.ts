@@ -72,7 +72,7 @@ export type RelationDefinition = {
 export type SorterDefinition = {field: string; increasing?: boolean};
 export type SorterDefinitionList = SorterDefinition[];
 
-export type StylerDefinition = {predicate: string; style: string};
+export type StylerDefinition = {predicate: string; style: PresentationStyle};
 export type StylerDefinitionList = StylerDefinition[];
 
 ///////////////////////////////////////////////////////////////////////////////

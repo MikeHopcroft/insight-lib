@@ -159,14 +159,13 @@ function outgoingWithNodeFilter(
 // Formatters
 //
 ///////////////////////////////////////////////////////////////////////////////
-export function hyperlink(text: string) {
-  return (href: string) => {
-    if (href) {
-      return {href, text};
-    } else {
-      return '';
-    }
-  };
+export function hyperlink(href: string) {
+  const text = 'link';
+  if (href) {
+    return {href, text};
+  } else {
+    return '';
+  }
 }
 
 export function dollars(value: number) {

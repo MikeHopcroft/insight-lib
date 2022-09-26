@@ -287,7 +287,7 @@ function compileStylers(
 
   const cases = stylers.map(styler => {
     const predicate = compile(styler.predicate);
-    const style = compile(styler.style);
+    const style = styler.style;
     return {predicate, style};
   });
 
@@ -295,7 +295,7 @@ function compileStylers(
     const context = {locals: {fields}};
     for (const c of cases) {
       if (c.predicate(context)) {
-        return c.style(context);
+        return c.style;
       }
     }
     return {};

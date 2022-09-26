@@ -22,8 +22,8 @@ const taskView: TreeDefinition = {
   // filter: {predicate: 'status==="active"'},
   sort: [{field: 'id', increasing: false}],
   style: [
-    {predicate: 'status === "active"', style: "{backgroundColor: 'red'}"},
-    {predicate: 'true', style: "{backgroundColor: 'green'}"},
+    {predicate: 'status === "active"', style: {backgroundColor: 'red'}},
+    {predicate: 'true', style: {backgroundColor: 'green'}},
   ],
 };
 
@@ -53,7 +53,7 @@ const featureTaskView: TreeDefinition = {
     {field: 'title'},
     {
       field: 'total',
-      style: [{predicate: 'total > 6', style: '{backgroundColor: "red"}'}],
+      style: [{predicate: 'total > 6', style: {backgroundColor: "red"}}],
     },
     {field: 'remaining'},
     {field: 'percent'},
