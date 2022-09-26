@@ -95,7 +95,7 @@ export interface Expression {
 }
 
 export type Filter = (row: NodeFields) => boolean;
-type Formatter = (value: any) => string | {[key: string]: any};
+export type Formatter = (value: any) => string | {[key: string]: any};
 
 export type Relation = (context: Node[]) => {
   childRowDefinition: CompiledTreeDefinition;

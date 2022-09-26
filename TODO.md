@@ -1,14 +1,6 @@
 # TreeView
 
-* Formatters
-* Consider separate global context for relation predicates, expressions, and formatters
-* x RELATIONS: Figure out work-around for outgoingInContext(), outgoingWithNodeFilter()
-  * x First without predicate
-  * x Then with predicate
-  * x Rename RelationDefinition2
 * Mock up insight-demo view as TreeDefinition
-* RELATIONS: Reference childRowDefinition by id
-  * Cache compilations
 * Publish npm package
 * . Integrate npm package into insight-demo
 * Bring in jest and jest test explorer recommendation
@@ -16,10 +8,34 @@
   * Migrate expression-eval tests to jest
 * Move expression-eval into tree folder
   * Check dependency web
+* Rename expressions.ts to built-ins.ts.
+  * Or remove after compileTree() migration
+* Consider combining columns and expressions
+  * One downside is the expression order can be used to allow expressions to reference each other. If expressions and columns were the same, we'd want the order to be screen order. Also, do we want a 1:1 correspondance? What about expressions with intermediate results?
+* Stop exporting compiled tree subtypes (e.g. Filter)
+* ===============================================
+* Catch and handle parse and eval errors
+* Consider separate global context for relation predicates, expressions, and formatters
+* Cleanup evaluateObjectLiteral()
+* Consider throwing at the default case of evaluate()
+* Enforce expression topological ordering so expressions can reference each other.
+* ===============================================
+* RELATIONS: Reference childRowDefinition by id
+  * Cache compilations
+* Data-driven formatter table
+* Compiled formatters
+* General sort functions for things like status where sort is not lexographic
 * Consider list of reserved field names (id, type, parent, child, sum, count, max, min)
-    * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
+  * Or perhaps disallow anything that starts with _ so that we can have _id, _type, etc.
 * SECURITY: Consider disabling member variable access entirely or for functions
 * SECURITY: determine whether Math is a safe global. Might need to replace it with a mock.
+* SECURITY: Make sure evaluateMember() doesn't return global symbols as members.
+* ===============================================
+* x Formatters
+* x RELATIONS: Figure out work-around for outgoingInContext(), outgoingWithNodeFilter()
+  * x First without predicate
+  * x Then with predicate
+  * x Rename RelationDefinition2
 * x Modify expression-eval for aggregate expressions
 * x Add MIT license
 * x Fix unit tests
@@ -30,23 +46,12 @@
   * x Expressions
     * x Parent context only
     * x Add child context for aggregates
-    * Cleanup evaluateObjectLiteral()
-    * Make sure evaluateMember() doesn't return global symbols as members.
-    * Rename expressions.ts to built-ins.ts.
-      * Or remove after compileTree() migration
-    * Consider combining columns and expressions
-      * One downside is the expression order can be used to allow expressions to reference each other. If expressions and columns were the same, we'd want the order to be screen order. Also, do we want a 1:1 correspondance? What about expressions with intermediate results?
-    * Catch and handle parse errors
-    * Catch and handle eval errors
-    * Consider throwing at the default case of evaluate()
-    * Enforce expression topological ordering so expressions can reference each other.
   * x Filters => child context only
-  * Formatters - these are structural formatters (e.g. hyperlinks, number format)
+  * x Formatters - these are structural formatters (e.g. hyperlinks, number format)
   * x Relations
   * x Sorters => child context only
-  * General sort functions for things like status where sort is not lexographic
   * x Stylers
-* Relation expressions should be able to filter on edge type and node type
+* x Relation expressions should be able to filter on edge type and node type
 * Schema inference
 * What is EdgeDescriptor?
 * Document current render pipeline.
@@ -60,11 +65,10 @@
   * x RenderRow => PresentationTree
   * x class Renderer builds DataTree.
 * x Should Renderer even be a class?
-* Change sample-view.ts to use TreeDefinition instead of CompiledTreeDefinition
+* x Change sample-view.ts to use TreeDefinition instead of CompiledTreeDefinition
 * x .filter might become an array
 * x Introduce an editable RowSpec
   * x A RowDefinition is a compiled RowSpec
-* Stop exporting compiled tree subtypes (e.g. Filter)
 * Figure out original intent for formatter signature
 * Look into vm2 (https://www.npmjs.com/package/vm2)
 * x Look into expression-eval (https://www.npmjs.com/package/expression-eval)

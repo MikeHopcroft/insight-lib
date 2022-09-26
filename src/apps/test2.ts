@@ -72,7 +72,11 @@ const capabilityFeatureTaskView: TreeDefinition = {
       value: 'count()',
     },
   ],
-  columns: [{field: 'title'}, {}, {field: 'count'}],
+  columns: [
+    {field: 'title'},
+    {},
+    {field: 'count', format: {format: 'dollars'}},
+  ],
 };
 
 ///////////////////////////////////////////////////////////////////////////////

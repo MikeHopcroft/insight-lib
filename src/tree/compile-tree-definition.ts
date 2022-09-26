@@ -1,5 +1,6 @@
 import {compile, CompiledExpression, Context} from '../expression-eval';
 import {EdgeCollection, Node, NodeFields} from '../store';
+import {dollars, hyperlink} from './expressions';
 
 import {globalSymbols} from './global-symbols';
 import {
@@ -9,6 +10,8 @@ import {
   ExpressionDefinition,
   Filter,
   FilterDefinition,
+  Formatter,
+  FormatterDefinition,
   Relation,
   RelationDefinition,
   Sorter,
@@ -25,12 +28,12 @@ import {
 //
 ///////////////////////////////////////////////////////////////////////////////
 export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
-  const relations = compileRelationsList(tree.relations);
+  const columns = compileColumns(tree.columns);
   const expressions = compileExpressions(tree.expressions);
   const filter = compileFilter(tree.filter);
+  const relations = compileRelationsList(tree.relations);
   const sort = compileSorters(tree.sort);
   const style = compileStylers(tree.style);
-  const columns = compileColumns(tree.columns);
 
   const compiled: CompiledTreeDefinition = {
     type: tree.type,
@@ -54,9 +57,8 @@ function compileColumns(
 ): CompiledTreeDefinition['columns'] {
   return columns.map(c => ({
     field: c.field,
+    format: compileFormat(c.format),
     style: compileStylers(c.style),
-    // For now, drop formatter
-    // TODO: compile formatter
   }));
 }
 
@@ -108,6 +110,27 @@ function compileFilter(
   };
 
   return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// compileFormat
+//
+///////////////////////////////////////////////////////////////////////////////
+function compileFormat(
+  format: FormatterDefinition | undefined
+): Formatter | undefined {
+  if (!format) {
+    return undefined;
+  }
+
+  if (format.format === 'hyperlink') {
+    return hyperlink;
+  } else if (format.format === 'dollars') {
+    return dollars;
+  }
+
+  throw new Error(`Bad format definition "${format.format}"`);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

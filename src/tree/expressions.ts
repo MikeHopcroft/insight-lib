@@ -1,9 +1,4 @@
-import {
-  EdgeType,
-  Node,
-  NodeFields,
-  NodeType,
-} from '../store';
+import {EdgeType, Node, NodeFields, NodeType} from '../store';
 
 import {
   CompiledTreeDefinition,
@@ -171,5 +166,15 @@ export function hyperlink(text: string) {
     } else {
       return '';
     }
-  }
+  };
+}
+
+export function dollars(value: number) {
+  let formatting_options = {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  };
+  let dollarString = new Intl.NumberFormat('en-US', formatting_options);
+  return dollarString.format(value);
 }
