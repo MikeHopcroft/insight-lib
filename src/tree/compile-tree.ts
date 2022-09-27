@@ -1,8 +1,9 @@
 import {compile, CompiledExpression, Context} from '../expression-eval';
 import {EdgeCollection, Node, NodeFields} from '../store';
-import {dollars, hyperlink} from './expressions';
 
+import {dollars, hyperlink} from './formatters';
 import {globalSymbols} from './global-symbols';
+
 import {
   CompiledTreeDefinition,
   DataTree,

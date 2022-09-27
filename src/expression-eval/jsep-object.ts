@@ -48,6 +48,8 @@ export const jsepObject = {
 
   init(jsep: any) {
     // Object literal support
+    // Specifying `this` type:
+    //   https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#specifying-the-type-of-this-for-functions
     function gobbleObjectExpression(this: any, env: any) {
       if (this.code === OCURLY_CODE) {
         this.index++;

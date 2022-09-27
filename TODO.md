@@ -1,15 +1,18 @@
 # TreeView
 
-* x Uninstall jsepObject
-* Add title to hyperlink
+* Add static title to hyperlink
+* x Rename expressions.ts to built-ins.ts.
+  * x Or remove after compileTree() migration
+* x Stop exporting compiled tree subtypes (e.g. Filter).
+  * x This requires migrating insight-demo away from the compiled tree.
+  * x Decided to remove convenience functions, but still export types.
+
+* Get hyperlink title and href from expressions
 * Move expression-eval into tree folder
   * Check dependency web
-* Rename expressions.ts to built-ins.ts.
-  * Or remove after compileTree() migration
 * Consider combining columns and expressions
   * One downside is the expression order can be used to allow expressions to reference each other. If expressions and columns were the same, we'd want the order to be screen order. Also, do we want a 1:1 correspondance? What about expressions with intermediate results?
-* Stop exporting compiled tree subtypes (e.g. Filter)
-  * This requires migrating insight-demo away from the compiled tree.
+* x Uninstall jsepObject
 * x Get linter clean
 * x Mock up insight-demo view as TreeDefinition
 * x Publish npm package

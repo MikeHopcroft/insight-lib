@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 
-import {PresentationTree, PresentationStyle} from '../tree';
+import {PresentationTree, PresentationStyle} from '.';
 
 export function presentationTreeToString(roots: PresentationTree[]): string {
   const widths: number[] = [];
