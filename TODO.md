@@ -1,14 +1,7 @@
 # TreeView
 
-* Get linter clean
-* Uninstall jsepObject
-* x Mock up insight-demo view as TreeDefinition
+* x Uninstall jsepObject
 * Add title to hyperlink
-* x Publish npm package
-* x Integrate npm package into insight-demo
-* . Bring in jest and jest test explorer recommendation
-    * Reenable Object Literal tests
-  * Migrate expression-eval tests to jest
 * Move expression-eval into tree folder
   * Check dependency web
 * Rename expressions.ts to built-ins.ts.
@@ -16,6 +9,14 @@
 * Consider combining columns and expressions
   * One downside is the expression order can be used to allow expressions to reference each other. If expressions and columns were the same, we'd want the order to be screen order. Also, do we want a 1:1 correspondance? What about expressions with intermediate results?
 * Stop exporting compiled tree subtypes (e.g. Filter)
+  * This requires migrating insight-demo away from the compiled tree.
+* x Get linter clean
+* x Mock up insight-demo view as TreeDefinition
+* x Publish npm package
+* x Integrate npm package into insight-demo
+* x Bring in jest and jest test explorer recommendation
+  * x Reenable Object Literal tests
+  * x Migrate expression-eval tests to jest
 * ===============================================
 * Catch and handle parse and eval errors
 * Consider separate global context for relation predicates, expressions, and formatters
