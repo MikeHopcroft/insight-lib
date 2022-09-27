@@ -1,10 +1,5 @@
 import {Node, NodeStore} from '../store';
-import {
-  DataTree,
-  CompiledTreeDefinition,
-  PresentationCell,
-  PresentationTree,
-} from '.';
+import {DataTree, CompiledTreeDefinition} from '.';
 
 ///////////////////////////////////////////////////////////////////////////////
 //

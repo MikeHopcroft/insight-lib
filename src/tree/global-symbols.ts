@@ -60,7 +60,10 @@ function sumAggregator(context: Context, args: (c: Context) => any[]): number {
   return total;
 }
 
-function countAggregator(context: Context, args: (c: Context) => any[]): number {
+function countAggregator(
+  context: Context,
+  args: (c: Context) => any[]
+): number {
   let count = 0;
   if (context.locals.children) {
     for (const child of context.locals.children) {

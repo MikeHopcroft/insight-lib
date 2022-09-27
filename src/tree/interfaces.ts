@@ -64,10 +64,10 @@ export interface FormatterDefinition {
 export type RelationDefinition = {
   childRowDefinition: TreeDefinition;
   direction?: string; // Defaults to 'outgoing'
-  edgeType?: string;  // Default behavior allows all edge types
-  nodeType?: string;  // Default behavior allows all node types
+  edgeType?: string; // Default behavior allows all edge types
+  nodeType?: string; // Default behavior allows all node types
   predicate?: string; // Default behavior allows all edges
-}
+};
 
 export type SorterDefinition = {field: string; increasing?: boolean};
 export type SorterDefinitionList = SorterDefinition[];

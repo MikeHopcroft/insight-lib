@@ -1,4 +1,4 @@
-import {EdgeType, Node, NodeFields, NodeType} from '../store';
+import {EdgeType, Node, NodeFields} from '../store';
 
 import {
   CompiledTreeDefinition,
@@ -134,26 +134,6 @@ export function outgoingInContext(
   };
 }
 
-// Outgoing edges leading to nodes with specified type.
-function outgoingWithNodeFilter(
-  type: EdgeType,
-  childRowDefinition: CompiledTreeDefinition,
-  nodeType: NodeType
-): Relation {
-  return (context: Node[]) => {
-    const node = context[context.length - 1];
-    const edges = node.outgoing[type];
-    if (edges) {
-      return {
-        childRowDefinition,
-        children: edges.map(c => c.to).filter(n => n.type === nodeType),
-      };
-    } else {
-      return {childRowDefinition, children: []};
-    }
-  };
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Formatters
@@ -169,11 +149,11 @@ export function hyperlink(href: string) {
 }
 
 export function dollars(value: number) {
-  let formatting_options = {
+  const formatting_options = {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
   };
-  let dollarString = new Intl.NumberFormat('en-US', formatting_options);
+  const dollarString = new Intl.NumberFormat('en-US', formatting_options);
   return dollarString.format(value);
 }

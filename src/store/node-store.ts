@@ -103,6 +103,6 @@ function serializeEdges(edges: Node['outgoing']): SerializableEdge[] {
 
 function getNodeRef(node: Node): string {
   // Create plausible fake NodeIds
-  const hash = murmurhash(node.type+node.id, 123456);
+  const hash = murmurhash(node.type + node.id, 123456);
   return `urn:is:${node.type}:${hash}`;
 }

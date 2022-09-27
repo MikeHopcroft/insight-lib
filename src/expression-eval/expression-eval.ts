@@ -58,31 +58,6 @@ export type CompiledExpression = (context: Context) => any;
  * Copyright (c) 2013 Stephen Oney, http://jsep.from.so/
  */
 
-// Default operator precedence from https://github.com/EricSmekens/jsep/blob/master/src/jsep.js#L55
-const DEFAULT_PRECEDENCE = {
-  '||': 1,
-  '&&': 2,
-  '|': 3,
-  '^': 4,
-  '&': 5,
-  '==': 6,
-  '!=': 6,
-  '===': 6,
-  '!==': 6,
-  '<': 7,
-  '>': 7,
-  '<=': 7,
-  '>=': 7,
-  '<<': 8,
-  '>>': 8,
-  '>>>': 8,
-  '+': 9,
-  '-': 9,
-  '*': 10,
-  '/': 10,
-  '%': 10,
-};
-
 const binops: {[key: string]: (a: any, b: any) => any} = {
   '||': function (a: any, b: any) {
     return a || b;
@@ -100,11 +75,13 @@ const binops: {[key: string]: (a: any, b: any) => any} = {
     return a & b;
   },
   '==': function (a: any, b: any) {
+    // eslint-disable-next-line eqeqeq
     return a == b;
-  }, // jshint ignore:line
+  },
   '!=': function (a: any, b: any) {
+    // eslint-disable-next-line eqeqeq
     return a != b;
-  }, // jshint ignore:line
+  },
   '===': function (a: any, b: any) {
     return a === b;
   },
@@ -164,10 +141,6 @@ const unops: {[key: string]: (a: any) => any} = {
   },
 };
 
-declare type operand = number | string;
-// declare type unaryCallback = (a: operand) => operand;
-// declare type binaryCallback = (a: operand, b: operand) => operand;
-
 type AnyExpression =
   | jsep.ArrayExpression
   | jsep.BinaryExpression
@@ -182,7 +155,7 @@ type AnyExpression =
   | ObjectExpression;
 
 function evaluateArray(list: any, context: Context) {
-  return list.map(function (v: any) {
+  return list.map((v: any) => {
     return evaluate(v, context);
   });
 }
@@ -240,7 +213,7 @@ function evaluate(_node: jsep.Expression, context: Context): any {
         evaluate(node.right, context)
       );
 
-    case 'CallExpression':
+    case 'CallExpression': {
       let caller, fn, assign;
       if (node.callee.type === 'MemberExpression') {
         assign = evaluateMember(node.callee as jsep.MemberExpression, context);
@@ -262,6 +235,7 @@ function evaluate(_node: jsep.Expression, context: Context): any {
       } else {
         return fn.apply(caller, evaluateArray(node.arguments, context));
       }
+    }
 
     case 'ConditionalExpression':
       return evaluate(node.test, context)

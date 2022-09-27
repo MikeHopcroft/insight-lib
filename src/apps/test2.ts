@@ -53,7 +53,7 @@ const featureTaskView: TreeDefinition = {
     {field: 'title'},
     {
       field: 'total',
-      style: [{predicate: 'total > 6', style: {backgroundColor: "red"}}],
+      style: [{predicate: 'total > 6', style: {backgroundColor: 'red'}}],
     },
     {field: 'remaining'},
     {field: 'percent'},

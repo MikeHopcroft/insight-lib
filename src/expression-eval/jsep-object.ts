@@ -36,6 +36,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import {Expression} from 'jsep';
+
 const OCURLY_CODE = 123; // {
 const CCURLY_CODE = 125; // }
 const OBJECT_EXP = 'ObjectExpression';
@@ -46,7 +48,7 @@ export const jsepObject = {
 
   init(jsep: any) {
     // Object literal support
-    function gobbleObjectExpression(this:any, env:any) {
+    function gobbleObjectExpression(this: any, env: any) {
       if (this.code === OCURLY_CODE) {
         this.index++;
         const properties = [];
@@ -114,24 +116,18 @@ export const jsepObject = {
   },
 } as any;
 
-// import * as jsep from 'jsep';
-import { Expression, IPlugin } from 'jsep';
-// export const name: string;
-// export function init(this: typeof jsep): void;
-
 export interface ObjectExpression extends Expression {
-	type: 'ObjectExpression';
-	properties: Property[];
+  type: 'ObjectExpression';
+  properties: Property[];
 }
 
 export interface Property extends Expression {
-	type: 'Property';
-	computed: boolean;
-	key: Expression;
-	shorthand: boolean;
-	value?: Expression;
+  type: 'Property';
+  computed: boolean;
+  key: Expression;
+  shorthand: boolean;
+  value?: Expression;
 }
 
 // declare const _export: IPlugin;
 // export default _export;
-

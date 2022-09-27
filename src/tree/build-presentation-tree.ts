@@ -1,8 +1,4 @@
-import {
-  DataTree,
-  PresentationCell,
-  PresentationTree,
-} from '.';
+import {DataTree, PresentationCell, PresentationTree} from '.';
 
 /////////////////////////////////////////////////////////////////////////////
 //

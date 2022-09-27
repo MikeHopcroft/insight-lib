@@ -33,9 +33,6 @@ import * as expr from './expression-eval';
 
 type Fixture = {expr: string; expected: any};
 
-const fixtures2: Fixture[] = [
-  {expr: '{color: "red"}', expected: {color: 'red'}},
-];
 const fixtures: Fixture[] = [
   // array expression
   {expr: '([1,2,3])[0]', expected: 1},
@@ -162,9 +159,10 @@ for (const fixture of fixtures) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function expectThrows(expression: string, context: any, error: string): void {
   try {
-    const val = expr.compile(expression)({locals: {fields: context}});
+    expr.compile(expression)({locals: {fields: context}});
     console.log(`Error: expected throw evaluating "${expression}"`);
   } catch (e: any) {
     const re = /Access to member "(\w+)" disallowed/;
@@ -182,12 +180,12 @@ function expectThrows(expression: string, context: any, error: string): void {
   }
 }
 
-expectThrows(`o.__proto__`, {o: {}}, '.__proto__');
-expectThrows(`o.prototype`, {o: {}}, 'prototype');
-expectThrows(`o.constructor`, {o: {}}, '.constructor');
-expectThrows(`o['__proto__']`, {o: {}}, '["__proto__"]');
-expectThrows(`o['prototype']`, {o: {}}, '["prototype"]');
-expectThrows(`o['constructor']`, {o: {}}, '["constructor"]');
-expectThrows(`o[p]`, {o: {}, p: '__proto__'}, '[~__proto__]');
-expectThrows(`o[p]`, {o: {}, p: 'prototype'}, '[~prototype]');
-expectThrows(`o[p]`, {o: {}, p: 'constructor'}, '[~constructor]');
+expectThrows('o.__proto__', {o: {}}, '.__proto__');
+expectThrows('o.prototype', {o: {}}, 'prototype');
+expectThrows('o.constructor', {o: {}}, '.constructor');
+expectThrows("o['__proto__']", {o: {}}, '["__proto__"]');
+expectThrows("o['prototype']", {o: {}}, '["prototype"]');
+expectThrows("o['constructor']", {o: {}}, '["constructor"]');
+expectThrows('o[p]', {o: {}, p: '__proto__'}, '[~__proto__]');
+expectThrows('o[p]', {o: {}, p: 'prototype'}, '[~prototype]');
+expectThrows('o[p]', {o: {}, p: 'constructor'}, '[~constructor]');

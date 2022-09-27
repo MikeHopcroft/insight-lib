@@ -1,5 +1,7 @@
 # TreeView
 
+* Get linter clean
+* Uninstall jsepObject
 * x Mock up insight-demo view as TreeDefinition
 * Add title to hyperlink
 * x Publish npm package

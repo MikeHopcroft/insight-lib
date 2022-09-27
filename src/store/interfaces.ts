@@ -42,4 +42,3 @@ export interface SerializableNode {
   outgoing: SerializableEdge[];
   fields: NodeFields;
 }
-
