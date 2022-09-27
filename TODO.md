@@ -1,9 +1,10 @@
 # TreeView
 
-* Mock up insight-demo view as TreeDefinition
-* Publish npm package
-* . Integrate npm package into insight-demo
-* Bring in jest and jest test explorer recommendation
+* x Mock up insight-demo view as TreeDefinition
+* Add title to hyperlink
+* x Publish npm package
+* x Integrate npm package into insight-demo
+* . Bring in jest and jest test explorer recommendation
     * Reenable Object Literal tests
   * Migrate expression-eval tests to jest
 * Move expression-eval into tree folder
