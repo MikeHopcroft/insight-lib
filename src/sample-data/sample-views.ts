@@ -1,4 +1,4 @@
-import {TreeDefinition} from '../tree';
+import {FormatterType, TreeDefinition} from '../tree';
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -65,7 +65,7 @@ export const capabilityFeatureTaskView: TreeDefinition = {
   columns: [
     {field: 'title'},
     {},
-    {field: 'count', format: {format: 'dollars'}},
+    {field: 'count', format: {type: FormatterType.STATIC, formatter: 'dollar'}},
   ],
 };
 

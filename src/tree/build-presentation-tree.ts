@@ -1,4 +1,4 @@
-import {DataTree, PresentationCell, PresentationTree} from '.';
+import {CompiledColumn, DataTree, PresentationCell, PresentationTree} from '.';
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -43,7 +43,7 @@ export function buildPresentationTree(rows: DataTree[]): PresentationTree[] {
       const formatter = c.format || nopFormatter;
       // TODO: text is not always a string. Rename to value or convert.
       const y: PresentationCell = {
-        text: c.field ? formatter(row.fields[c.field]) : '',
+        text: formatter(row, c),
       };
       const styler = c.style;
       if (styler) {
@@ -72,6 +72,6 @@ export function buildPresentationTree(rows: DataTree[]): PresentationTree[] {
   return presentationTrees;
 }
 
-function nopFormatter(text: string): string {
-  return text;
+function nopFormatter(row: DataTree, col: CompiledColumn): string {
+  return col.field ? row.fields[col.field] : '';
 }

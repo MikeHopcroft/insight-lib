@@ -6,6 +6,7 @@ import {
   buildDataTree,
   buildPresentationTree,
   compileTree,
+  FormatterType,
   presentationTreeToString,
   TreeDefinition,
 } from '../tree';
@@ -75,7 +76,10 @@ const capabilityFeatureTaskView: TreeDefinition = {
   columns: [
     {field: 'title'},
     {},
-    {field: 'count', format: {format: 'dollars'}},
+    {
+      field: 'count',
+      format: {type: FormatterType.STATIC, formatter: 'dollar'},
+    },
   ],
 };
 

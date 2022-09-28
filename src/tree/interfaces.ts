@@ -57,7 +57,7 @@ export interface FilterDefinition {
   predicate: string;
 }
 
-enum FormatterType {
+export enum FormatterType {
   STATIC,
   DYNAMIC,
 }
@@ -67,25 +67,25 @@ export interface FormatterDefinitionBase {
   formatter: string;
 }
 
+export type StaticFormatterNames = 'dollar';
+
 export interface StaticFormatterDefinition extends FormatterDefinitionBase {
   type: FormatterType.STATIC;
-  formatter: string;
+  formatter: StaticFormatterNames;
   parameter?: string;
 }
 
+export type DynamicFormatterNames = 'hyperlink';
+
 export interface DynamicFormatterDefinition extends FormatterDefinitionBase {
   type: FormatterType.DYNAMIC;
-  formatter: string;
+  formatter: DynamicFormatterNames;
   fields?: string[];
 }
 
-// export type FormatterDefinition =
-//   | StaticFormatterDefinition
-//   | DynamicFormatterDefinition;
-
-export interface FormatterDefinition {
-  format: string;
-}
+export type FormatterDefinition =
+  | StaticFormatterDefinition
+  | DynamicFormatterDefinition;
 
 export type RelationDefinition = {
   childRowDefinition: TreeDefinition;
@@ -115,13 +115,18 @@ export type CompiledTreeDefinition = GenericTreeDefinition<
   Styler
 >;
 
+export type CompiledColumn = CompiledTreeDefinition['columns'][0];
+
 export interface Expression {
   field: string;
   value: (node: DataTree) => any;
 }
 
 export type Filter = (row: NodeFields) => boolean;
-export type Formatter = (value: any) => string | {[key: string]: any};
+export type Formatter = (
+  row: DataTree,
+  cell: CompiledColumn
+) => string | {[key: string]: any};
 
 export type Relation = (context: Node[]) => {
   childRowDefinition: CompiledTreeDefinition;

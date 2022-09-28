@@ -13,6 +13,7 @@ import {
   FilterDefinition,
   Formatter,
   FormatterDefinition,
+  FormatterType,
   Relation,
   RelationDefinition,
   Sorter,
@@ -125,13 +126,21 @@ function compileFormat(
     return undefined;
   }
 
-  if (format.format === 'hyperlink') {
-    return hyperlink;
-  } else if (format.format === 'dollars') {
+  if (
+    format.type === FormatterType.DYNAMIC &&
+    format.formatter === 'hyperlink'
+  ) {
+    return hyperlink(format.fields || []);
+  } else if (
+    format.type === FormatterType.STATIC &&
+    format.formatter === 'dollar'
+  ) {
     return dollars;
   }
 
-  throw new Error(`Bad format definition "${format.format}"`);
+  // Currently, type system analysis shows we never get here.
+  // This may change with extensible formatters.
+  throw new Error(`Bad format definition "${(format as any).formatter}"`);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

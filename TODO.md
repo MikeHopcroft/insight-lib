@@ -1,12 +1,13 @@
 # TreeView
 
+* Error monads in DataTree and PresentationTree
 * Add static title to hyperlink
 * x Rename expressions.ts to built-ins.ts.
   * x Or remove after compileTree() migration
 * x Stop exporting compiled tree subtypes (e.g. Filter).
   * x This requires migrating insight-demo away from the compiled tree.
   * x Decided to remove convenience functions, but still export types.
-
+* Consider using terminology, `view` instead of `tree`
 * Get hyperlink title and href from expressions
 * Move expression-eval into tree folder
   * Check dependency web
