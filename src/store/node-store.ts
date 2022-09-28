@@ -31,7 +31,8 @@ export class NodeStore {
     return [];
   }
 
-  createNode(type: NodeType, id: NodeId, fields: NodeFields): Node {
+  createNode(type: NodeType, originalId: NodeId, fields: NodeFields): Node {
+    const id = type + ':' + originalId;
     const node: Node = {type, id, incoming: {}, outgoing: {}, fields};
     this.addNode(node);
     return node;
@@ -74,7 +75,7 @@ export class NodeStore {
     const a = this.nodes.get(node.type);
     if (a) {
       if (a.has(node.id)) {
-        throw new Error(`Duplicate node (${node.type}, ${node.id})`);
+        throw new Error(`Duplicate node (id=${node.id})`);
       }
       a.set(node.id, node);
     } else {
@@ -103,6 +104,6 @@ function serializeEdges(edges: Node['outgoing']): SerializableEdge[] {
 
 function getNodeRef(node: Node): string {
   // Create plausible fake NodeIds
-  const hash = murmurhash(node.type + node.id, 123456);
+  const hash = murmurhash(node.id, 123456);
   return `urn:is:${node.type}:${hash}`;
 }

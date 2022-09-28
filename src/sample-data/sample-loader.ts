@@ -28,7 +28,7 @@ function createTable<T extends any[]>(
   const type = table.id;
   for (const [id, row] of table.rows.entries()) {
     const fields = createFields(table.columns, row);
-    store.createNode(type, id, fields);
+    store.createNode(type, String(id), fields);
   }
 }
 

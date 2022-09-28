@@ -57,6 +57,32 @@ export interface FilterDefinition {
   predicate: string;
 }
 
+enum FormatterType {
+  STATIC,
+  DYNAMIC,
+}
+
+export interface FormatterDefinitionBase {
+  type: FormatterType;
+  formatter: string;
+}
+
+export interface StaticFormatterDefinition extends FormatterDefinitionBase {
+  type: FormatterType.STATIC;
+  formatter: string;
+  parameter?: string;
+}
+
+export interface DynamicFormatterDefinition extends FormatterDefinitionBase {
+  type: FormatterType.DYNAMIC;
+  formatter: string;
+  fields?: string[];
+}
+
+// export type FormatterDefinition =
+//   | StaticFormatterDefinition
+//   | DynamicFormatterDefinition;
+
 export interface FormatterDefinition {
   format: string;
 }

@@ -4,13 +4,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 export type NodeType = string;
-export type NodeId = number;
+export type NodeId = string;
 export type NodeFields = {[key: string]: any};
 export type EdgeCollection = {[type: EdgeType]: Edge[]};
 
 export interface Node {
-  type: NodeType;
   id: NodeId;
+  type: NodeType;
   incoming: EdgeCollection;
   outgoing: EdgeCollection;
   fields: NodeFields;
