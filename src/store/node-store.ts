@@ -13,18 +13,15 @@ import {
 } from './interfaces';
 
 export class NodeStore {
-  nodes = new Map<NodeType, Map<NodeId, Node>>();
+  nodesByType = new Map<NodeType, Map<NodeId, Node>>();
+  nodesById = new Map<NodeId, Node>();
 
-  getNode(type: NodeType, id: NodeId): Node | undefined {
-    const a = this.nodes.get(type);
-    if (a) {
-      return a.get(id);
-    }
-    return undefined;
+  getNode(id: NodeId): Node | undefined {
+    return this.nodesById.get(id);
   }
 
   getNodesWithType(type: NodeType): Node[] {
-    const a = this.nodes.get(type);
+    const a = this.nodesByType.get(type);
     if (a) {
       return [...a.values()];
     }
@@ -58,7 +55,7 @@ export class NodeStore {
 
   serialize(): SerializableNode[] {
     const nodes: SerializableNode[] = [];
-    for (const type of this.nodes.values()) {
+    for (const type of this.nodesByType.values()) {
       for (const node of type.values()) {
         nodes.push({
           id: getNodeRef(node),
@@ -72,7 +69,7 @@ export class NodeStore {
   }
 
   private addNode(node: Node) {
-    const a = this.nodes.get(node.type);
+    const a = this.nodesByType.get(node.type);
     if (a) {
       if (a.has(node.id)) {
         throw new Error(`Duplicate node (id=${node.id})`);
@@ -80,7 +77,12 @@ export class NodeStore {
       a.set(node.id, node);
     } else {
       const a = new Map<NodeId, Node>([[node.id, node]]);
-      this.nodes.set(node.type, a);
+      this.nodesByType.set(node.type, a);
+    }
+    if (this.nodesById.has(node.id)) {
+      throw new Error(`Duplicate node (id=${node.id})`);
+    } else {
+      this.nodesById.set(node.id, node);
     }
   }
 }
