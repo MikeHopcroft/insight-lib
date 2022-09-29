@@ -1,6 +1,6 @@
 {
   "name": "@hopcroft/insight-lib",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Hierachical view library",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
