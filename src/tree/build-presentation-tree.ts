@@ -43,6 +43,7 @@ export function buildPresentationTree(rows: DataTree[]): PresentationTree[] {
       const formatter = c.format || nopFormatter;
       // TODO: text is not always a string. Rename to value or convert.
       const y: PresentationCell = {
+        id: c.id,
         text: formatter(row, c),
       };
       const styler = c.style;

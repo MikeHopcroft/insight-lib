@@ -28,6 +28,8 @@ export interface GenericTreeDefinition<
 }
 
 export interface ColumnDefinition<FORMATTER, STYLER> {
+  id: string;
+
   // Use field: undefined for a padding cell
   field?: string;
 
@@ -165,6 +167,7 @@ export interface PresentationStyle {
 }
 
 export interface PresentationCell {
+  id: string;
   text: string | {[key: string]: any};
   style?: PresentationStyle;
 }

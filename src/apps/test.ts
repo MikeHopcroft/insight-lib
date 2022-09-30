@@ -19,7 +19,12 @@ import {
 const taskView: TreeDefinition = {
   id: 'taskView',
   type: 'tasks',
-  columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
+  columns: [
+    {id: 'id', field: 'id'},
+    {id: 'title', field: 'title'},
+    {id: 'status', field: 'status'},
+    {id: 'exp', field: 'exp'},
+  ],
   expressions: [{field: 'exp', value: 'id + 1'}],
   // filter: {predicate: 'status==="active"'},
   sort: [{field: 'id', increasing: false}],
@@ -53,14 +58,15 @@ const featureTaskView: TreeDefinition = {
   ],
 
   columns: [
-    {field: 'title'},
+    {id: 'title', field: 'title'},
     {
+      id: 'total',
       field: 'total',
       style: [{predicate: 'total > 6', style: {backgroundColor: 'red'}}],
     },
-    {field: 'remaining'},
-    {field: 'percent'},
-    {field: 'count'},
+    {id: 'remaining', field: 'remaining'},
+    {id: 'percent', field: 'percent'},
+    {id: 'count', field: 'count'},
   ],
 };
 
@@ -77,9 +83,10 @@ const capabilityFeatureTaskView: TreeDefinition = {
     },
   ],
   columns: [
-    {field: 'title'},
-    {},
+    {id: 'title', field: 'title'},
+    {id: 'spacer'},
     {
+      id: 'count',
       field: 'count',
       format: {type: FormatterType.STATIC, formatter: 'dollar'},
     },
@@ -94,7 +101,7 @@ const capabilityFeatureTaskView: TreeDefinition = {
 const impactView: TreeDefinition = {
   id: 'impactView',
   type: 'impacts',
-  columns: [{field: 'title'}],
+  columns: [{id: 'title', field: 'title'}],
   sort: [{field: 'title', increasing: false}],
 };
 
@@ -102,7 +109,7 @@ const insightImpactView: TreeDefinition = {
   id: 'insightImpactView',
   type: 'insights',
   relations: [{childRowDefinition: impactView, edgeType: 'insights=>impacts'}],
-  columns: [{field: 'title'}],
+  columns: [{id: 'title', field: 'title'}],
   sort: [{field: 'title', increasing: false}],
 };
 
@@ -112,7 +119,7 @@ const accountInsightImpactView: TreeDefinition = {
   relations: [
     {childRowDefinition: insightImpactView, edgeType: 'accounts=>insights'},
   ],
-  columns: [{field: 'name'}],
+  columns: [{id: 'name', field: 'name'}],
   sort: [{field: 'name', increasing: false}],
 };
 

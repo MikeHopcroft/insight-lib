@@ -59,6 +59,7 @@ function compileColumns(
   columns: TreeDefinition['columns']
 ): CompiledTreeDefinition['columns'] {
   return columns.map(c => ({
+    id: c.id,
     field: c.field,
     format: compileFormat(c.format),
     style: compileStylers(c.style),

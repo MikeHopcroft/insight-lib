@@ -2,7 +2,8 @@
 
 * Error monads in DataTree and PresentationTree
 * Add static title to hyperlink
-* x Unique ids for TreeDefinition, CompiledTree, DataTree, and PresentationTree.
+* x Unique ids for TreeDefinition, CompiledTree, DataTree, and PresentationTree rows.
+* x Unique ids for TreeDefinition, CompiledTree, DataTree, and PresentationTree cells.
 * x Rename expressions.ts to built-ins.ts.
   * x Or remove after compileTree() migration
 * x Stop exporting compiled tree subtypes (e.g. Filter).
