@@ -54,7 +54,7 @@ export function buildPresentationTree(rows: DataTree[]): PresentationTree[] {
       }
       return y;
     });
-    const x: PresentationTree = {cells};
+    const x: PresentationTree = {id: row.id, cells};
     if (row.children) {
       x.children = buildPresentationTree(row.children);
     }

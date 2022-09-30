@@ -35,6 +35,7 @@ function buildDataTreeRecursion(
     //
     const fields = node.fields;
     const dataTree: DataTree = {
+      id: node.id,
       fields,
       definition,
     };

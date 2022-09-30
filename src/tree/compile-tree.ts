@@ -38,6 +38,7 @@ export function compileTree(tree: TreeDefinition): CompiledTreeDefinition {
   const style = compileStylers(tree.style);
 
   const compiled: CompiledTreeDefinition = {
+    id: tree.id,
     type: tree.type,
     columns,
     expressions,

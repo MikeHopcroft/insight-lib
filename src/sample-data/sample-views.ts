@@ -6,6 +6,7 @@ import {FormatterType, TreeDefinition} from '../tree';
 //
 ////////////////////////////////////////////////////////////////////////////////
 export const taskView: TreeDefinition = {
+  id: 'taskView',
   type: 'tasks',
   columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
   expressions: [{field: 'exp', value: 'id + 1'}],
@@ -18,6 +19,7 @@ export const taskView: TreeDefinition = {
 };
 
 export const featureTaskView: TreeDefinition = {
+  id: 'featureTaskView',
   type: 'features',
   relations: [{childRowDefinition: taskView, edgeType: 'features=>tasks'}],
   expressions: [
@@ -52,6 +54,7 @@ export const featureTaskView: TreeDefinition = {
 };
 
 export const capabilityFeatureTaskView: TreeDefinition = {
+  id: 'capabilityFeatureTaskView',
   type: 'capabilities',
   relations: [
     {childRowDefinition: featureTaskView, edgeType: 'capabilities=>features'},
@@ -75,12 +78,14 @@ export const capabilityFeatureTaskView: TreeDefinition = {
 //
 ////////////////////////////////////////////////////////////////////////////////
 export const impactView: TreeDefinition = {
+  id: 'impactView',
   type: 'impacts',
   columns: [{field: 'title'}],
   sort: [{field: 'title', increasing: false}],
 };
 
 export const insightImpactView: TreeDefinition = {
+  id: 'insightImpactView',
   type: 'insights',
   relations: [{childRowDefinition: impactView, edgeType: 'insights=>impacts'}],
   columns: [{field: 'title'}],
@@ -88,6 +93,7 @@ export const insightImpactView: TreeDefinition = {
 };
 
 export const accountInsightImpactView: TreeDefinition = {
+  id: 'accountInsightImpactView',
   type: 'accounts',
   relations: [
     {childRowDefinition: insightImpactView, edgeType: 'accounts=>insights'},

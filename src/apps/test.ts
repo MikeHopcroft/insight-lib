@@ -17,6 +17,7 @@ import {
 //
 ////////////////////////////////////////////////////////////////////////////////
 const taskView: TreeDefinition = {
+  id: 'taskView',
   type: 'tasks',
   columns: [{field: 'id'}, {field: 'title'}, {field: 'status'}, {field: 'exp'}],
   expressions: [{field: 'exp', value: 'id + 1'}],
@@ -29,6 +30,7 @@ const taskView: TreeDefinition = {
 };
 
 const featureTaskView: TreeDefinition = {
+  id: 'featureTaskView',
   type: 'features',
   relations: [{childRowDefinition: taskView, edgeType: 'features=>tasks'}],
   expressions: [
@@ -63,6 +65,7 @@ const featureTaskView: TreeDefinition = {
 };
 
 const capabilityFeatureTaskView: TreeDefinition = {
+  id: 'capabilityFeatureTaskView',
   type: 'capabilities',
   relations: [
     {childRowDefinition: featureTaskView, edgeType: 'capabilities=>features'},
@@ -89,12 +92,14 @@ const capabilityFeatureTaskView: TreeDefinition = {
 //
 ////////////////////////////////////////////////////////////////////////////////
 const impactView: TreeDefinition = {
+  id: 'impactView',
   type: 'impacts',
   columns: [{field: 'title'}],
   sort: [{field: 'title', increasing: false}],
 };
 
 const insightImpactView: TreeDefinition = {
+  id: 'insightImpactView',
   type: 'insights',
   relations: [{childRowDefinition: impactView, edgeType: 'insights=>impacts'}],
   columns: [{field: 'title'}],
@@ -102,6 +107,7 @@ const insightImpactView: TreeDefinition = {
 };
 
 const accountInsightImpactView: TreeDefinition = {
+  id: 'accountInsightImpactView',
   type: 'accounts',
   relations: [
     {childRowDefinition: insightImpactView, edgeType: 'accounts=>insights'},

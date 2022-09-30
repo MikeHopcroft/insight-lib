@@ -13,6 +13,8 @@ export interface GenericTreeDefinition<
   SORTER,
   STYLER
 > {
+  id: string;
+
   // Data source, hierarchical structure, and computed fields.
   type: NodeType;
   relations?: RELATION[];
@@ -142,6 +144,7 @@ export type Styler = (row: NodeFields) => PresentationStyle | undefined;
 //
 ///////////////////////////////////////////////////////////////////////////////
 export interface DataTree {
+  id: string;
   fields: NodeFields;
 
   // Used by render pass.
@@ -167,6 +170,7 @@ export interface PresentationCell {
 }
 
 export interface PresentationTree {
+  id: string;
   cells: PresentationCell[];
   children?: PresentationTree[];
   style?: PresentationStyle;
